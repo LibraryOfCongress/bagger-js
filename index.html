@@ -30,16 +30,9 @@
         </nav>
 
         <div class="container">
-            <div class="alert alert-info" role="alert">
+            <div class="alert alert-warning" role="alert">
                 This is still a proof of concept: no files are actually transferred but you can download the
                 manifests
-            </div>
-
-            <div class="alert alert-warning" role="alert">
-                For performance, the SHA-256 implementation may be swapped out with
-                <a href="https://github.com/vibornoff/asmcrypto.js">asmcrypto.js</a>
-                or <a href="http://bitwiseshiftleft.github.io/sjcl/">SJCL</a>.
-                The WebCrypto API can be enabled on browsers which support it.
             </div>
         </div>
 
@@ -63,7 +56,7 @@
                     <tr>
                         <th class="file-name">Filename</th>
                         <th class="file-size">Size</th>
-                        <th class="file-hash">MD5</th>
+                        <th class="file-hash">SHA-1</th>
                         <th class="file-hash">SHA-256</th>
                     </tr>
                 </thead>
@@ -74,7 +67,7 @@
                             <td class="file-size">
                                 <output></output>
                             </td>
-                            <td class="file-hash md5">
+                            <td class="file-hash sha1">
                                 <output></output>
                             </td>
                             <td class="file-hash sha256">
@@ -92,7 +85,7 @@
                     <tr>
                         <th>Totals:</th>
                         <td class="file-size total"></td>
-                        <td><a id="manifest-md5" download="manifest-md5.txt">manifest-md5</a></td>
+                        <td><a id="manifest-sha1" download="manifest-sha1.txt">manifest-sha1</a></td>
                         <td><a id="manifest-sha256" download="manifest-sha256.txt">manifest-sha256</a></td>
                     </tr>
                 </tfoot>
