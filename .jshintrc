@@ -1,0 +1,21 @@
+{
+    "maxlen": 110,
+    "indent": 4,
+
+    "strict": true,
+    "browser": true,
+
+    "bitwise": true,
+    "camelcase": true,
+    "curly": true,
+    "forin": true,
+    "freeze": true,
+    "immed": true,
+    "newcap": true,
+    "noarg": true,
+    "noempty": true,
+    "nonew": true,
+    "trailing": true,
+    "undef": true,
+    "unused": true
+}
