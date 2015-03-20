@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>
+            BagIt – JavaScript Experiment
+        </title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="main.css">
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">BagIt-JS</a>
+                </div>
+                <div id="navbar" class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">Create Bag</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="alert alert-info" role="alert">
+                This is still a proof of concept: no files are actually transferred but you can download the
+                manifests
+            </div>
+
+            <div class="alert alert-warning" role="alert">
+                For performance, the SHA-256 implementation may be swapped out with
+                <a href="https://github.com/vibornoff/asmcrypto.js">asmcrypto.js</a>
+                or <a href="http://bitwiseshiftleft.github.io/sjcl/">SJCL</a>.
+                The WebCrypto API can be enabled on browsers which support it.
+            </div>
+        </div>
+
+        <div class="container">
+            <h1>Upload a bag</h1>
+
+            <div id="dropzone" class="jumbotron text-center">
+                <p>Drag and drop files or directories here!</p>
+
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label>Select files: <input type="file" multiple></label>
+                        <button class="btn btn-primary">Go!</button>
+                    </div>
+                </form>
+            </div>
+
+            <table id="bag-contents" class="table table-striped">
+                <caption>Current Contents</caption>
+                <thead>
+                    <tr>
+                        <th class="file-name">Filename</th>
+                        <th class="file-size">Size</th>
+                        <th class="file-hash">MD5</th>
+                        <th class="file-hash">SHA-256</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template id="file-row-template">
+                        <tr>
+                            <td class="file-name"></td>
+                            <td class="file-size">
+                                <output></output>
+                            </td>
+                            <td class="file-hash md5">
+                                <output></output>
+                            </td>
+                            <td class="file-hash sha256">
+                                <output></output>
+                                <div class="progress">
+                                    <div role="progressbar" class="progress-bar progress-bar-striped">
+                                        0%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Totals:</th>
+                        <td class="file-size total"></td>
+                        <td><a id="manifest-md5" download="manifest-md5.txt">manifest-md5</a></td>
+                        <td><a id="manifest-sha256" download="manifest-sha256.txt">manifest-sha256</a></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
+        <script defer src="main.js"></script>
+    </body>
+</html>

@@ -1,0 +1,39 @@
+body {
+	padding-top: 50px;
+}
+
+#dropzone {
+	border: dashed #ccc 4px;
+}
+
+#dropzone:hover,
+#dropzone.active {
+	border: dashed #ccd 4px;
+	background-color: #eef;
+}
+
+th {
+	text-align: right;
+}
+
+th.file-name {
+	text-align: left;
+}
+
+
+tbody .file-size,
+tbody .file-hash,
+tfoot .file-size {
+	font-family: monospace;
+	text-align: right;
+}
+
+.progress-bar {
+	width: 0%;
+	min-width: 2em;
+}
+
+output {
+	font-size: small;
+	padding-top: 0;
+}
