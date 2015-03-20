@@ -1,7 +1,7 @@
 /* jslint browser: true, indent: 4 */
-/* global self, importScripts, postMessage, CryptoJS, console */
+/* global self, importScripts, postMessage, asmCrypto, console */
 
-importScripts('md5-rollup.js', 'sha256-rollup.js', 'lib-typedarrays.js');
+importScripts('asmcrypto.js');
 
 var activeHashes = {};
 
@@ -10,15 +10,8 @@ function updateHashes(filename, block) {
 
     var currentState = activeHashes[filename];
 
-    /*
-        We need to convert the input ArrayBuffer into the WordArray
-        used by the CryptoJS hashers:
-        See https://code.google.com/p/crypto-js/issues/detail?id=67
-    */
-    var words = CryptoJS.lib.WordArray.create(block);
-
     for (var hashName in currentState) { // jshint -W089
-        currentState[hashName].update(words);
+        currentState[hashName].process(block);
     }
 }
 
@@ -31,8 +24,8 @@ self.addEventListener('message', function(evt) {
     switch (d.action) {
         case 'start':
             activeHashes[d.filename] = {
-                'md5': CryptoJS.algo.MD5.create(),
-                'sha256': CryptoJS.algo.SHA256.create()
+                'sha1': new asmCrypto.SHA1(),
+                'sha256': new asmCrypto.SHA256()
             };
             break;
 
@@ -45,8 +38,8 @@ self.addEventListener('message', function(evt) {
                 currentState = activeHashes[d.filename];
 
             for (var hashName in currentState) { // jshint -W089
-                var i = currentState[hashName].finalize();
-                output[hashName] = i.toString(CryptoJS.enc.Hex);
+                var i = currentState[hashName].finish();
+                output[hashName] = asmCrypto.bytes_to_hex(i.result);
             }
 
             delete activeHashes[d.filename];

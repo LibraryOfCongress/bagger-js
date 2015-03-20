@@ -39,7 +39,7 @@
         bagContents.querySelector('.file-size.total').textContent = total;
 
         // TODO: make this dynamic:
-        var hashTypes = ['md5', 'sha256'];
+        var hashTypes = ['sha1', 'sha256'];
         hashTypes.forEach(function (hashType) {
             var manifest = [];
 
