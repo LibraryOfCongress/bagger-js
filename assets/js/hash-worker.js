@@ -1,7 +1,7 @@
 /* jslint browser: true, indent: 4 */
 /* global self, importScripts, postMessage, asmCrypto, console */
 
-importScripts('asmcrypto.js');
+require('asmcrypto.js');
 
 var activeHashes = {};
 

@@ -1,0 +1,22 @@
+{
+  "name": "bagger",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cd dist; python3 -m http.server --bind 127.0.0.1"
+  },
+  "author": "",
+  "devDependencies": {
+    "browserify": "^9.0.3",
+    "gulp": "^3.8.11",
+    "gulp-sourcemaps": "^1.5.1",
+    "gulp-util": "^3.0.4",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "dependencies": {
+    "asmcrypto.js": "https://github.com/vibornoff/asmcrypto.js/archive/v0.0.7.tar.gz"
+  }
+}
