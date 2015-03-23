@@ -157,7 +157,7 @@
             sliceEnd = sliceStart + Math.min(blockSize, taskState.file.size - sliceStart),
             slice = taskState.file.slice(sliceStart, sliceEnd);
 
-        if (sliceStart < taskState.file.size) {
+        if (sliceStart <= taskState.file.size) {
             taskState.currentOffset = sliceEnd;
             taskState.reader.readAsArrayBuffer(slice);
         } else {
