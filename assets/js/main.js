@@ -18,7 +18,20 @@
             var file = fileList[i],
                 templateRow = fileRowTemplate.content.querySelector('tr');
 
-            templateRow.querySelector('.file-name output').textContent = file.name;
+            /*
+                There's no standard interface for getting files with the context of a selected or dropped
+                directory (see #1). Currently we're using a non-standard interface in Chrome and due to its
+                limitations we have to store a fullPath property while recursing the directory tree (see
+                walkDirectoryTree below) because we cannot update the built-in name property.
+
+                To avoid having to check everywhere we want to get the filename, we'll take the opposite
+                approach and set fullPath from file.name if it's not already set so we can use it elsewhere
+            */
+            if (!('fullPath' in file)) {
+                file.fullPath = file.name;
+            }
+
+            templateRow.querySelector('.file-name output').textContent = file.fullPath;
             templateRow.querySelector('.file-size output').textContent = file.size;
 
             var fileRow = bagContentsBody.appendChild(document.importNode(templateRow, true));
@@ -96,7 +109,7 @@
             'reader': reader
         };
 
-        activeHashes[file.name] = taskState;
+        activeHashes[file.fullPath] = taskState;
 
         reader.onload = function (evt) {
             var progressBar = outputRow.querySelector('.progress-bar'),
@@ -106,17 +119,17 @@
 
             hashWorker.postMessage({
                 'action': 'update',
-                'filename': file.name,
+                'filename': file.fullPath,
                 'bytes': evt.target.result
             });
         };
 
         hashWorker.postMessage({
-            'filename': file.name,
+            'filename': file.fullPath,
             'action': 'start'
         });
 
-        getNextBlock(activeHashes[file.name]);
+        getNextBlock(activeHashes[file.fullPath]);
     }
 
     function handleWorkerResponse(evt) {
@@ -131,7 +144,7 @@
                     getNextBlock(task);
                 } else {
                     hashWorker.postMessage({
-                        'filename': task.file.name,
+                        'filename': task.file.fullPath,
                         'action': 'stop'
                     });
                 }
@@ -166,6 +179,27 @@
         }
     }
 
+    function walkDirectoryTree(entry, basePath) {
+        basePath = basePath || '';
+
+        if (entry.isFile) {
+            entry.file(function(file) {
+                file.fullPath = basePath + '/' + file.name;
+                handleFiles([file]);
+            });
+        } else if (entry.isDirectory) {
+            var dirReader = entry.createReader();
+            dirReader.readEntries(function(entries) {
+                for (var j = 0; j < entries.length; j++) {
+                    var subEntry = entries[j],
+                        fullPath = basePath ? basePath + '/' + entry.name : entry.name;
+                    walkDirectoryTree(subEntry, fullPath);
+                }
+            });
+        }
+    }
+
+
     dropZone.querySelector('input[type="file"]').addEventListener('change', function () {
         dropZone.classList.add('active');
         handleFiles(this.files);
@@ -178,7 +212,19 @@
 
         dropZone.classList.add('active');
 
-        handleFiles(evt.dataTransfer.files);
+        if (typeof evt.dataTransfer.items !== 'undefined') {
+            var items = evt.dataTransfer.items;
+
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i],
+                    entry = item.webkitGetAsEntry();
+
+                walkDirectoryTree(entry);
+            }
+
+        } else {
+            handleFiles(evt.dataTransfer.files);
+        }
 
         dropZone.classList.remove('active');
     }, false);
