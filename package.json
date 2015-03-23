@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cd dist; python3 -m http.server --bind 127.0.0.1"
+    "start": "cd dist; python3 -m http.server --bind 0.0.0.0"
   },
   "author": "",
   "devDependencies": {
