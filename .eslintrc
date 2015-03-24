@@ -6,7 +6,6 @@
 
     "rules": {
         "no-use-before-define": 1,
-        "no-console": 1,
         "no-undef": 1,
         "quotes": [1, "single", "avoid-escape"]
     }
