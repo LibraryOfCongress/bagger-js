@@ -27,8 +27,13 @@
                 To avoid having to check everywhere we want to get the filename, we'll take the opposite
                 approach and set fullPath from file.name if it's not already set so we can use it elsewhere
             */
+
             if (!('fullPath' in file)) {
-                file.fullPath = file.name;
+                if ('webkitRelativePath' in file && file.webkitRelativePath.length > 0) {
+                    file.fullPath = file.webkitRelativePath;
+                } else {
+                    file.fullPath = file.name;
+                }
             }
 
             templateRow.querySelector('.file-name output').textContent = file.fullPath;
