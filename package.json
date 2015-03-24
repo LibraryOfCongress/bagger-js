@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cd dist; python3 -m http.server --bind 0.0.0.0"
+    "start": "node server.js"
   },
   "author": "",
   "devDependencies": {
@@ -17,6 +17,9 @@
     "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {
-    "asmcrypto.js": "https://github.com/vibornoff/asmcrypto.js/archive/v0.0.7.tar.gz"
+    "asmcrypto.js": "https://github.com/vibornoff/asmcrypto.js/archive/v0.0.7.tar.gz",
+    "connect": "^3.3.5",
+    "morgan": "^1.5.2",
+    "serve-static": "^1.9.2"
   }
 }
