@@ -17,7 +17,7 @@
             var file = fileList[i],
                 templateRow = fileRowTemplate.content.querySelector('tr');
 
-            templateRow.querySelector('.file-name').textContent = file.name;
+            templateRow.querySelector('.file-name output').textContent = file.name;
             templateRow.querySelector('.file-size output').textContent = file.size;
 
             var fileRow = bagContentsBody.appendChild(document.importNode(templateRow, true));
@@ -47,7 +47,7 @@
 
             for (i = 0; i < rows.length; i++) {
                 var row = rows[i],
-                    filename = row.querySelector('.file-name').textContent,
+                    filename = row.querySelector('.file-name output').textContent,
                     hash = row.querySelector('.file-hash.' + hashType + ' output').textContent;
 
                 if (!!filename && !!hash) {
