@@ -16,5 +16,6 @@
     "noempty": true,
     "nonew": true,
     "trailing": true,
+    "undef": true,
     "unused": true
 }
