@@ -199,7 +199,6 @@
         }
     }
 
-
     dropZone.querySelector('input[type="file"]').addEventListener('change', function () {
         dropZone.classList.add('active');
         handleFiles(this.files);
@@ -243,4 +242,8 @@
     dropZone.addEventListener('dragend', function () {
         dropZone.classList.remove('active');
     }, false);
+
+    if (typeof DataTransferItemList === 'undefined') {
+        document.getElementById('directory-support-warning').removeAttribute('hidden');
+    }
 })();

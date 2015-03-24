@@ -30,7 +30,19 @@
         </nav>
 
         <div class="container">
-            <div class="alert alert-warning" role="alert">
+            <div id="directory-support-warning" class="alert alert-warning alert-dismissible" role="alert" hidden>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+                The browser which you are using allows the selection of or dropping multiple files.
+                Unfortunately, support for nested folders requires a web API which is currently only
+                available on Google Chrome.
+
+                See <a href="https://github.com/loc-rdc/bagger-js/pull/1">issue #1</a> for more information.
+            </div>
+
+            <div class="alert alert-info alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
                 This is still a proof of concept: no files are actually transferred but you can download the
                 manifests
             </div>
