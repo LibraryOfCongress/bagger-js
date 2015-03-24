@@ -3,7 +3,7 @@
         "browser": true,
         "node": true
     },
-    
+
     "rules": {
         "no-use-before-define": 1,
         "no-console": 1,

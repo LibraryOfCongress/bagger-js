@@ -2,7 +2,7 @@
 /* global require, console */
 
 (function () {
-    "use strict";
+    'use strict';
 
     var gulp = require('gulp'),
         sourceStream = require('vinyl-source-stream'),

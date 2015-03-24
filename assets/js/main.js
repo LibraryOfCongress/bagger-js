@@ -2,7 +2,7 @@
 /* global console */
 
 (function () {
-    "use strict";
+    'use strict';
 
     var dropZone = document.getElementById('dropzone'),
         bagContents = document.getElementById('bag-contents'),
@@ -52,7 +52,7 @@
                     hash = row.querySelector('.file-hash.' + hashType + ' output').textContent;
 
                 if (!!filename && !!hash) {
-                    manifest.push([hash, filename].join("\t"));
+                    manifest.push([hash, filename].join('\t'));
                 }
             }
 
@@ -61,7 +61,7 @@
                 if (manifest.length < 1) {
                     downloadLink.setAttribute('disabled', 'disabled');
                 } else {
-                    var payload = 'data:text/plain,' + encodeURIComponent(manifest.join("\n"));
+                    var payload = 'data:text/plain,' + encodeURIComponent(manifest.join('\n'));
                     downloadLink.setAttribute('href', payload);
                     downloadLink.removeAttribute('disabled');
                 }

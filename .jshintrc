@@ -15,6 +15,7 @@
     "noarg": true,
     "noempty": true,
     "nonew": true,
+    "quotmark": true,
     "trailing": true,
     "undef": true,
     "unused": true
