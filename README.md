@@ -38,3 +38,13 @@ At this point the compiled JavaScript, CSS and HTML is in the `dist/` directory 
 ### Run the test suite
 
     % npm test
+
+### Have Gulp watch for file changes and re-compile the sources
+
+    % gulp develop
+
+
+## Contributor Guidelines
+
+The included .jshintrc documents the basic JavaScript requirements. Use of a Git pre-commit hook such as
+https://gist.github.com/acdha/8717683/ is recommended to ensure that JSHint is already run.
