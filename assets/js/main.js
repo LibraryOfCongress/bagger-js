@@ -1,4 +1,5 @@
 /* jslint browser: true, indent: 4 */
+/* global console */
 
 (function () {
     "use strict";
@@ -161,7 +162,7 @@
             taskState.currentOffset = sliceEnd;
             taskState.reader.readAsArrayBuffer(slice);
         } else {
-            console.error('READ PAST END!');
+            console.error('Attempted to read past end of file!');
         }
     }
 
