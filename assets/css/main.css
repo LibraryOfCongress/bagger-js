@@ -24,7 +24,6 @@ th.file-name {
 tbody .file-size,
 tbody .file-hash,
 tfoot .file-size {
-	font-family: monospace;
 	text-align: right;
 }
 
@@ -34,6 +33,7 @@ tfoot .file-size {
 }
 
 output {
+	font-family: monospace;
 	font-size: small;
 	padding-top: 0;
 }
