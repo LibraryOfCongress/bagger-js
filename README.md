@@ -14,6 +14,13 @@ and a simple web application which allows bagging and transferring local content
 * [ ] Ability to resume interrupted transfers
 * [ ] Ability to download the generated bag rather than individual files
 
+## Docker
+
+To build and run via [Docker](https://www.docker.com) v1.5+:
+
+    % sudo docker build --tag bagger:dev .
+    % sudo docker run -p 8000:8000 -d -t bagger:dev
+
 ## Quickstart
 
 The build system requires [npm](https://npmjs.org) and [gulp](http://gulpjs.com). If you don't already have Gulp installed:
