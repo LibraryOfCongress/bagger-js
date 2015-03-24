@@ -1,0 +1,9 @@
+{
+    "rules": {
+        "no-use-before-define": 1,
+        "no-console": 1,
+        "no-undef": 1,
+        "no-trailing-spaces": 0,
+        "quotes": [1, "double"]
+    }
+}

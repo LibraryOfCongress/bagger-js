@@ -8,6 +8,7 @@
         sourceStream = require('vinyl-source-stream'),
         transform = require('vinyl-transform'),
         browserify = require('browserify'),
+        eslint = require('gulp-eslint'),
         exorcist = require('exorcist'),
         replace = require('gulp-replace');
 
@@ -44,7 +45,7 @@
             .pipe(gulp.dest('./dist'));
     });
 
-    gulp.task('default', ['browserify', 'browserify-hash-worker', 'static', 'css']);
+    gulp.task('default', ['lint', 'browserify', 'browserify-hash-worker', 'static', 'css']);
 
     gulp.task('develop', ['default'], function() {
         var watcher = gulp.watch('assets/**/*.*', ['default']);
@@ -52,6 +53,15 @@
             console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
         });
 
+    });
+
+    gulp.task('lint', function () {
+        // Note: To have the process exit with an error code (1) on
+        //  lint error, return the stream and pipe to failOnError last.
+        return gulp.src(['*.js', 'assets/js/*.js'])
+            .pipe(eslint())
+            .pipe(eslint.format())
+            .pipe(eslint.failOnError());
     });
 
 })();

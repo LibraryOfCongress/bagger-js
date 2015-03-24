@@ -12,6 +12,7 @@
     "browserify": "^9.0.3",
     "exorcist": "^0.1.6",
     "gulp": "^3.8.11",
+    "gulp-eslint": "^0.7.0",
     "gulp-replace": "^0.5.3",
     "gulp-sourcemaps": "^1.5.1",
     "gulp-util": "^3.0.4",
