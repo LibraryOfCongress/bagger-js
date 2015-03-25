@@ -7,7 +7,7 @@ and a simple web application which allows bagging and transferring local content
 ## Major Features
 
 * [x] File drag and drop or selection
-* [ ] [Recursive directory drag and drop or selection](https://github.com/loc-rdc/bagger-js/pull/1)
+* [x] [Recursive directory drag and drop or selection](https://github.com/loc-rdc/bagger-js/pull/1) (currently supported only in Chrome; see #1)
 * [x] Incremental hashing
 * [ ] Multi-threading
 * [ ] Uploads to S3
