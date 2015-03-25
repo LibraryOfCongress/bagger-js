@@ -1,0 +1,28 @@
+---
+# config-developer-machine.yml
+# responsible for configuring the local developer's machine so that
+# all required software for building, testing, and deploying is installed
+# and correctly configured.
+
+- hosts: localhost
+  tasks:
+  - name: Install npm
+    homebrew: name=npm state=latest
+    when: ansible_distribution == 'Darwin'
+
+  - name: Install npm
+    apt: name=nodejs state=latest
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: Install npm
+    yum: name=nodejs state=latest
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+  - name: Install gulp
+    npm: name=gulp path=../
+
+  - name: Install git hooks
+    template: src=files/{{ item }} dest=../.git/hooks/ mode=775
+    with_items:
+      - "post-checkout"
+      - "pre-commit"
