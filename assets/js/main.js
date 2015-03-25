@@ -1,5 +1,7 @@
 /* jslint browser: true, indent: 4 */
-/* global console */
+/* global console, require */
+
+require('../jsx/bagger.jsx');
 
 (function () {
     'use strict';
