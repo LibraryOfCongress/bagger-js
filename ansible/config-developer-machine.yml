@@ -21,6 +21,18 @@
   - name: Install gulp
     npm: name=gulp path=../
 
+  - name: Install Docker
+    homebrew: name=docker state=latest
+    when: ansible_distrubution == 'Darwin'
+
+  - name: Install Docker
+    shell: wget -qO- https://get.docker.com/ | sh
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: Install Docker
+    yum: name=docker state=latest
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
   - name: Install git hooks
     template: src=files/{{ item }} dest=../.git/hooks/ mode=775
     with_items:
