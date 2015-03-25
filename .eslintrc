@@ -1,9 +1,12 @@
 {
     "env": {
+        "es6": true,
         "browser": true,
         "node": true
     },
-
+    "ecmaFeatures": {
+        "jsx": true
+    },
     "rules": {
         "no-use-before-define": 0,
         "no-undef": 1,
