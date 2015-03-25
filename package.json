@@ -9,6 +9,7 @@
   },
   "author": "",
   "devDependencies": {
+    "babelify": "^5.0.4",
     "browserify": "^9.0.3",
     "exorcist": "^0.1.6",
     "gulp": "^3.8.11",

@@ -8,12 +8,14 @@
         sourceStream = require('vinyl-source-stream'),
         transform = require('vinyl-transform'),
         browserify = require('browserify'),
+        babelify = require('babelify'),
         eslint = require('gulp-eslint'),
         exorcist = require('exorcist'),
         replace = require('gulp-replace');
 
     gulp.task('browserify', function(){
         var b = browserify({debug: true});
+        b.transform(babelify);
         b.add('./assets/js/main.js');
         return b.bundle()
             .pipe(sourceStream('main.js'))
@@ -23,6 +25,7 @@
 
     gulp.task('browserify-hash-worker', function(){
         var b = browserify({debug: true});
+        b.transform(babelify);
         b.add('./assets/js/hash-worker.js');
         return b.bundle()
             .pipe(sourceStream('hash-worker.js'))
