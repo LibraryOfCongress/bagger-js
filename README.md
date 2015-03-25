@@ -22,17 +22,20 @@ To build and run via [Docker](https://www.docker.com) v1.5+(exclude sudo if runn
     % sudo docker run -p 8000:8000 -d -t bagger:dev
 
 ## Quickstart
+### setup.sh Script
+For easy setup run setup.sh. This will configure your development environment using ansible. Ansible needs to be installed before running (unless using an Apple computer).
 
+### Manual setup
 The build system requires [npm](https://npmjs.org) and [gulp](http://gulpjs.com). If you don't already have Gulp installed:
 
     % npm install -g gulp
 
 
-### Install dependencies
+#### Install dependencies
 
     % npm install
 
-### Compile the sources
+#### Compile the sources
 
     % gulp
 
@@ -54,4 +57,4 @@ At this point the compiled JavaScript, CSS and HTML is in the `dist/` directory 
 ## Contributor Guidelines
 
 The included .jshintrc documents the basic JavaScript requirements. Use of a Git pre-commit hook such as
-https://gist.github.com/acdha/8717683/ is recommended to ensure that JSHint is already run.
+https://gist.github.com/acdha/8717683/ is recommended to ensure that JSHint is already run (setup.sh automatically includes these hooks locally).
