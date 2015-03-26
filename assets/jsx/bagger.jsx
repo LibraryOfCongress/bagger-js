@@ -13,26 +13,6 @@ class Bagger extends React.Component {
         this.setState({files: []});
     }
     handleFilesChanged(files) {
-        for (var i = 0; i < files.length; i++) {
-            var file = files[i];
-            /*
-               There's no standard interface for getting files with the context of a selected or dropped
-               directory (see #1). Currently we're using a non-standard interface in Chrome and due to its
-               limitations we have to store a fullPath property while recursing the directory tree (see
-               walkDirectoryTree below) because we cannot update the built-in name property.
-
-               To avoid having to check everywhere we want to get the filename, we'll take the opposite
-               approach and set fullPath from file.name if it's not already set so we can use it elsewhere
-             */
-
-            if (!('fullPath' in file)) {
-                if ('webkitRelativePath' in file && file.webkitRelativePath.length > 0) {
-                    file.fullPath = file.webkitRelativePath;
-                } else {
-                    file.fullPath = file.name;
-                }
-            }
-        }
         this.setState({files: files});
         return;
     }
