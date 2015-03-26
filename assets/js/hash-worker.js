@@ -6,8 +6,6 @@ require('asmcrypto.js');
 var activeHashes = {};
 
 function updateHashes(filename, block) {
-    'use strict';
-
     var currentState = activeHashes[filename];
 
     for (var hashName in currentState) { // jshint -W089
@@ -16,8 +14,6 @@ function updateHashes(filename, block) {
 }
 
 self.addEventListener('message', function(evt) {
-    'use strict';
-
     var d = evt.data,
         response = {'filename': d.filename, 'action': d.action};
 

@@ -9,8 +9,10 @@
   },
   "author": "",
   "devDependencies": {
+    "babel-eslint": "^2.0.2",
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
+    "esprima-fb": "^13001.1001.0-dev-harmony-fb",
     "exorcist": "^0.1.6",
     "gulp": "^3.8.11",
     "gulp-eslint": "^0.7.0",

@@ -2,7 +2,7 @@
     "maxlen": 110,
     "indent": 4,
 
-    "strict": true,
+    "strict": false,
     "browser": true,
 
     "bitwise": true,
@@ -18,5 +18,6 @@
     "quotmark": true,
     "trailing": true,
     "undef": true,
-    "unused": true
+    "unused": true,
+    "esnext": true
 }

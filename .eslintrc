@@ -1,4 +1,5 @@
 {
+    "parser": "babel-eslint",
     "env": {
         "es6": true,
         "browser": true,
@@ -8,6 +9,7 @@
         "jsx": true
     },
     "rules": {
+        "strict": [0, "function"],
         "no-use-before-define": 0,
         "no-undef": 1,
         "quotes": [1, "single", "avoid-escape"]
