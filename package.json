@@ -9,6 +9,7 @@
   },
   "author": "",
   "devDependencies": {
+    "asmcrypto.js": "https://github.com/vibornoff/asmcrypto.js/archive/v0.0.7.tar.gz",
     "babel-eslint": "^2.0.2",
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
@@ -25,7 +26,6 @@
     "vinyl-transform": "^1.0.0"
   },
   "dependencies": {
-    "asmcrypto.js": "https://github.com/vibornoff/asmcrypto.js/archive/v0.0.7.tar.gz",
     "connect": "^3.3.5",
     "morgan": "^1.5.2",
     "serve-static": "^1.9.2"
