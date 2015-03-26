@@ -8,10 +8,6 @@ class Bagger extends React.Component {
         super(props);
         this.state = {files: []};
     }
-    handleClick(e) {
-        e.preventDefault();
-        this.setState({files: []});
-    }
     handleFilesChanged(files) {
         this.setState({files: files});
         return;
