@@ -48,53 +48,7 @@
             </div>
         </div>
 
-        <div id="bagger"></div>
-
-        <div class="container">
-
-            <table id="bag-contents" class="table table-striped">
-                <caption>Current Contents</caption>
-                <thead>
-                    <tr>
-                        <th class="file-name">Filename</th>
-                        <th class="file-size">Size</th>
-                        <th class="file-hash">SHA-1</th>
-                        <th class="file-hash">SHA-256</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template id="file-row-template">
-                        <tr>
-                            <td class="file-name">
-                                <output></output>
-                            </td>
-                            <td class="file-size">
-                                <output></output>
-                            </td>
-                            <td class="file-hash sha1">
-                                <output></output>
-                            </td>
-                            <td class="file-hash sha256">
-                                <output></output>
-                                <div class="progress">
-                                    <div role="progressbar" class="progress-bar progress-bar-striped">
-                                        0%
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </template>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th>Totals:</th>
-                        <td class="file-size total"></td>
-                        <td><a id="manifest-sha1" download="manifest-sha1.txt">manifest-sha1</a></td>
-                        <td><a id="manifest-sha256" download="manifest-sha256.txt">manifest-sha256</a></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
+        <div id="bagger" class="container"></div>
 
         <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
         <script defer src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
