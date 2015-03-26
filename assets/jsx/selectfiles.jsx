@@ -1,20 +1,16 @@
 var React = require('react');
 
 import { BagContents } from '../jsx/contents.jsx';
-import { SelectFiles } from '../jsx/selectfiles.jsx';
 
-class Bagger extends React.Component {
+class SelectFiles extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {files: []};
     }
-    handleClick(e) {
+    handleChange(e) {
         e.preventDefault();
-        this.setState({files: []});
-    }
-    handleFilesChanged(files) {
-        for (var i = 0; i < files.length; i++) {
-            var file = files[i];
+        var fileList = event.target.files;
+        for (var i = 0; i < fileList.length; i++) {
+            var file = fileList[i];
             /*
                There's no standard interface for getting files with the context of a selected or dropped
                directory (see #1). Currently we're using a non-standard interface in Chrome and due to its
@@ -33,21 +29,20 @@ class Bagger extends React.Component {
                 }
             }
         }
-        this.setState({files: files});
+        this.props.onFilesChange(fileList);
         return;
     }
     render() {
-        if (this.state.files.length !== 0) {
-            return <BagContents files={this.state.files}/>;
-        }
         return (
-            <div id="dropzone" className="jumbotron text-center">
-                <h1>Upload a bag</h1>
-                <p>Drag and drop files or directories here!</p>
-                <SelectFiles onFilesChange={this.handleFilesChanged.bind(this)} />
-            </div>
+            <form className="form-horizontal" onChange={this.handleChange.bind(this)}>
+                <div className="form-group">
+                    <label>Select files: <input type="file" multiple webkitdirectory /></label>
+                    <button className="btn btn-primary">Go!</button>
+                </div>
+            </form>
         );
     }
 }
 
-export { Bagger };
+export { SelectFiles };
+
