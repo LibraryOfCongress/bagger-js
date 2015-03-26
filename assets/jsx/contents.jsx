@@ -167,25 +167,6 @@ class BagContents extends React.Component {
             }
         }
 
-        function walkDirectoryTree(entry, basePath) {
-            basePath = basePath || '';
-
-            if (entry.isFile) {
-                entry.file(function(file) {
-                    file.fullPath = basePath + '/' + file.name;
-                    handleFiles([file]);
-                });
-            } else if (entry.isDirectory) {
-                var dirReader = entry.createReader();
-                dirReader.readEntries(function(entries) {
-                    for (var j = 0; j < entries.length; j++) {
-                        var subEntry = entries[j],
-                            fullPath = basePath ? basePath + '/' + entry.name : entry.name;
-                        walkDirectoryTree(subEntry, fullPath);
-                    }
-                });
-            }
-        }
         console.log('handling files: ', this.state.files);
         handleFiles(this.state.files);
 

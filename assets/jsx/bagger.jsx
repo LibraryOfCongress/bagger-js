@@ -21,9 +21,8 @@ class Bagger extends React.Component {
             return <BagContents files={this.state.files}/>;
         }
         return (
-            <div id="dropzone" className="jumbotron text-center">
+            <div>
                 <h1>Upload a bag</h1>
-                <p>Drag and drop files or directories here!</p>
                 <SelectFiles onFilesChange={this.handleFilesChanged.bind(this)} />
             </div>
         );

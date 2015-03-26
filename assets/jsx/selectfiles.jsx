@@ -6,6 +6,81 @@ class SelectFiles extends React.Component {
     constructor(props) {
         super(props);
     }
+    componentDidMount() {
+        var element = this.refs.dropzone.getDOMNode();
+        var dropZone = element; //element.getElementById('dropzone'),
+
+        var files = [];
+        var onFilesChange = this.props.onFilesChange;
+        function walkDirectoryTree(entry, basePath) {
+            basePath = basePath || '';
+
+            if (entry.isFile) {
+                entry.file(function(file) {
+                    file.fullPath = basePath + '/' + file.name;
+                    files.push(file);
+                });
+            } else if (entry.isDirectory) {
+                var dirReader = entry.createReader();
+                dirReader.readEntries(function(entries) {
+                    for (var j = 0; j < entries.length; j++) {
+                        var subEntry = entries[j],
+                            fullPath = basePath ? basePath + '/' + entry.name : entry.name;
+                        walkDirectoryTree(subEntry, fullPath);
+                    }
+                });
+            }
+        }
+
+        dropZone.querySelector('input[type="file"]').addEventListener('change', function () {
+            dropZone.classList.add('active');
+            onFilesChange(this.files);
+            dropZone.classList.add('active');
+        });
+
+
+        dropZone.addEventListener('drop', function (evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+
+            dropZone.classList.add('active');
+
+            if (typeof evt.dataTransfer.items !== 'undefined') {
+                var items = evt.dataTransfer.items;
+
+                for (var i = 0; i < items.length; i++) {
+                    var item = items[i],
+                        entry = item.webkitGetAsEntry();
+
+                    walkDirectoryTree(entry);
+                }
+                onFilesChange(files);
+            } else {
+                onFilesChange(evt.dataTransfer.files);
+            }
+
+            dropZone.classList.remove('active');
+        }, false);
+
+        dropZone.addEventListener('dragover', function (evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'copy';
+            dropZone.classList.add('active');
+        }, false);
+
+        dropZone.addEventListener('dragleave', function () {
+            dropZone.classList.remove('active');
+        }, false);
+
+        dropZone.addEventListener('dragend', function () {
+            dropZone.classList.remove('active');
+        }, false);
+
+        if (typeof DataTransferItemList === 'undefined') {
+            element.getElementById('directory-support-warning').removeAttribute('hidden');
+        }
+    }
     handleChange(e) {
         e.preventDefault();
         var fileList = event.target.files;
@@ -32,14 +107,18 @@ class SelectFiles extends React.Component {
         this.props.onFilesChange(fileList);
         return;
     }
+
     render() {
         return (
-            <form className="form-horizontal" onChange={this.handleChange.bind(this)}>
-                <div className="form-group">
-                    <label>Select files: <input type="file" multiple webkitdirectory /></label>
-                    <button className="btn btn-primary">Go!</button>
-                </div>
-            </form>
+            <div ref="dropzone" id="dropzone" className="jumbotron text-center">
+                <p>Drag and drop files or directories here!</p>
+                <form className="form-horizontal" onChange={this.handleChange.bind(this)}>
+                    <div className="form-group">
+                        <label>Select files: <input type="file" multiple webkitdirectory /></label>
+                        <button className="btn btn-primary">Go!</button>
+                    </div>
+                </form>
+            </div>
         );
     }
 }
