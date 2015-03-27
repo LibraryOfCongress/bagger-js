@@ -6,9 +6,32 @@ class SelectFiles extends React.Component {
     constructor(props) {
         super(props);
     }
+    onFilesChange(fileList) {
+        var files = [];
+        for (var i = 0; i < fileList.length; i++) {
+            var file = fileList[i];
+            /*
+               There's no standard interface for getting files with the context of a selected or dropped
+               directory (see #1). Currently we're using a non-standard interface in Chrome and due to its
+               limitations we have to store a fullPath property while recursing the directory tree (see
+               walkDirectoryTree below) because we cannot update the built-in name property.
+
+               To avoid having to check everywhere we want to get the filename, we'll take the opposite
+               approach and set fullPath from file.name if it's not already set so we can use it elsewhere
+             */
+
+            if (!('fullPath' in file)) {
+                if ('webkitRelativePath' in file && file.webkitRelativePath.length > 0) {
+                    files.push({file: file, fullPath: file.webkitRelativePath});
+                } else {
+                    files.push({file: file, fullPath: file.name});
+                }
+            }
+        }
+        this.props.onFilesChange(files);
+    }
     componentDidMount() {
-        var element = this.refs.dropzone.getDOMNode();
-        var dropZone = element; //element.getElementById('dropzone'),
+        var dropZone = this.refs.dropzone.getDOMNode();
 
         var files = [];
         var onFilesChange = this.props.onFilesChange;
@@ -17,8 +40,7 @@ class SelectFiles extends React.Component {
 
             if (entry.isFile) {
                 entry.file(function(file) {
-                    file.fullPath = basePath + '/' + file.name;
-                    files.push(file);
+                    files.push({file: file, fullPath: basePath + '/' + file.name});
                 });
             } else if (entry.isDirectory) {
                 var dirReader = entry.createReader();
@@ -32,13 +54,7 @@ class SelectFiles extends React.Component {
             }
         }
 
-        dropZone.querySelector('input[type="file"]').addEventListener('change', function () {
-            dropZone.classList.add('active');
-            onFilesChange(this.files);
-            dropZone.classList.add('active');
-        });
-
-
+        var selectFiles = this;
         dropZone.addEventListener('drop', function (evt) {
             evt.stopPropagation();
             evt.preventDefault();
@@ -56,7 +72,7 @@ class SelectFiles extends React.Component {
                 }
                 onFilesChange(files);
             } else {
-                onFilesChange(evt.dataTransfer.files);
+                selectFiles.onFilesChange(evt.dataTransfer.files);
             }
 
             dropZone.classList.remove('active');
@@ -76,35 +92,10 @@ class SelectFiles extends React.Component {
         dropZone.addEventListener('dragend', function () {
             dropZone.classList.remove('active');
         }, false);
-
-        if (typeof DataTransferItemList === 'undefined') {
-            element.getElementById('directory-support-warning').removeAttribute('hidden');
-        }
     }
     handleChange(e) {
         e.preventDefault();
-        var fileList = event.target.files;
-        for (var i = 0; i < fileList.length; i++) {
-            var file = fileList[i];
-            /*
-               There's no standard interface for getting files with the context of a selected or dropped
-               directory (see #1). Currently we're using a non-standard interface in Chrome and due to its
-               limitations we have to store a fullPath property while recursing the directory tree (see
-               walkDirectoryTree below) because we cannot update the built-in name property.
-
-               To avoid having to check everywhere we want to get the filename, we'll take the opposite
-               approach and set fullPath from file.name if it's not already set so we can use it elsewhere
-             */
-
-            if (!('fullPath' in file)) {
-                if ('webkitRelativePath' in file && file.webkitRelativePath.length > 0) {
-                    file.fullPath = file.webkitRelativePath;
-                } else {
-                    file.fullPath = file.name;
-                }
-            }
-        }
-        this.props.onFilesChange(fileList);
+        this.onFilesChange(event.target.files);
         return;
     }
 

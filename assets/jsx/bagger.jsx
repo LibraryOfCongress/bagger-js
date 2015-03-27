@@ -9,7 +9,11 @@ class Bagger extends React.Component {
         this.state = {files: []};
     }
     handleFilesChanged(files) {
-        this.setState({files: files});
+        var bagFiles = [];
+        for (var i in files) {
+            bagFiles.push(files[i]);
+        }
+        this.setState({files: bagFiles});
         return;
     }
     render() {

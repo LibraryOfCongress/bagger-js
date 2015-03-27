@@ -6,3 +6,8 @@ var React = require('react');
 import { Bagger } from '../jsx/bagger.jsx';
 
 React.render(React.createElement(Bagger, null), document.getElementById('bagger'));
+
+if (typeof DataTransferItemList === 'undefined') {
+    document.getElementById('directory-support-warning').removeAttribute('hidden');
+}
+
