@@ -44,6 +44,11 @@ self.addEventListener('message', function(evt) {
             output[hashName] = asmCrypto.bytes_to_hex(i.result);
             // jshint +W106
         }
+        break;
+
+    default:
+        console.error('Unknown action', d.action);
+
     }
 
     postMessage(response);
