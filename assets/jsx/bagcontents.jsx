@@ -22,12 +22,10 @@ class BagContents extends React.Component {
         this.state = {files: props.files};
     }
     render() {
-        var total = 0;
         var hashTypes = ['sha1', 'sha256'];
         var manifest = {'sha1': [], 'sha256': []};
         var href = {'sha1': null, 'sha256': null};
         var files = this.state.files.map(function (file) {
-            total += file.file.size;
             hashTypes.forEach(function (hashType) {
                 var hash = file.hashes[hashType];
                 manifest[hashType].push([hash, file.fullPath].join('\t'));
@@ -55,7 +53,7 @@ class BagContents extends React.Component {
                 <tfoot>
                     <tr>
                         <th>Totals:</th>
-                        <td className="file-size total">{total}</td>
+                        <td className="file-size total">{this.props.total}</td>
                         <td><a id="manifest-sha1" href={href.sha1} target="_blank" download="manifest-sha1.txt">manifest-sha1</a></td>
                         <td><a id="manifest-sha256" href={href.sha256} target="_blank" download="manifest-sha256.txt">manifest-sha256</a></td>
                     </tr>
