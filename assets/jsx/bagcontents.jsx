@@ -22,7 +22,7 @@ class BagContents extends React.Component {
         this.state = {files: props.files, hashes: props.hashes};
     }
     render() {
-        var hashes = this.state.hashes;
+        var hashes = this.props.hashes;
         var files = this.state.files.map(function (file) {
             var fileHashes = hashes[file.fullPath];
             if (fileHashes === undefined) {
