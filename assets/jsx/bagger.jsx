@@ -1,6 +1,6 @@
 var React = require('react');
 
-import { BagContents } from '../jsx/contents.jsx';
+import { BagContents } from '../jsx/bagcontents.jsx';
 import { SelectFiles } from '../jsx/selectfiles.jsx';
 
 class Bagger extends React.Component {
