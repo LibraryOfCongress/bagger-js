@@ -26,9 +26,9 @@ gulp.task('browserify-hash-worker', function(){
     b.add('./assets/js/hash-worker.js');
     return b.bundle()
         .pipe(sourceStream('hash-worker.js'))
-    // A better solution would be running Browserify on the entire asmCrypto
-    // module but since we're not debugging that module we'll just strip the
-    // sourceMapping comment to avoid 404 warnings when opening the debugger
+        // A better solution would be running Browserify on the entire asmCrypto
+        // module but since we're not debugging that module we'll just strip the
+        // sourceMapping comment to avoid 404 warnings when opening the debugger
         .pipe(replace('//# sourceMappingURL=asmcrypto.js.map', ''))
         .pipe(transform(function () { return exorcist('dist/hash-worker.js.map'); }))
         .pipe(gulp.dest('./dist'));
