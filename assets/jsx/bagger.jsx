@@ -6,24 +6,22 @@ import { SelectFiles } from '../jsx/selectfiles.jsx';
 class Bagger extends React.Component {
     constructor(props) {
         super(props);
-        // FIXME: refactor files so we can remove hashes and change it to each file including a hashes element
-        this.state = {files: [], pendingFileHashKeys: [], hashes: {}};
+        this.state = {files: [], pendingFileHashKeys: []};
     }
 
     handleFilesChanged(files) {
         // FIXME: Switch to use a set so we can add files in multiple batches & only keep the unique filenames
-        var bagFiles = [], pendingKeys = [], newHashes = {};
+        var bagFiles = [], pendingKeys = [];
 
         for (var i in files) {
             var file = files[i];
+            file.hashes = {};
             var newRowId = bagFiles.push(file) - 1;
-            newHashes[file.fullPath] = {};
             console.log('added', file, 'as', newRowId);
             pendingKeys.push(newRowId);
         }
 
-        // TODO: review whether we need to merge hashes in after multiple file add operations
-        this.setState({files: bagFiles, pendingFileHashKeys: pendingKeys, hashes: newHashes},
+        this.setState({files: bagFiles, pendingFileHashKeys: pendingKeys},
                       this.checkHashQueue);
         return;
     }
@@ -49,14 +47,22 @@ class Bagger extends React.Component {
         var d = evt.data;
         switch (d.action) {
             case 'hash':
-                var hashes = {};
-                for (var hashName in d.output) { // jshint -W089
-                    hashes[hashName] = d.output[hashName];
+                var file = null;
+                var files = this.state.files;
+                for (var i in files) {
+                    file = files[i];
+                    if (file.fullPath === d.file.fullPath) {
+                        break;
+                    }
                 }
-                var n = {};
-                n[d.file.fullPath] = hashes;
-                var updatedHashes = React.addons.update(this.state.hashes, {$merge: n});
-                this.setState({hashes: updatedHashes});
+                if (file !== null) {
+                    for (var hashName in d.output) { // jshint -W089
+                        file.hashes[hashName] = d.output[hashName];
+                    }
+                } else {
+                    console.log("didn't find file: ", d.file.fullPath);
+                }
+                this.setState({files: files});
                 this.checkHashQueue();
                 break;
             case 'update':
@@ -74,7 +80,7 @@ class Bagger extends React.Component {
     render() {
         // FIXME: always have <SelectFiles> visible even after files have been added the first time
         if (this.state.files.length !== 0) {
-            return <BagContents files={this.state.files} hashes={this.state.hashes}/>;
+            return <BagContents files={this.state.files} />;
         }
         return (
             <div>
