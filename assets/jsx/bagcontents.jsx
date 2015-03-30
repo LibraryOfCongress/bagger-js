@@ -7,10 +7,10 @@ class FileRow extends React.Component {
     render() {
         return (
             <tr>
-                <td className="file-name">{this.props.name}</td>
-                <td className="file-size">{this.props.size}</td>
-                <td className="file-hash sha1">{this.props.hashes.sha1}</td>
-                <td className="file-hash sha256">{this.props.hashes.sha256}</td>
+                <td className="file-name">{this.props.file.fullPath}</td>
+                <td className="file-size">{this.props.file.file.size}</td>
+                <td className="file-hash sha1">{this.props.file.hashes.sha1}</td>
+                <td className="file-hash sha256">{this.props.file.hashes.sha256}</td>
             </tr>
         );
     }
@@ -19,16 +19,11 @@ class FileRow extends React.Component {
 class BagContents extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {files: props.files, hashes: props.hashes};
+        this.state = {files: props.files};
     }
     render() {
-        var hashes = this.state.hashes;
         var files = this.state.files.map(function (file) {
-            var fileHashes = hashes[file.fullPath];
-            if (fileHashes === undefined) {
-                fileHashes = {};
-            }
-            return <FileRow key={file.fullPath} name={file.fullPath} size={file.size} hashes={fileHashes} />;
+            return <FileRow file={file} key={file.fullPath} />;
         });
 
         return (
