@@ -6,10 +6,14 @@ require('asmcrypto.js');
 var blockSize = 1048576;
 
 self.addEventListener('message', function(evt) {
+    // Unpack some variables for clarity below:
     var d = evt.data,
-        response = {'file': d.file, 'action': d.action, 'workerId': d.workerId};
+        workerId = d.workerId,
+        action = d.action,
+        fileInfo = d.fileInfo,
+        response = {'fileInfo': fileInfo, 'action': action, 'workerId': workerId};
 
-    switch (d.action) {
+    switch (action) {
         case 'hash':
             var reader = new FileReaderSync();
             var hashes = {
@@ -17,13 +21,17 @@ self.addEventListener('message', function(evt) {
                 'sha256': new asmCrypto.SHA256()
             };
 
-            var currentOffset = 0;
+            var file = fileInfo.file,
+                currentOffset = 0;
 
-            while (currentOffset < d.file.size) {
+            console.log('Processing %s (%d bytes)', fileInfo.fullPath, file.size);
+
+            while (currentOffset < file.size) {
                 var sliceStart = currentOffset;
-                var sliceEnd = sliceStart + Math.min(blockSize, d.file.size - sliceStart);
-                var slice = d.file.slice(sliceStart, sliceEnd);
-                if (sliceStart <= d.file.size) {
+                var sliceEnd = sliceStart + Math.min(blockSize, file.size - sliceStart);
+                var slice = file.slice(sliceStart, sliceEnd);
+
+                if (sliceStart <= file.size) {
                     currentOffset = sliceEnd;
                     var bytes = reader.readAsArrayBuffer(slice);
 
@@ -49,5 +57,6 @@ self.addEventListener('message', function(evt) {
             console.error('Unknown action', d.action);
     }
 
+    console.log('Worker %d: returning %s response:', workerId, action, response);
     postMessage(response);
 });
