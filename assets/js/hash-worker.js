@@ -63,9 +63,9 @@ self.addEventListener('message', function(evt) {
             break;
 
         default:
-            console.error('Unknown action', d.action);
+            console.error('Unknown action: %s', action, d);
     }
 
-    console.log('Worker %d: returning %s response:', workerId, action, response);
+    console.log('Worker %d: returning %s response: %O', workerId, action, response);
     postMessage(response);
 });
