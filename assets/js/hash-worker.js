@@ -26,6 +26,8 @@ self.addEventListener('message', function(evt) {
 
             console.log('Processing %s (%d bytes)', fileInfo.fullPath, file.size);
 
+            var startTime = Date.now();
+
             while (currentOffset < file.size) {
                 var sliceStart = currentOffset;
                 var sliceEnd = sliceStart + Math.min(blockSize, file.size - sliceStart);
@@ -51,6 +53,13 @@ self.addEventListener('message', function(evt) {
                 output[hashName] = asmCrypto.bytes_to_hex(i.result);
                 // jshint +W106
             }
+
+            // Stop counter & convert from milliseconds:
+            var elapsedSeconds = (Date.now() - startTime) / 1000;
+
+            console.log('Hashed %d bytes in %f seconds (%s MB/s)', file.size, elapsedSeconds.toFixed(2),
+                        ((file.size / 1048576) / elapsedSeconds).toFixed(1));
+
             break;
 
         default:
