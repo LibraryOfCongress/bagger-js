@@ -95,7 +95,7 @@ class SelectFiles extends React.Component {
     }
     handleChange(e) {
         e.preventDefault();
-        this.onFilesChange(event.target.files);
+        this.onFilesChange(e.target.files);
         return;
     }
 
