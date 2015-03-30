@@ -6,7 +6,20 @@ import { SelectFiles } from '../jsx/selectfiles.jsx';
 class Bagger extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {files: [], pendingFileHashKeys: []};
+
+        this.hashWorkers = [];
+        this.busyWorkers = new Set();
+
+        for (var i = 0; i < 2; i++) {
+            var w = new Worker('hash-worker.js');
+            w.addEventListener('message', this.handleWorkerResponse.bind(this));
+            this.hashWorkers.push(w);
+        }
+
+        this.state = {
+            files: [],
+            pendingFileHashKeys: []
+        };
     }
 
     handleFilesChanged(files) {
@@ -22,7 +35,7 @@ class Bagger extends React.Component {
         }
 
         this.setState({files: bagFiles, pendingFileHashKeys: pendingKeys},
-                      this.checkHashQueue);
+                      this.checkHashQueue.bind(this));
         return;
     }
 
@@ -30,51 +43,77 @@ class Bagger extends React.Component {
         var files = this.state.files, pendingFileHashKeys = this.state.pendingFileHashKeys;
 
         if (pendingFileHashKeys.length < 1) {
-            console.log('No pending hashes');
+            console.debug('No pending files to hash');
             return;
         }
 
-        var file = files[pendingFileHashKeys.shift()];
+        while (this.hashWorkers.length > this.busyWorkers.size) {
+            var nextHashWorkerId;
 
-        console.log('Now processing', file, '(' + pendingFileHashKeys.length + ' to go)');
-        this.hashWorker.postMessage({
-            'file': file,
-            'action': 'hash'
-        });
+            for (var i = 0; i < this.hashWorkers.length; i++) {
+                if (!this.busyWorkers.has(i)) {
+                    this.busyWorkers.add(i);
+                    nextHashWorkerId = i;
+                    break;
+                }
+            }
+
+            if (nextHashWorkerId === null) {
+                throw new Error('Could not find a free worker as expected');
+            }
+
+            var file = files[pendingFileHashKeys.shift()];
+
+            console.log('Telling worker %d to process file %s (%d queued)', nextHashWorkerId, file.fullPath,
+                        pendingFileHashKeys.length);
+
+            this.hashWorkers[nextHashWorkerId].postMessage({
+                'workerId': nextHashWorkerId,
+                'file': file,
+                'action': 'hash'
+            });
+        }
+
+        this.setState({activeHashWorkers: this.busyWorkers.size});
+        console.log('Waiting for a free hash worker; current count: %d', this.busyWorkers.size);
     }
 
     handleWorkerResponse(evt) {
         var d = evt.data;
+
+        this.busyWorkers.delete(d.workerId);
+
         switch (d.action) {
             case 'hash':
-                var file = null;
-                var files = this.state.files;
+                var file,
+                    files = this.state.files;
+
+
                 for (var i in files) {
                     file = files[i];
                     if (file.fullPath === d.file.fullPath) {
                         break;
                     }
                 }
-                if (file !== null) {
-                    for (var hashName in d.output) { // jshint -W089
-                        file.hashes[hashName] = d.output[hashName];
-                    }
-                } else {
-                    console.log("didn't find file: ", d.file.fullPath);
+
+                if (!file) {
+                    console.error("Couldn't find file %s in files", d.file.fullPath, files);
+                    return;
                 }
+
+                console.log('Received hashes for file %s from worker %d', file.fullPath, d.workerId, d.output);
+
+                for (var hashName in d.output) { // jshint -W089
+                    file.hashes[hashName] = d.output[hashName];
+                }
+
                 this.setState({files: files});
                 this.checkHashQueue();
                 break;
-            case 'update':
-                // FIXME: update worker status display
-                break;
-        }
-    }
 
-    componentDidMount() {
-        // FIXME: manage more than 1 hashWorker
-        this.hashWorker = new Worker('hash-worker.js');
-        this.hashWorker.addEventListener('message', this.handleWorkerResponse.bind(this));
+            default:
+                console.error('Received unknown %s message: %s', d.action, d);
+        }
     }
 
     render() {

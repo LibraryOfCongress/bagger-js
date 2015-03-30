@@ -7,7 +7,7 @@ var blockSize = 1048576;
 
 self.addEventListener('message', function(evt) {
     var d = evt.data,
-        response = {'file': d.file, 'action': d.action};
+        response = {'file': d.file, 'action': d.action, 'workerId': d.workerId};
 
     switch (d.action) {
         case 'hash':
