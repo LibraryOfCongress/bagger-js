@@ -22,7 +22,9 @@ class BagContents extends React.Component {
         this.state = {files: props.files};
     }
     render() {
+        var total = 0;
         var files = this.state.files.map(function (file) {
+            total += file.file.size;
             return <FileRow file={file} key={file.fullPath} />;
         });
 
@@ -43,7 +45,7 @@ class BagContents extends React.Component {
                 <tfoot>
                     <tr>
                         <th>Totals:</th>
-                        <td className="file-size total"></td>
+                        <td className="file-size total">{total}</td>
                         <td><a id="manifest-sha1" download="manifest-sha1.txt">manifest-sha1</a></td>
                         <td><a id="manifest-sha256" download="manifest-sha256.txt">manifest-sha256</a></td>
                     </tr>
