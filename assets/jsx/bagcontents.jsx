@@ -19,37 +19,7 @@ class FileRow extends React.Component {
 class BagContents extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {files: props.files, hashes: {}};
-    }
-    handleWorkerResponse(evt) {
-        var d = evt.data;
-        switch (d.action) {
-            case 'hash':
-                var hashes = {};
-                for (var hashName in d.output) { // jshint -W089
-                    hashes[hashName] = d.output[hashName];
-                }
-                var n = {};
-                n[d.file.fullPath] = hashes;
-                var updatedHashes = React.addons.update(this.state.hashes, {$merge: n});
-                this.setState({hashes: updatedHashes});
-                break;
-            case 'update':
-                break;
-            case 'stop':
-                //processHashQueue();
-                break;
-        }
-    }
-    componentDidMount() {
-        var hashWorker = new Worker('hash-worker.js');
-        hashWorker.addEventListener('message', this.handleWorkerResponse.bind(this));
-        var file = this.state.files[0]; // TODO
-        hashWorker.postMessage({
-            'file': file,
-            'action': 'hash'
-        });
-        console.log('handling files: ', this.state.files);
+        this.state = {files: props.files, hashes: props.hashes};
     }
     render() {
         var hashes = this.state.hashes;
