@@ -109,6 +109,13 @@ class Bagger extends React.Component {
                     file.hashes[hashName] = d.output[hashName];
                 }
 
+                if ('performance' in d) {
+                    var perf = d.performance;
+                    console.log('Hashed %d bytes in %f seconds (%s MB/s)', perf.bytes,
+                                perf.seconds.toFixed(2),
+                                ((perf.bytes / 1048576) / perf.seconds).toFixed(1));
+                }
+
                 this.setState({files: files});
                 this.checkHashQueue();
                 break;

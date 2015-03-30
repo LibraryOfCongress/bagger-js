@@ -56,9 +56,11 @@ self.addEventListener('message', function(evt) {
 
             // Stop counter & convert from milliseconds:
             var elapsedSeconds = (Date.now() - startTime) / 1000;
-
-            console.log('Hashed %d bytes in %f seconds (%s MB/s)', file.size, elapsedSeconds.toFixed(2),
-                        ((file.size / 1048576) / elapsedSeconds).toFixed(1));
+            response.performance = {
+                'bytes': file.size,
+                'seconds': elapsedSeconds,
+                'startMilliseconds': startTime
+            };
 
             break;
 
