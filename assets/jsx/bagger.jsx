@@ -10,7 +10,7 @@ class Bagger extends React.Component {
         this.hashWorkers = [];
         this.busyWorkers = new Set();
 
-        for (var i = 0; i < 2; i++) {
+        for (var i = 0; i < 4; i++) {
             var w = new Worker('hash-worker.js');
             w.addEventListener('message', this.handleWorkerResponse.bind(this));
             this.hashWorkers.push(w);
