@@ -1,5 +1,5 @@
 /* jslint browser: true, indent: 4 */
-/* global self, require, postMessage, asmCrypto, console */
+/* global self, require, postMessage, asmCrypto, console, FileReaderSync */
 
 require('asmcrypto.js');
 
@@ -11,26 +11,25 @@ self.addEventListener('message', function(evt) {
 
     switch (d.action) {
         case 'hash':
-            var reader = new FileReader();
+            var reader = new FileReaderSync();
             var hashes = {
                 'sha1': new asmCrypto.SHA1(),
                 'sha256': new asmCrypto.SHA256()
             };
 
-            reader.onload = function(e) {
-                for (var name in hashes) { // jshint -W089
-                    hashes[name].process(e.target.result);
-                }
-            };
-
             var currentOffset = 0;
+
             while (currentOffset < d.file.size) {
                 var sliceStart = currentOffset;
                 var sliceEnd = sliceStart + Math.min(blockSize, d.file.size - sliceStart);
                 var slice = d.file.slice(sliceStart, sliceEnd);
                 if (sliceStart <= d.file.size) {
                     currentOffset = sliceEnd;
-                    reader.readAsArrayBuffer(slice);
+                    var bytes = reader.readAsArrayBuffer(slice);
+
+                    for (var alg in hashes) { // jshint -W089
+                        hashes[alg].process(bytes);
+                    }
                 } else {
                     console.error('Attempted to read past end of file!');
                 }
