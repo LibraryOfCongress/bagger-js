@@ -45,12 +45,12 @@ class BagContents extends React.Component {
                     <tr>
                         <th className="file-name">Filename</th>
                         <th className="file-size">Size</th>
-                        <th className="file-hash">SHA-1</th>
-                        <th className="file-hash">SHA-256</th>
+                        <th className="file-hash sha1">SHA-1</th>
+                        <th className="file-hash sha256">SHA-256</th>
                     </tr>
                 </thead>
                 <tbody>
-                {files}
+                    {files}
                 </tbody>
                 <tfoot>
                     <tr>

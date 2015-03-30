@@ -12,6 +12,29 @@ body {
 	background-color: #eef;
 }
 
+/* We'll use table-layout fixed to avoid massive reflow calculations */
+#bag-contents {
+	table-layout: fixed;
+	max-width: 98vw;
+}
+
+#bag-contents thead th {
+	width: 20%;
+}
+
+#bag-contents thead th.file-name {
+	width: 50%;
+}
+
+#bag-contents thead th.file-size {
+	width: 10%;
+}
+
+#bag-contents td {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 th {
 	text-align: right;
 }
@@ -20,20 +43,13 @@ th.file-name {
 	text-align: left;
 }
 
-
-tbody .file-size,
-tbody .file-hash,
-tfoot .file-size {
+.file-size, .file-hash {
 	text-align: right;
+	font-family: monospace;
+	font-size: small;
 }
 
 .progress-bar {
 	width: 0%;
 	min-width: 2em;
-}
-
-output {
-	font-family: monospace;
-	font-size: small;
-	padding-top: 0;
 }
