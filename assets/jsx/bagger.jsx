@@ -18,7 +18,9 @@ class Bagger extends React.Component {
 
         this.state = {
             files: [],
-            pendingFileHashKeys: []
+            pendingFileHashKeys: [],
+            total: 0,
+            bagging: false
         };
     }
 
@@ -44,8 +46,11 @@ class Bagger extends React.Component {
 
         if (pendingFileHashKeys.length < 1) {
             console.debug('No pending files to hash');
+            this.setState({bagging: true});
             return;
         }
+
+        this.setState({bagging: false});
 
         while (this.hashWorkers.length > this.busyWorkers.size) {
             var nextHashWorkerId;
@@ -88,8 +93,10 @@ class Bagger extends React.Component {
         switch (d.action) {
             case 'hash':
                 var file,
-                    files = this.state.files;
+                    files = this.state.files,
+                    total = this.state.total;
 
+                total = total + d.fileInfo.file.size;
 
                 for (var i in files) {
                     file = files[i];
@@ -116,7 +123,7 @@ class Bagger extends React.Component {
                                 ((perf.bytes / 1048576) / perf.seconds).toFixed(1));
                 }
 
-                this.setState({files: files});
+                this.setState({files: files, total: total});
                 this.checkHashQueue();
                 break;
 
@@ -128,7 +135,11 @@ class Bagger extends React.Component {
     render() {
         // FIXME: always have <SelectFiles> visible even after files have been added the first time
         if (this.state.files.length !== 0) {
-            return <BagContents files={this.state.files} />;
+            return (
+                <div>
+                    <BagContents files={this.state.files} total={this.state.total} bagging={this.state.bagging} />
+                </div>
+            );
         }
         return (
             <div>
