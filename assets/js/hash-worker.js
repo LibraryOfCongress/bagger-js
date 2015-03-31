@@ -10,8 +10,9 @@ self.addEventListener('message', function(evt) {
     var d = evt.data,
         workerId = d.workerId,
         action = d.action,
-        fileInfo = d.fileInfo,
-        response = {'fileInfo': fileInfo, 'action': action, 'workerId': workerId};
+        file = d.file,
+        fullPath = d.fullPath,
+        response = {'file': file, 'fullPath': fullPath, 'action': action, 'workerId': workerId};
 
     switch (action) {
         case 'hash':
@@ -21,14 +22,13 @@ self.addEventListener('message', function(evt) {
                 'sha256': new asmCrypto.SHA256()
             };
 
-            var file = fileInfo.file,
-                currentOffset = 0;
+            var currentOffset = 0;
 
             // Access size once so we can avoid paying the cost of repeated access in the future:
             var fileSize = file.size;
-            fileInfo.size = fileSize;
+            response.fileSize = fileSize;
+            console.log('Processing %s (%d bytes)', fullPath, fileSize);
 
-            console.log('Processing %s (%d bytes)', fileInfo.fullPath, fileInfo.size);
 
             var startTime = Date.now();
 
