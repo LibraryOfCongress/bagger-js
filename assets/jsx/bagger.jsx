@@ -52,7 +52,7 @@ class Bagger extends React.Component {
 
         this.setState({bagging: false});
 
-        while (this.hashWorkers.length > this.busyWorkers.size) {
+        while (pendingFileHashKeys.length && (this.hashWorkers.length > this.busyWorkers.size)) {
             var nextHashWorkerId;
 
             for (var i = 0; i < this.hashWorkers.length; i++) {
