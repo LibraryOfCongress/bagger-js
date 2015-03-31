@@ -7,13 +7,32 @@ class Dashboard extends React.Component {
             hashWorkers = this.props.hashWorkers,
             uploadWorkers = this.props.uploadWorkers;
 
+        if (files.total < 1) {
+            return null;
+        }
+
         var hashComplete = (100 * (1 - (hashWorkers.pendingFiles / files.total))).toFixed(0),
             // Yay insufficient magic: this has to be done at a distance because the JSX parser forces style to be an object but can't declare one inline:
             hashCompleteStyle = {width: hashComplete + '%'},
-            hashSpeed = filesize(hashWorkers.totalBytes / hashWorkers.totalTime, {round: 0}),
+            hashBytesPerSecond = hashWorkers.totalBytes / hashWorkers.totalTime || 0,
+            hashSpeed = filesize(hashBytesPerSecond, {round: 1}),
             uploadComplete = (100 * (1 - (uploadWorkers.pendingFiles / files.total))).toFixed(0),
             uploadCompleteStyle = {width: uploadComplete + '%'},
-            uploadSpeed = filesize(uploadWorkers.totalBytes / uploadWorkers.totalTime, {round: 0});
+            uploadBytesPerSecond = uploadWorkers.totalBytes / uploadWorkers.totalTime || 0,
+            uploadSpeed = filesize(uploadBytesPerSecond, {round: 1});
+
+            var hashProgressClasses = 'progress-bar',
+                uploadProgressClasses = 'progress-bar';
+
+            if (hashWorkers.active > 0) {
+                hashProgressClasses += ' progress-bar-striped active';
+            } else if (hashWorkers.totalBytes > 0) {
+                hashProgressClasses += ' progress-bar-success';
+            }
+
+            if (uploadWorkers.active > 0) {
+                uploadProgressClasses += ' progress-bar-striped active';
+            }
 
         return (
             <div className="dashboard well well-sm clearfix">
@@ -27,7 +46,7 @@ class Dashboard extends React.Component {
                 <div className="col-sm-5 hash-stats">
                     <h5>Hashing</h5>
                     <div className="progress">
-                        <div className="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{hashComplete}" aria-valuemin="0" aria-valuemax="100" style={hashCompleteStyle}>
+                        <div className={hashProgressClasses} role="progressbar" aria-valuenow="{hashComplete}" aria-valuemin="0" aria-valuemax="100" style={hashCompleteStyle}>
                             {hashComplete}%
                         </div>
                     </div>
@@ -39,7 +58,7 @@ class Dashboard extends React.Component {
                     <h5>Uploads</h5>
 
                     <div className="progress">
-                        <div className="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{uploadComplete}" aria-valuemin="0" aria-valuemax="100" style={uploadCompleteStyle}>
+                        <div className={uploadProgressClasses} role="progressbar" aria-valuenow="{uploadComplete}" aria-valuemin="0" aria-valuemax="100" style={uploadCompleteStyle}>
                             {uploadComplete}%
                         </div>
                     </div>

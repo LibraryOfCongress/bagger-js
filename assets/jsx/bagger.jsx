@@ -1,4 +1,4 @@
-var React = require('react');
+var React = require('react/addons');
 
 import { BagContents } from '../jsx/bagcontents.jsx';
 import { SelectFiles } from '../jsx/selectfiles.jsx';
@@ -23,8 +23,21 @@ class Bagger extends React.Component {
         this.state = {
             files: [],
             pendingFileHashKeys: [],
+            // FIXME: this should have a less generic name:
             total: 0,
-            bagging: false
+            bagging: false,
+            performance: {
+                hashWorkers: {
+                    files: 0,
+                    bytes: 0,
+                    time: 0
+                },
+                uploadWorkers: {
+                    files: 0,
+                    bytes: 0,
+                    time: 0
+                }
+            }
         };
     }
 
@@ -107,7 +120,8 @@ class Bagger extends React.Component {
             case 'hash':
                 var file,
                     files = this.state.files,
-                    total = this.state.total;
+                    total = this.state.total,
+                    performance = this.state.performance;
 
                 for (var i in files) {
                     file = files[i];
@@ -130,14 +144,24 @@ class Bagger extends React.Component {
                     file.hashes[hashName] = d.output[hashName];
                 }
 
-                if ('performance' in d) {
-                    var perf = d.performance;
-                    console.log('Hashed %d bytes in %s seconds (%s MB/s)', fileSize,
-                                perf.seconds.toFixed(2),
-                                ((perf.bytes / 1048576) / perf.seconds).toFixed(1));
-                }
+                var taskPerf = d.performance;
+                console.log('Hashed %d bytes in %s seconds (%s MB/s)', fileSize,
+                            taskPerf.seconds.toFixed(2),
+                            ((fileSize / 1048576) / taskPerf.seconds).toFixed(1));
 
-                this.setState({files: files, total: total});
+                this.setState({
+                    files: files,
+                    total: total,
+                    performance: React.addons.update(performance, {
+                        $merge: {
+                            hashWorkers: {
+                                files: performance.hashWorkers.files + 1,
+                                bytes: performance.hashWorkers.bytes + fileSize,
+                                time: performance.hashWorkers.time + taskPerf.seconds
+                            }
+                        }
+                    })
+                });
                 this.checkHashQueue();
                 break;
 
@@ -149,22 +173,22 @@ class Bagger extends React.Component {
     render() {
         var stats = {
             files: {
-                total: 1234,
-                size: 1234567890
+                total: this.state.files.length,
+                size: this.state.total
             },
             hashWorkers: {
-                total: 8,
-                active: 6,
-                pendingFiles: 456,
-                totalBytes: 12345678900,
-                totalTime: 1234
+                total: this.hashWorkers.length,
+                active: this.busyWorkers.size,
+                pendingFiles: this.state.pendingFileHashKeys.length,
+                totalBytes: this.state.performance.hashWorkers.bytes,
+                totalTime: this.state.performance.hashWorkers.time
             },
             uploadWorkers: {
                 total: 2,
                 active: 2,
-                pendingFiles: 1111,
-                totalBytes: 123456789,
-                totalTime: 1234
+                pendingFiles: 1234,
+                totalBytes: this.state.performance.uploadWorkers.bytes,
+                totalTime: this.state.performance.uploadWorkers.time
             }
         };
 
