@@ -2,6 +2,8 @@ var React = require('react');
 
 import { BagContents } from '../jsx/bagcontents.jsx';
 import { SelectFiles } from '../jsx/selectfiles.jsx';
+import { Dashboard } from '../jsx/dashboard.jsx';
+
 
 class Bagger extends React.Component {
     constructor(props) {
@@ -145,10 +147,33 @@ class Bagger extends React.Component {
     }
 
     render() {
+        var stats = {
+            files: {
+                total: 1234,
+                size: 1234567890
+            },
+            hashWorkers: {
+                total: 8,
+                active: 6,
+                pendingFiles: 456,
+                totalBytes: 12345678900,
+                totalTime: 1234
+            },
+            uploadWorkers: {
+                total: 2,
+                active: 2,
+                pendingFiles: 1111,
+                totalBytes: 123456789,
+                totalTime: 1234
+            }
+        };
+
         return (
             <div className="bagger">
                 <h1>Add files</h1>
                 <SelectFiles onFilesChange={this.handleFilesChanged.bind(this)} />
+
+                <Dashboard {...stats} />
 
                 <BagContents files={this.state.files} total={this.state.total} bagging={this.state.bagging} />
             </div>
