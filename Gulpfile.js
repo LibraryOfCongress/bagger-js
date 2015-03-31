@@ -40,7 +40,7 @@ gulp.task('browserify-upload-worker', function(){
     b.add('./assets/js/upload-worker.js');
     return b.bundle()
         .pipe(sourceStream('upload-worker.js'))
-        .pipe(transform(function () { return exorcist('dist/hash-worker.js.map'); }))
+        .pipe(transform(function () { return exorcist('dist/upload-worker.js.map'); }))
         .pipe(gulp.dest('./dist'));
 });
 
