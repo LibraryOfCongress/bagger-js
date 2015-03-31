@@ -8,26 +8,38 @@ class SelectFiles extends React.Component {
     }
 
     processFileList(fileList) {
+        /*
+         * Convert a FileList into a list of {file:, fullPath:} objects which are passed to
+         * this.props.onFilesChange so all downstream callers can reliably get the full path
+         */
         var files = [];
+
         for (var i = 0; i < fileList.length; i++) {
-            var file = fileList[i];
-            /*
-               There's no standard interface for getting files with the context of a selected or dropped
-               directory (see #1). Currently we're using a non-standard interface in Chrome and due to its
-               limitations we have to store a fullPath property while recursing the directory tree (see
-               walkDirectoryTree below) because we cannot update the built-in name property.
+            var file = fileList[i],
+                fileInfo;
 
-               To avoid having to check everywhere we want to get the filename, we'll take the opposite
-               approach and set fullPath from file.name if it's not already set so we can use it elsewhere
-             */
+            if ('file' in file && 'fullPath' in file) {
+                // Our "file" is already in the format we need:
+                fileInfo = file;
+            } else {
+                /*
+                   There's no standard interface for getting files with the context of a selected or dropped
+                   directory (see #1). Currently we're using a non-standard interface in Chrome and due to its
+                   limitations we have to store a fullPath property while recursing the directory tree (see
+                   walkDirectoryTree below) because we cannot update the built-in name property.
 
-            if (!('fullPath' in file)) {
+                   To avoid having to check everywhere we want to get the filename, we'll take the opposite
+                   approach and set fullPath from file.name if it's not already set so we can use it elsewhere
+                 */
+
                 if ('webkitRelativePath' in file && file.webkitRelativePath.length > 0) {
-                    files.push({file: file, fullPath: file.webkitRelativePath});
+                    fileInfo = {file: file, fullPath: file.webkitRelativePath};
                 } else {
-                    files.push({file: file, fullPath: file.name});
+                    fileInfo = {file: file, fullPath: file.name};
                 }
             }
+
+            files.push(fileInfo);
         }
         this.props.onFilesChange(files);
     }
