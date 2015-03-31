@@ -81,7 +81,8 @@ class Bagger extends React.Component {
 
             this.hashWorkers[nextHashWorkerId].postMessage({
                 'workerId': nextHashWorkerId,
-                'fileInfo': file,
+                'file': file.file,
+                'fullPath': file.fullPath,
                 'action': 'hash'
             });
         }
@@ -93,7 +94,7 @@ class Bagger extends React.Component {
     handleWorkerResponse(evt) {
         var d = evt.data,
             workerId = d.workerId,
-            fileInfo = d.fileInfo;
+            fullPath = d.fullPath;
 
         this.busyWorkers.delete(d.workerId);
 
@@ -105,20 +106,20 @@ class Bagger extends React.Component {
 
                 for (var i in files) {
                     file = files[i];
-                    if (file.fullPath === fileInfo.fullPath) {
+                    if (file.fullPath === fullPath) {
                         break;
                     }
                 }
 
                 if (!file) {
-                    console.error("Couldn't find file %s in files", fileInfo.fullPath, files);
+                    console.error("Couldn't find file %s in files", fullPath, files);
                     return;
                 }
 
-                file.size = d.fileInfo.file.size; // promote size to fileInfo
+                file.size = d.file.size; // promote size to fileInfo
                 total = total + file.size;
 
-                console.log('Received hashes for file %s from worker %d', file.fullPath, workerId, d.output);
+                console.log('Received hashes for file %s from worker %d', fullPath, workerId, d.output);
 
                 for (var hashName in d.output) { // jshint -W089
                     file.hashes[hashName] = d.output[hashName];
