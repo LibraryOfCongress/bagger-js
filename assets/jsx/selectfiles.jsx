@@ -71,7 +71,7 @@ class SelectFiles extends React.Component {
                     walkDirectoryTree(entry);
                 }
             } else {
-                selectFiles.onFilesChange(evt.dataTransfer.files);
+                onFilesChange(evt.dataTransfer.files);
             }
 
             dropZone.classList.remove('active');
