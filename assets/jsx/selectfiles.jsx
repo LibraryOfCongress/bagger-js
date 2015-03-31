@@ -33,15 +33,15 @@ class SelectFiles extends React.Component {
     componentDidMount() {
         var dropZone = this.refs.dropzone.getDOMNode();
 
-        var files = [];
         var onFilesChange = this.props.onFilesChange;
+
         function walkDirectoryTree(entry, basePath) {
             basePath = basePath || '';
 
             if (entry.isFile) {
                 entry.file(function(file) {
                     var fullPath = basePath ? basePath + '/' + file.name : file.name;
-                    files.push({file: file, fullPath: fullPath});
+                    onFilesChange([{file: file, fullPath: fullPath}]);
                 });
             } else if (entry.isDirectory) {
                 var dirReader = entry.createReader();
@@ -55,7 +55,6 @@ class SelectFiles extends React.Component {
             }
         }
 
-        var selectFiles = this;
         dropZone.addEventListener('drop', function (evt) {
             evt.stopPropagation();
             evt.preventDefault();
@@ -71,7 +70,6 @@ class SelectFiles extends React.Component {
 
                     walkDirectoryTree(entry);
                 }
-                onFilesChange(files);
             } else {
                 selectFiles.onFilesChange(evt.dataTransfer.files);
             }
@@ -116,4 +114,3 @@ class SelectFiles extends React.Component {
 }
 
 export { SelectFiles };
-
