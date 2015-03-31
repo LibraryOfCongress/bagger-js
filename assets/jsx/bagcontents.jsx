@@ -21,10 +21,18 @@ class FileRow extends React.Component {
 class BagContents extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {files: props.files};
+        this.state = {
+            files: props.files,
+            bagging: props.bagging,
+            total: props.total
+        };
     }
     render() {
-        var files = this.state.files.map(function (file) {
+        if (this.props.files.length < 1) {
+            return null;
+        }
+
+        var files = this.props.files.map(function (file) {
             return <FileRow file={file} key={file.fullPath} />;
         });
 

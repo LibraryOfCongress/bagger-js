@@ -24,15 +24,22 @@ class Bagger extends React.Component {
         };
     }
 
-    handleFilesChanged(files) {
-        // FIXME: Switch to use a set so we can add files in multiple batches & only keep the unique filenames
-        var bagFiles = [], pendingKeys = [];
+    handleFilesChanged(newFiles) {
+        var bagFiles = [].concat(this.state.files), pendingKeys = [].concat(this.state.pendingFileHashKeys);
 
-        for (var i in files) {
-            var file = files[i];
-            file.hashes = {};
-            var newRowId = bagFiles.push(file) - 1;
-            console.log('added', file, 'as', newRowId);
+        var uniqueFilenames = new Set(this.state.files.map(function (i) { return i.fullPath; }));
+
+        for (var idx in newFiles) {
+            var rec = newFiles[idx];
+
+            if (uniqueFilenames.has(rec.fullPath)) {
+                console.log('Skipping duplicate file', rec.fullPath);
+                continue;
+            }
+
+            rec.hashes = {};
+
+            var newRowId = bagFiles.push(rec) - 1;
             pendingKeys.push(newRowId);
         }
 
@@ -133,18 +140,12 @@ class Bagger extends React.Component {
     }
 
     render() {
-        // FIXME: always have <SelectFiles> visible even after files have been added the first time
-        if (this.state.files.length !== 0) {
-            return (
-                <div>
-                    <BagContents files={this.state.files} total={this.state.total} bagging={this.state.bagging} />
-                </div>
-            );
-        }
         return (
-            <div>
+            <div className="bagger">
                 <h1>Upload a bag</h1>
                 <SelectFiles onFilesChange={this.handleFilesChanged.bind(this)} />
+
+                <BagContents files={this.state.files} total={this.state.total} bagging={this.state.bagging} />
             </div>
         );
     }
