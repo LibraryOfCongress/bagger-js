@@ -103,8 +103,6 @@ class Bagger extends React.Component {
                     files = this.state.files,
                     total = this.state.total;
 
-                total = total + d.fileInfo.file.size;
-
                 for (var i in files) {
                     file = files[i];
                     if (file.fullPath === fileInfo.fullPath) {
@@ -116,6 +114,9 @@ class Bagger extends React.Component {
                     console.error("Couldn't find file %s in files", fileInfo.fullPath, files);
                     return;
                 }
+
+                file.size = d.fileInfo.file.size; // promote size to fileInfo
+                total = total + file.size;
 
                 console.log('Received hashes for file %s from worker %d', file.fullPath, workerId, d.output);
 
