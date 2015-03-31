@@ -94,7 +94,8 @@ class Bagger extends React.Component {
     handleWorkerResponse(evt) {
         var d = evt.data,
             workerId = d.workerId,
-            fullPath = d.fullPath;
+            fullPath = d.fullPath,
+            fileSize = d.fileSize;
 
         this.busyWorkers.delete(d.workerId);
 
@@ -116,8 +117,8 @@ class Bagger extends React.Component {
                     return;
                 }
 
-                file.size = d.file.size; // promote size to fileInfo
-                total = total + file.size;
+                file.size = fileSize;
+                total += fileSize;
 
                 console.log('Received hashes for file %s from worker %d', fullPath, workerId, d.output);
 
@@ -127,7 +128,7 @@ class Bagger extends React.Component {
 
                 if ('performance' in d) {
                     var perf = d.performance;
-                    console.log('Hashed %d bytes in %s seconds (%s MB/s)', perf.bytes,
+                    console.log('Hashed %d bytes in %s seconds (%s MB/s)', fileSize,
                                 perf.seconds.toFixed(2),
                                 ((perf.bytes / 1048576) / perf.seconds).toFixed(1));
                 }
