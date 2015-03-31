@@ -24,16 +24,20 @@ self.addEventListener('message', function(evt) {
             var file = fileInfo.file,
                 currentOffset = 0;
 
-            console.log('Processing %s (%d bytes)', fileInfo.fullPath, file.size);
+            // Access size once so we can avoid paying the cost of repeated access in the future:
+            var fileSize = file.size;
+            fileInfo.size = fileSize;
+
+            console.log('Processing %s (%d bytes)', fileInfo.fullPath, fileInfo.size);
 
             var startTime = Date.now();
 
-            while (currentOffset < file.size) {
+            while (currentOffset < fileSize) {
                 var sliceStart = currentOffset;
-                var sliceEnd = sliceStart + Math.min(blockSize, file.size - sliceStart);
+                var sliceEnd = sliceStart + Math.min(blockSize, fileSize - sliceStart);
                 var slice = file.slice(sliceStart, sliceEnd);
 
-                if (sliceStart <= file.size) {
+                if (sliceStart <= fileSize) {
                     currentOffset = sliceEnd;
                     var bytes = reader.readAsArrayBuffer(slice);
 
@@ -57,7 +61,6 @@ self.addEventListener('message', function(evt) {
             // Stop counter & convert from milliseconds:
             var elapsedSeconds = (Date.now() - startTime) / 1000;
             response.performance = {
-                'bytes': file.size,
                 'seconds': elapsedSeconds,
                 'startMilliseconds': startTime
             };

@@ -115,8 +115,8 @@ class Bagger extends React.Component {
                     return;
                 }
 
-                file.size = d.fileInfo.file.size; // promote size to fileInfo
-                total = total + file.size;
+                file.size = fileInfo.size;
+                total += fileInfo.size;
 
                 console.log('Received hashes for file %s from worker %d', file.fullPath, workerId, d.output);
 
@@ -126,7 +126,7 @@ class Bagger extends React.Component {
 
                 if ('performance' in d) {
                     var perf = d.performance;
-                    console.log('Hashed %d bytes in %s seconds (%s MB/s)', perf.bytes,
+                    console.log('Hashed %d bytes in %s seconds (%s MB/s)', fileInfo.size,
                                 perf.seconds.toFixed(2),
                                 ((perf.bytes / 1048576) / perf.seconds).toFixed(1));
                 }
