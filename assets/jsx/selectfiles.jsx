@@ -6,7 +6,8 @@ class SelectFiles extends React.Component {
     constructor(props) {
         super(props);
     }
-    onFilesChange(fileList) {
+
+    processFileList(fileList) {
         var files = [];
         for (var i = 0; i < fileList.length; i++) {
             var file = fileList[i];
@@ -33,7 +34,7 @@ class SelectFiles extends React.Component {
     componentDidMount() {
         var dropZone = this.refs.dropzone.getDOMNode();
 
-        var onFilesChange = this.props.onFilesChange;
+        var processFileList = this.processFileList.bind(this);
 
         function walkDirectoryTree(entry, basePath) {
             basePath = basePath || '';
@@ -41,7 +42,7 @@ class SelectFiles extends React.Component {
             if (entry.isFile) {
                 entry.file(function(file) {
                     var fullPath = basePath ? basePath + '/' + file.name : file.name;
-                    onFilesChange([{file: file, fullPath: fullPath}]);
+                    processFileList([{file: file, fullPath: fullPath}]);
                 });
             } else if (entry.isDirectory) {
                 var dirReader = entry.createReader();
@@ -71,7 +72,7 @@ class SelectFiles extends React.Component {
                     walkDirectoryTree(entry);
                 }
             } else {
-                onFilesChange(evt.dataTransfer.files);
+                processFileList(evt.dataTransfer.files);
             }
 
             dropZone.classList.remove('active');
@@ -92,9 +93,10 @@ class SelectFiles extends React.Component {
             dropZone.classList.remove('active');
         }, false);
     }
-    handleChange(e) {
+
+    handleFileInputChange(e) {
         e.preventDefault();
-        this.onFilesChange(e.target.files);
+        this.processFileList(e.target.files);
         return;
     }
 
@@ -102,9 +104,9 @@ class SelectFiles extends React.Component {
         return (
             <div ref="dropzone" id="dropzone" className="jumbotron text-center">
                 <p>Drag and drop files or directories here!</p>
-                <form className="form-horizontal" onChange={this.handleChange.bind(this)}>
+                <form className="form-horizontal">
                     <div className="form-group">
-                        <label>Select files: <input type="file" multiple webkitdirectory /></label>
+                        <label>Select files: <input type="file" onChange={this.handleFileInputChange.bind(this)} multiple webkitdirectory /></label>
                         <button className="btn btn-primary">Go!</button>
                     </div>
                 </form>
