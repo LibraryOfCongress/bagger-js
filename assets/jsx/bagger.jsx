@@ -147,7 +147,7 @@ class Bagger extends React.Component {
     render() {
         return (
             <div className="bagger">
-                <h1>Upload a bag</h1>
+                <h1>Add files</h1>
                 <SelectFiles onFilesChange={this.handleFilesChanged.bind(this)} />
 
                 <BagContents files={this.state.files} total={this.state.total} bagging={this.state.bagging} />
