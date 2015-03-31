@@ -10,6 +10,7 @@
   "author": "",
   "devDependencies": {
     "asmcrypto.js": "https://github.com/vibornoff/asmcrypto.js/archive/v0.0.7.tar.gz",
+    "aws-sdk": "^2.1.20",
     "babel-eslint": "^2.0.2",
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",

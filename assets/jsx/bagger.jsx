@@ -7,6 +7,8 @@ class Bagger extends React.Component {
     constructor(props) {
         super(props);
 
+        this.uploadWorker = new Worker('upload-worker.js');
+
         this.hashWorkers = [];
         this.busyWorkers = new Set();
 
