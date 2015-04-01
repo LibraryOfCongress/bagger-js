@@ -23,7 +23,7 @@ class BagContents extends React.Component {
         super(props);
         this.state = {
             files: props.files,
-            bagging: props.bagging,
+            hashing: props.hashing,
             total: props.total
         };
     }
@@ -39,7 +39,7 @@ class BagContents extends React.Component {
         var manifestSHA1 = null;
         var manifestSHA256 = null;
 
-        if (this.props.bagging) {
+        if (this.props.hashing) {
             manifestSHA1 = <Manifest files={this.props.files} hashType="sha1" />;
             manifestSHA256 = <Manifest files={this.props.files} hashType="sha256" />;
         }
