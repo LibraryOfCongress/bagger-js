@@ -252,7 +252,7 @@ class Bagger extends React.Component {
                 totalUploaded += fileSize;
                 totalFilesUploaded += 1;
 
-                console.log('Received upload for file %s from worker %d', fullPath, workerId, d.output);
+                console.log('Received upload for file %s from worker %d', fullPath, workerId);
 
                 var taskPerf = d.performance;
                 console.log('Uploaded %d bytes in %s seconds (%s MB/s)', fileSize,

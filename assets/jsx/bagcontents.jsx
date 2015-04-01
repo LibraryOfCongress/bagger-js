@@ -49,6 +49,7 @@ class BagContents extends React.Component {
             manifestSHA256 = <Manifest files={this.props.files} hashType="sha256" />;
         }
 
+        var inProgress = !this.props.hashing;
 
         var bagContentsTable = null;
 
@@ -88,7 +89,8 @@ class BagContents extends React.Component {
                 </div>
 
                 <h2>
-                    Contents <small>{this.props.files.length.toLocaleString()} files ({filesize(this.props.total, {round: 0})})</small>
+                    Contents <small>{this.props.files.length.toLocaleString()} files
+                                    ({inProgress ? 'at least ': ''}{filesize(this.props.total, {round: 0})})</small>
                 </h2>
 
                 {bagContentsTable}
