@@ -12,8 +12,6 @@ class Dashboard extends React.Component {
         }
 
         var hashComplete = (100 * (1 - (hashWorkers.pendingFiles / files.total))).toFixed(0),
-            // Yay insufficient magic: this has to be done at a distance because the JSX parser forces style to be an object but can't declare one inline:
-            hashCompleteStyle = {width: hashComplete + '%'},
             hashBytesPerSecond = hashWorkers.totalBytes / hashWorkers.totalTime || 0,
             hashSpeed = filesize(hashBytesPerSecond, {round: 1}),
             uploadComplete = (100 * (1 - (uploadWorkers.pendingFiles / files.total))).toFixed(0),
@@ -46,7 +44,7 @@ class Dashboard extends React.Component {
                 <div className="col-sm-5 hash-stats">
                     <h5>Hashing</h5>
                     <div className="progress">
-                        <div className={hashProgressClasses} role="progressbar" aria-valuenow="{hashComplete}" aria-valuemin="0" aria-valuemax="100" style={hashCompleteStyle}>
+                        <div className={hashProgressClasses} role="progressbar" aria-valuenow={{width: hashComplete + '%'}} aria-valuemin="0" aria-valuemax="100" style={{width: hashComplete + '%'}}>
                             {hashComplete}%
                         </div>
                     </div>
