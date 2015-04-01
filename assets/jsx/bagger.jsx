@@ -31,7 +31,6 @@ class Bagger extends React.Component {
             files: [],
             pendingFileHashKeys: [],
             pendingFileUploadKeys: [],
-            // FIXME: this should have a less generic name:
             totalBytes: 0,
             totalFilesUploaded: 0,
             hashing: false,
