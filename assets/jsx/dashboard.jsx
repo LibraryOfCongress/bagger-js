@@ -6,7 +6,7 @@ class Dashboard extends React.Component {
         var res = ['progress-bar'];
 
         if (workerStats.completed) {
-            res = res.push('progress-bar-success');
+            res.push('progress-bar-success');
         } else if (workerStats.active > 0) {
             res = res.concat(['progress-bar-striped', 'active']);
         }

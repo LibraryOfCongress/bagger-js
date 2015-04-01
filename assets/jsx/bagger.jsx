@@ -12,7 +12,7 @@ class WorkerPool {
 
         for (var i = 0; i < n; i++) {
             var w = new Worker(url);
-            w.addEventListener('message', responseHandler);
+            w.addEventListener('message', this.handleWorkerResponse.bind(this));
             this.workers.push(w);
         }
 
@@ -20,7 +20,7 @@ class WorkerPool {
         this.responseHandler = responseHandler;
     }
 
-    handlerWorkerResponse(evt) {
+    handleWorkerResponse(evt) {
         this.busyWorkers.delete(evt.data.workerId);
         this.responseHandler(evt);
     }
