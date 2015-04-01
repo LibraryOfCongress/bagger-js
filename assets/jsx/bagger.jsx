@@ -51,16 +51,9 @@ class Bagger extends React.Component {
     constructor(props) {
         super(props);
 
-        this.hashWorkers = [];
-        this.busyHashWorkers = new Set();
+        this.hashWorkerPool = new WorkerPool('hash-worker.js', 4, this.handleHashWorkerResponse.bind(this));
 
-        this.uploadWorkerPool = new WorkerPool('upload-worker.js', 4, this.handleUploaderResponse.bind(this));
-
-        for (var i = 0; i < 4; i++) {
-            var w = new Worker('hash-worker.js');
-            w.addEventListener('message', this.handleHashWorkerResponse.bind(this));
-            this.hashWorkers.push(w);
-        }
+        this.uploadWorkerPool = new WorkerPool('upload-worker.js', 4, this.handleUploadWorkerResponse.bind(this));
 
         this.state = {
             files: [],
@@ -120,36 +113,20 @@ class Bagger extends React.Component {
 
         this.setState({hashing: false});
 
-        while (pendingFileHashKeys.length && (this.hashWorkers.length > this.busyHashWorkers.size)) {
-            var nextHashWorkerId;
-
-            for (var i = 0; i < this.hashWorkers.length; i++) {
-                if (!this.busyHashWorkers.has(i)) {
-                    this.busyHashWorkers.add(i);
-                    nextHashWorkerId = i;
-                    break;
-                }
-            }
-
-            if (nextHashWorkerId === null) {
-                throw new Error('Could not find a free worker as expected');
-            }
-
+        while (pendingFileHashKeys.length && this.hashWorkerPool.workerFree()) {
             var file = files[pendingFileHashKeys.shift()];
 
-            console.log('Telling worker %d to process file %s (%d queued)', nextHashWorkerId, file.fullPath,
-                        pendingFileHashKeys.length);
+            //console.log('Telling worker %d to process file %s (%d queued)', nextHashWorkerId, file.fullPath, pendingFileHashKeys.length);
 
-            this.hashWorkers[nextHashWorkerId].postMessage({
-                'workerId': nextHashWorkerId,
+            this.hashWorkerPool.postMessage({
                 'file': file.file,
                 'fullPath': file.fullPath,
                 'action': 'hash'
             });
         }
 
-        this.setState({activeHashWorkers: this.busyHashWorkers.size});
-        console.log('Waiting for a free hash worker; current count: %d', this.busyHashWorkers.size);
+        this.setState({activeHashWorkers: this.hashWorkerPool.busyWorkers.size});
+        console.log('Waiting for a free hash worker; current count: %d', this.hashWorkerPool.busyWorkers.size);
     }
 
     checkUploadQueue() {
@@ -185,8 +162,6 @@ class Bagger extends React.Component {
             workerId = d.workerId,
             fullPath = d.fullPath,
             fileSize = d.fileSize;
-
-        this.busyHashWorkers.delete(d.workerId);
 
         switch (d.action) {
             case 'hash':
@@ -247,7 +222,7 @@ class Bagger extends React.Component {
         }
     }
 
-    handleUploaderResponse(evt) {
+    handleUploadWorkerResponse(evt) {
         var d = evt.data,
             workerId = d.workerId,
             fullPath = d.fullPath,
@@ -313,8 +288,8 @@ class Bagger extends React.Component {
                 size: this.state.totalBytes
             },
             hashWorkers: {
-                total: this.hashWorkers.length,
-                active: this.busyHashWorkers.size,
+                total: this.hashWorkerPool.workers.length,
+                active: this.hashWorkerPool.busyWorkers.size,
                 pendingFiles: this.state.pendingFileHashKeys.length,
                 totalBytes: this.state.performance.hashWorkers.bytes,
                 totalTime: this.state.performance.hashWorkers.time
