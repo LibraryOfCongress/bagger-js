@@ -2,6 +2,18 @@ var React = require('react/addons'),
     filesize = require('filesize');
 
 class Dashboard extends React.Component {
+    getProgressBarClasses(workerStats) {
+        var res = ['progress-bar'];
+
+        if (workerStats.active > 0) {
+            res.push(['progress-bar-striped', 'active']);
+        } else if (workerStats.totalBytes > 0) {
+            res.push(['progress-bar-success']);
+        }
+
+        return res.join(' ');
+    }
+
     render() {
         var files = this.props.files,
             hashWorkers = this.props.hashWorkers,
@@ -19,18 +31,8 @@ class Dashboard extends React.Component {
             uploadBytesPerSecond = uploadWorkers.totalBytes / uploadWorkers.totalTime || 0,
             uploadSpeed = filesize(uploadBytesPerSecond, {round: 1});
 
-            var hashProgressClasses = 'progress-bar',
-                uploadProgressClasses = 'progress-bar';
-
-            if (hashWorkers.active > 0) {
-                hashProgressClasses += ' progress-bar-striped active';
-            } else if (hashWorkers.totalBytes > 0) {
-                hashProgressClasses += ' progress-bar-success';
-            }
-
-            if (uploadWorkers.active > 0) {
-                uploadProgressClasses += ' progress-bar-striped active';
-            }
+        var hashProgressClasses = this.getProgressBarClasses(hashWorkers),
+            uploadProgressClasses = this.getProgressBarClasses(uploadWorkers);
 
         return (
             <div className="dashboard well well-sm clearfix">
