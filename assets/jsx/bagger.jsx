@@ -293,7 +293,7 @@ class Bagger extends React.Component {
                 pendingFiles: this.state.pendingFileHashKeys.length,
                 totalBytes: this.state.performance.hashWorkers.bytes,
                 totalTime: this.state.performance.hashWorkers.time,
-                completed: this.busyHashWorkers.size === 0 && this.state.files.length > 0 && this.state.pendingFileHashKeys.length === 0
+                completed: this.hashWorkerPool.busyWorkers.size === 0 && this.state.files.length > 0 && this.state.pendingFileHashKeys.length === 0
             },
             uploadWorkers: {
                 total: this.uploadWorkerPool.workers.length,
@@ -302,7 +302,7 @@ class Bagger extends React.Component {
                 pendingFiles: this.state.pendingFileUploadKeys.length,
                 totalBytes: this.state.performance.uploadWorkers.bytes,
                 totalTime: this.state.performance.uploadWorkers.time,
-                completed: this.busyUploadWorkers.size === 0 && this.state.files.length > 0 && this.state.totalFilesUploaded >= this.state.files.length
+                completed: this.uploadWorkerPool.busyWorkers.size === 0 && this.state.files.length > 0 && this.state.totalFilesUploaded >= this.state.files.length
             }
         };
 
