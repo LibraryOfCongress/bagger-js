@@ -8,10 +8,12 @@ class FileRow extends React.Component {
         super(props);
     }
     render() {
+        var fileSize = this.props.file.size ? filesize(this.props.file.size) : '?';
+
         return (
             <tr>
                 <td className="file-name">{this.props.file.fullPath}</td>
-                <td className="file-size">{this.props.file.size}</td>
+                <td className="file-size">{fileSize}</td>
                 <td className="file-hash sha1" title={this.props.file.hashes.sha1}>{this.props.file.hashes.sha1}</td>
                 <td className="file-hash sha256" title={this.props.file.hashes.sha256}>{this.props.file.hashes.sha256}</td>
             </tr>
