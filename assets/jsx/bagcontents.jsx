@@ -68,7 +68,7 @@ class BagContents extends React.Component {
                     <tfoot>
                         <tr>
                             <th>Totals:</th>
-                            <td className="file-size total">{this.props.total}</td>
+                            <td className="file-size total">{filesize(this.props.total)}</td>
                             <td>{manifestSHA1}</td>
                             <td>{manifestSHA256}</td>
                         </tr>
