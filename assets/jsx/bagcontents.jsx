@@ -1,4 +1,5 @@
-var React = require('react/addons');
+var React = require('react/addons'),
+    filesize = require('filesize');
 
 import { Manifest } from '../jsx/manifest.jsx';
 
@@ -22,11 +23,13 @@ class BagContents extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            collapsed: true,
             files: props.files,
             bagging: props.bagging,
             total: props.total
         };
     }
+
     render() {
         if (this.props.files.length < 1) {
             return null;
@@ -44,30 +47,56 @@ class BagContents extends React.Component {
             manifestSHA256 = <Manifest files={this.props.files} hashType="sha256" />;
         }
 
+
+        var bagContentsTable = null;
+
+        if (!this.state.collapsed) {
+            bagContentsTable = (
+                <table className="table table-striped">
+                    <caption>Current Contents</caption>
+                    <thead>
+                        <tr>
+                            <th className="file-name">Filename</th>
+                            <th className="file-size">Size</th>
+                            <th className="file-hash sha1">SHA-1</th>
+                            <th className="file-hash sha256">SHA-256</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {files}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Totals:</th>
+                            <td className="file-size total">{this.props.total}</td>
+                            <td>{manifestSHA1}</td>
+                            <td>{manifestSHA256}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            );
+        }
+
         return (
-            <table id="bag-contents" className="table table-striped">
-                <caption>Current Contents</caption>
-                <thead>
-                    <tr>
-                        <th className="file-name">Filename</th>
-                        <th className="file-size">Size</th>
-                        <th className="file-hash sha1">SHA-1</th>
-                        <th className="file-hash sha256">SHA-256</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {files}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th>Totals:</th>
-                        <td className="file-size total">{this.props.total}</td>
-                        <td>{manifestSHA1}</td>
-                        <td>{manifestSHA256}</td>
-                    </tr>
-                </tfoot>
-            </table>
+            <div id="bag-contents" className="well well-sm">
+                <div className="pull-right">
+                    <button className="btn btn-info btn-lg" onClick={this.toggleCollapse.bind(this)}>
+                        {this.state.collapsed ? 'Show' : 'Hide'} File List
+                    </button>
+                </div>
+
+                <h2>
+                    Contents <small>{this.props.files.length.toLocaleString()} files ({filesize(this.props.total, {round: 0})})</small>
+                </h2>
+
+                {bagContentsTable}
+            </div>
         );
+    }
+
+    toggleCollapse(evt) {
+        evt.preventDefault();
+        this.setState({collapsed: !this.state.collapsed});
     }
 }
 

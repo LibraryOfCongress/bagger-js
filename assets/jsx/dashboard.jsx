@@ -34,14 +34,7 @@ class Dashboard extends React.Component {
 
         return (
             <div className="dashboard well well-sm clearfix">
-                <div className="col-sm-2 file-stats">
-                    <h5>Files</h5>
-                    <span className="text-right">
-                        <output>{files.total.toLocaleString()}</output>
-                        <output>{filesize(files.size)}</output>
-                    </span>
-                </div>
-                <div className="col-sm-5 hash-stats">
+                <div className="col-sm-6 hash-stats">
                     <h5>Hashing</h5>
                     <div className="progress">
                         <div className={hashProgressClasses} role="progressbar" aria-valuenow={{width: hashComplete + '%'}} aria-valuemin="0" aria-valuemax="100" style={{width: hashComplete + '%'}}>
@@ -49,10 +42,9 @@ class Dashboard extends React.Component {
                         </div>
                     </div>
 
-                    <p>{hashWorkers.active} / {hashWorkers.total} active</p>
-                    <p>Throughput: {hashSpeed}/s</p>
+                    <p>{hashWorkers.active} / {hashWorkers.total} active, average throughput: {hashSpeed}/s</p>
                 </div>
-                <div className="col-sm-5 upload-stats">
+                <div className="col-sm-6 upload-stats">
                     <h5>Uploads</h5>
 
                     <div className="progress">
@@ -61,8 +53,7 @@ class Dashboard extends React.Component {
                         </div>
                     </div>
 
-                    <p>{uploadWorkers.active} / {uploadWorkers.total} active</p>
-                    <p>Throughput: {uploadSpeed}/s</p>
+                    <p>{uploadWorkers.active} / {uploadWorkers.total} active, average throughput: {uploadSpeed}/s</p>
                 </div>
             </div>
         );
