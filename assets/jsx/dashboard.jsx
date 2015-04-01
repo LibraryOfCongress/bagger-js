@@ -7,14 +7,14 @@ class Dashboard extends React.Component {
             hashWorkers = this.props.hashWorkers,
             uploadWorkers = this.props.uploadWorkers;
 
-        if (files.totalHashed < 1) {
+        if (files.total < 1) {
             return null;
         }
 
-        var hashComplete = (100 * (1 - (hashWorkers.pendingFiles / files.totalHashed))).toFixed(0),
+        var hashComplete = (100 * (1 - (hashWorkers.pendingFiles / files.total))).toFixed(0),
             hashBytesPerSecond = hashWorkers.totalBytes / hashWorkers.totalTime || 0,
             hashSpeed = filesize(hashBytesPerSecond, {round: 1}),
-            uploadComplete = (100 * (1 - (uploadWorkers.pendingFiles / files.totalHashed))).toFixed(0),
+            uploadComplete = (100 * (uploadWorkers.totalUploaded / files.total)).toFixed(0),
             uploadCompleteStyle = {width: uploadComplete + '%'},
             uploadBytesPerSecond = uploadWorkers.totalBytes / uploadWorkers.totalTime || 0,
             uploadSpeed = filesize(uploadBytesPerSecond, {round: 1});
@@ -37,7 +37,7 @@ class Dashboard extends React.Component {
                 <div className="col-sm-2 file-stats">
                     <h5>Files</h5>
                     <span className="text-right">
-                        <output>{files.totalHashed.toLocaleString()}</output>
+                        <output>{files.total.toLocaleString()}</output>
                         <output>{filesize(files.size)}</output>
                     </span>
                 </div>

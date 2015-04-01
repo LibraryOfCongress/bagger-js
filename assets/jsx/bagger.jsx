@@ -32,7 +32,8 @@ class Bagger extends React.Component {
             pendingFileHashKeys: [],
             pendingFileUploadKeys: [],
             // FIXME: this should have a less generic name:
-            totalHashed: 0,
+            totalBytes: 0,
+            totalFilesUploaded: 0,
             hashing: false,
             performance: {
                 hashWorkers: {
@@ -50,8 +51,7 @@ class Bagger extends React.Component {
     }
 
     handleFilesChanged(newFiles) {
-        var bagFiles = [].concat(this.state.files), pendingKeys = [].concat(this.state.pendingFileHashKeys),
-            pendingUploadKeys = [].concat(this.state.pendingFileUploadKeys);
+        var bagFiles = [].concat(this.state.files), pendingKeys = [].concat(this.state.pendingFileHashKeys);
 
         var uniqueFilenames = new Set(this.state.files.map(function (i) { return i.fullPath; }));
 
@@ -67,13 +67,11 @@ class Bagger extends React.Component {
 
             var newRowId = bagFiles.push(rec) - 1;
             pendingKeys.push(newRowId);
-            pendingUploadKeys.push(newRowId);
         }
 
         this.setState({files: bagFiles, pendingFileHashKeys: pendingKeys},
                       this.checkHashQueue.bind(this));
-        this.setState({pendingFileUploadKeys: pendingUploadKeys},
-                      this.checkUploadQueue.bind(this));
+
         return;
     }
 
@@ -175,7 +173,7 @@ class Bagger extends React.Component {
             case 'hash':
                 var file,
                     files = this.state.files,
-                    totalHashed = this.state.totalHashed,
+                    totalBytes = this.state.totalBytes,
                     performance = this.state.performance;
 
                 for (var i in files) {
@@ -190,8 +188,13 @@ class Bagger extends React.Component {
                     return;
                 }
 
+                var pendingUploadKeys = [].concat(this.state.pendingFileUploadKeys);
+                pendingUploadKeys.push(i);
+                this.setState({pendingFileUploadKeys: pendingUploadKeys},
+                              this.checkUploadQueue.bind(this));
+
                 file.size = fileSize;
-                totalHashed += fileSize;
+                totalBytes += fileSize;
 
                 console.log('Received hashes for file %s from worker %d', fullPath, workerId, d.output);
 
@@ -206,7 +209,7 @@ class Bagger extends React.Component {
 
                 this.setState({
                     files: files,
-                    totalHashed: totalHashed,
+                    totalBytes: totalBytes,
                     performance: React.addons.update(performance, {
                         $merge: {
                             hashWorkers: {
@@ -238,6 +241,7 @@ class Bagger extends React.Component {
                 var file,
                     files = this.state.files,
                     totalUploaded = this.state.totalUploaded,
+                    totalFilesUploaded = this.state.totalFilesUploaded,
                     performance = this.state.performance;
 
                 for (var i in files) {
@@ -254,6 +258,7 @@ class Bagger extends React.Component {
 
                 //file.size = fileSize;
                 totalUploaded += fileSize;
+                totalFilesUploaded += 1;
 
                 console.log('Received upload for file %s from worker %d', fullPath, workerId, d.output);
 
@@ -265,6 +270,7 @@ class Bagger extends React.Component {
                 this.setState({
                     files: files,
                     totalUploaded: totalUploaded,
+                    totalFilesUploaded: totalFilesUploaded,
                     performance: React.addons.update(performance, {
                         $merge: {
                             uploadWorkers: {
@@ -286,8 +292,8 @@ class Bagger extends React.Component {
     render() {
         var stats = {
             files: {
-                totalHashed: this.state.files.length,
-                size: this.state.totalHashed
+                total: this.state.files.length,
+                size: this.state.totalBytes
             },
             hashWorkers: {
                 total: this.hashWorkers.length,
@@ -298,6 +304,7 @@ class Bagger extends React.Component {
             },
             uploadWorkers: {
                 total: this.uploaders.length,
+                totalUploaded: this.state.totalFilesUploaded,
                 active: this.busyUploaders.size,
                 pendingFiles: this.state.pendingFileUploadKeys.length,
                 totalBytes: this.state.performance.uploadWorkers.bytes,
@@ -312,7 +319,7 @@ class Bagger extends React.Component {
 
                 <Dashboard {...stats} />
 
-                <BagContents files={this.state.files} total={this.state.totalHashed} hashing={this.state.hashing} />
+                <BagContents files={this.state.files} total={this.state.totalBytes} hashing={this.state.hashing} />
             </div>
         );
     }
