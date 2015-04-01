@@ -44,10 +44,9 @@ th.file-name {
 	text-align: left;
 }
 
-.file-size, .file-hash {
+td.file-size, td.file-hash {
 	text-align: right;
-	font-family: monospace;
-	font-size: small;
+	font-family: Menlo, Consolas, 'Droid Sans Mono', monospace;
 }
 
 .progress-bar {
