@@ -5,10 +5,10 @@ class Dashboard extends React.Component {
     getProgressBarClasses(workerStats) {
         var res = ['progress-bar'];
 
-        if (workerStats.active > 0) {
-            res.push(['progress-bar-striped', 'active']);
-        } else if (workerStats.totalBytes > 0) {
+        if (workerStats.completed) {
             res.push(['progress-bar-success']);
+        } else if (workerStats.active > 0) {
+            res.push(['progress-bar-striped', 'active']);
         }
 
         return res.join(' ');
