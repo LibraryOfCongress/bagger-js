@@ -10,21 +10,21 @@ class Bagger extends React.Component {
         super(props);
 
         this.hashWorkers = [];
-        this.busyWorkers = new Set();
+        this.busyHashWorkers = new Set();
 
-        this.uploaders = [];
-        this.busyUploaders = new Set();
+        this.uploadWorkers = [];
+        this.busyUploadWorkers = new Set();
 
         for (var i = 0; i < 4; i++) {
             var w = new Worker('hash-worker.js');
-            w.addEventListener('message', this.handleWorkerResponse.bind(this));
+            w.addEventListener('message', this.handleHashWorkerResponse.bind(this));
             this.hashWorkers.push(w);
         }
 
         for (i = 0; i < 4; i++) {
             w = new Worker('upload-worker.js');
             w.addEventListener('message', this.handleUploaderResponse.bind(this));
-            this.uploaders.push(w);
+            this.uploadWorkers.push(w);
         }
 
         this.state = {
@@ -85,12 +85,12 @@ class Bagger extends React.Component {
 
         this.setState({hashing: false});
 
-        while (pendingFileHashKeys.length && (this.hashWorkers.length > this.busyWorkers.size)) {
+        while (pendingFileHashKeys.length && (this.hashWorkers.length > this.busyHashWorkers.size)) {
             var nextHashWorkerId;
 
             for (var i = 0; i < this.hashWorkers.length; i++) {
-                if (!this.busyWorkers.has(i)) {
-                    this.busyWorkers.add(i);
+                if (!this.busyHashWorkers.has(i)) {
+                    this.busyHashWorkers.add(i);
                     nextHashWorkerId = i;
                     break;
                 }
@@ -113,8 +113,8 @@ class Bagger extends React.Component {
             });
         }
 
-        this.setState({activeHashWorkers: this.busyWorkers.size});
-        console.log('Waiting for a free hash worker; current count: %d', this.busyWorkers.size);
+        this.setState({activeHashWorkers: this.busyHashWorkers.size});
+        console.log('Waiting for a free hash worker; current count: %d', this.busyHashWorkers.size);
     }
 
     checkUploadQueue() {
@@ -128,12 +128,12 @@ class Bagger extends React.Component {
 
         this.setState({uploading: false});
 
-        while (pendingFileUploadKeys.length && (this.uploaders.length > this.busyUploaders.size)) {
+        while (pendingFileUploadKeys.length && (this.uploadWorkers.length > this.busyUploadWorkers.size)) {
             var nextUploadWorkerId;
 
-            for (var i = 0; i < this.uploaders.length; i++) {
-                if (!this.busyUploaders.has(i)) {
-                    this.busyUploaders.add(i);
+            for (var i = 0; i < this.uploadWorkers.length; i++) {
+                if (!this.busyUploadWorkers.has(i)) {
+                    this.busyUploadWorkers.add(i);
                     nextUploadWorkerId = i;
                     break;
                 }
@@ -148,7 +148,7 @@ class Bagger extends React.Component {
             console.log('Telling worker %d to upload file %s (%d queued)', nextUploadWorkerId, file.fullPath,
                         pendingFileUploadKeys.length);
 
-            this.uploaders[nextUploadWorkerId].postMessage({
+            this.uploadWorkers[nextUploadWorkerId].postMessage({
                 'workerId': nextUploadWorkerId,
                 'file': file.file,
                 'fullPath': file.fullPath,
@@ -156,17 +156,17 @@ class Bagger extends React.Component {
             });
         }
 
-        this.setState({activeUploadWorkers: this.busyUploaders.size});
-        console.log('Waiting for a free upload worker; current count: %d', this.busyUploaders.size);
+        this.setState({activeUploadWorkers: this.busyUploadWorkers.size});
+        console.log('Waiting for a free upload worker; current count: %d', this.busyUploadWorkers.size);
     }
 
-    handleWorkerResponse(evt) {
+    handleHashWorkerResponse(evt) {
         var d = evt.data,
             workerId = d.workerId,
             fullPath = d.fullPath,
             fileSize = d.fileSize;
 
-        this.busyWorkers.delete(d.workerId);
+        this.busyHashWorkers.delete(d.workerId);
 
         switch (d.action) {
             case 'hash':
@@ -233,7 +233,7 @@ class Bagger extends React.Component {
             fullPath = d.fullPath,
             fileSize = d.fileSize;
 
-        this.busyUploaders.delete(d.workerId);
+        this.busyUploadWorkers.delete(d.workerId);
 
         switch (d.action) {
             case 'upload':
@@ -296,15 +296,15 @@ class Bagger extends React.Component {
             },
             hashWorkers: {
                 total: this.hashWorkers.length,
-                active: this.busyWorkers.size,
+                active: this.busyHashWorkers.size,
                 pendingFiles: this.state.pendingFileHashKeys.length,
                 totalBytes: this.state.performance.hashWorkers.bytes,
                 totalTime: this.state.performance.hashWorkers.time
             },
             uploadWorkers: {
-                total: this.uploaders.length,
+                total: this.uploadWorkers.length,
                 totalUploaded: this.state.totalFilesUploaded,
-                active: this.busyUploaders.size,
+                active: this.busyUploadWorkers.size,
                 pendingFiles: this.state.pendingFileUploadKeys.length,
                 totalBytes: this.state.performance.uploadWorkers.bytes,
                 totalTime: this.state.performance.uploadWorkers.time
