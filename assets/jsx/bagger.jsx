@@ -4,48 +4,7 @@ import { BagContents } from '../jsx/bagcontents.jsx';
 import { SelectFiles } from '../jsx/selectfiles.jsx';
 import { Dashboard } from '../jsx/dashboard.jsx';
 
-class WorkerPool {
-
-    constructor(url, n, responseHandler) {
-        this.n = n;
-        this.workers = [];
-
-        for (var i = 0; i < n; i++) {
-            var w = new Worker(url);
-            w.addEventListener('message', this.handleWorkerResponse.bind(this));
-            this.workers.push(w);
-        }
-
-        this.busyWorkers = new Set();
-        this.responseHandler = responseHandler;
-    }
-
-    handleWorkerResponse(evt) {
-        this.busyWorkers.delete(evt.data.workerId);
-        this.responseHandler(evt);
-    }
-
-    workerFree() {
-        return (this.workers.length > this.busyWorkers.size);
-    }
-
-    postMessage(message) {
-        var nextWorkerId;
-
-        for (var i = 0; i < this.workers.length; i++) {
-            if (!this.busyWorkers.has(i)) {
-                this.busyWorkers.add(i);
-                nextWorkerId = i;
-                break;
-            }
-        }
-        if (nextWorkerId === null) {
-            throw new Error('Could not find a free worker as expected');
-        }
-        message.workerId = nextWorkerId;
-        this.workers[nextWorkerId].postMessage(message);
-    }
-}
+import { WorkerPool } from '../js/worker-pool.js';
 
 class Bagger extends React.Component {
     constructor(props) {
@@ -57,11 +16,9 @@ class Bagger extends React.Component {
 
         this.state = {
             files: [],
-            pendingFileHashKeys: [],
-            pendingFileUploadKeys: [],
             totalBytes: 0,
+            totalFilesHashed: 0,
             totalFilesUploaded: 0,
-            hashing: false,
             performance: {
                 hashWorkers: {
                     files: 0,
@@ -78,7 +35,7 @@ class Bagger extends React.Component {
     }
 
     handleFilesChanged(newFiles) {
-        var bagFiles = [].concat(this.state.files), pendingKeys = [].concat(this.state.pendingFileHashKeys);
+        var bagFiles = [].concat(this.state.files);
 
         var uniqueFilenames = new Set(this.state.files.map(function (i) { return i.fullPath; }));
 
@@ -92,69 +49,24 @@ class Bagger extends React.Component {
 
             rec.hashes = {};
 
-            var newRowId = bagFiles.push(rec) - 1;
-            pendingKeys.push(newRowId);
+            bagFiles.push(rec);
         }
 
-        this.setState({files: bagFiles, pendingFileHashKeys: pendingKeys},
-                      this.checkHashQueue.bind(this));
+        this.setState({files: bagFiles}, function() {
+            for (var i in this.state.files) {
+                var file = this.state.files[i];
+                this.hashWorkerPool.postMessage(
+                    {
+                        'file': file.file,
+                        'fullPath': file.fullPath,
+                        'action': 'hash'
+                    }
+                );
+
+            }
+        });
 
         return;
-    }
-
-    checkHashQueue() {
-        var files = this.state.files, pendingFileHashKeys = this.state.pendingFileHashKeys;
-
-        if (pendingFileHashKeys.length < 1) {
-            console.debug('No pending files to hash');
-            this.setState({hashing: true});
-            return;
-        }
-
-        this.setState({hashing: false});
-
-        while (pendingFileHashKeys.length && this.hashWorkerPool.workerFree()) {
-            var file = files[pendingFileHashKeys.shift()];
-
-            //console.log('Telling worker %d to process file %s (%d queued)', nextHashWorkerId, file.fullPath, pendingFileHashKeys.length);
-
-            this.hashWorkerPool.postMessage({
-                'file': file.file,
-                'fullPath': file.fullPath,
-                'action': 'hash'
-            });
-        }
-
-        this.setState({activeHashWorkers: this.hashWorkerPool.busyWorkers.size});
-        console.log('Waiting for a free hash worker; current count: %d', this.hashWorkerPool.busyWorkers.size);
-    }
-
-    checkUploadQueue() {
-        var files = this.state.files, pendingFileUploadKeys = this.state.pendingFileUploadKeys;
-
-        if (pendingFileUploadKeys.length < 1) {
-            console.debug('No pending files to upload');
-            this.setState({uploading: true});
-            return;
-        }
-
-        this.setState({uploading: false});
-
-        while (pendingFileUploadKeys.length && this.uploadWorkerPool.workerFree()) {
-
-            var file = files[pendingFileUploadKeys.shift()];
-
-            //console.log('Telling worker %d to upload file %s (%d queued)', nextUploadWorkerId, file.fullPath, pendingFileUploadKeys.length);
-
-            this.uploadWorkerPool.postMessage({
-                'file': file.file,
-                'fullPath': file.fullPath,
-                'action': 'upload'
-            });
-        }
-
-        this.setState({activeUploadWorkers: this.uploadWorkerPool.busyWorkers.size});
-        console.log('Waiting for a free upload worker; current count: %d', this.uploadWorkerPool.busyWorkers.size);
     }
 
     handleHashWorkerResponse(evt) {
@@ -168,6 +80,7 @@ class Bagger extends React.Component {
                 var file,
                     files = this.state.files,
                     totalBytes = this.state.totalBytes,
+                    totalFilesHashed = this.state.totalFilesHashed,
                     performance = this.state.performance;
 
                 for (var i in files) {
@@ -182,10 +95,14 @@ class Bagger extends React.Component {
                     return;
                 }
 
-                var pendingUploadKeys = [].concat(this.state.pendingFileUploadKeys);
-                pendingUploadKeys.push(i);
-                this.setState({pendingFileUploadKeys: pendingUploadKeys},
-                              this.checkUploadQueue.bind(this));
+                this.uploadWorkerPool.postMessage(
+                    {
+                        'file': file.file,
+                        'fullPath': file.fullPath,
+                        'action': 'upload'
+                    });
+
+                totalFilesHashed += 1;
 
                 file.size = fileSize;
                 totalBytes += fileSize;
@@ -203,6 +120,7 @@ class Bagger extends React.Component {
 
                 this.setState({
                     files: files,
+                    totalFilesHashed: totalFilesHashed,
                     totalBytes: totalBytes,
                     performance: React.addons.update(performance, {
                         $merge: {
@@ -214,7 +132,7 @@ class Bagger extends React.Component {
                         }
                     })
                 });
-                this.checkHashQueue();
+
                 break;
 
             default:
@@ -248,7 +166,6 @@ class Bagger extends React.Component {
                     return;
                 }
 
-                //file.size = fileSize;
                 totalUploaded += fileSize;
                 totalFilesUploaded += 1;
 
@@ -273,7 +190,7 @@ class Bagger extends React.Component {
                         }
                     })
                 });
-                this.checkUploadQueue();
+
                 break;
 
             default:
@@ -290,21 +207,22 @@ class Bagger extends React.Component {
             hashWorkers: {
                 total: this.hashWorkerPool.workers.length,
                 active: this.hashWorkerPool.busyWorkers.size,
-                pendingFiles: this.state.pendingFileHashKeys.length,
+                pendingFiles: this.state.files.length - this.state.totalFilesHashed,
                 totalBytes: this.state.performance.hashWorkers.bytes,
                 totalTime: this.state.performance.hashWorkers.time,
-                completed: this.hashWorkerPool.busyWorkers.size === 0 && this.state.files.length > 0 && this.state.pendingFileHashKeys.length === 0
+                completed: this.hashWorkerPool.busyWorkers.size === 0 && this.state.files.length > 0 && this.state.files.length === this.state.totalFilesHashed
             },
             uploadWorkers: {
                 total: this.uploadWorkerPool.workers.length,
                 totalUploaded: this.state.totalFilesUploaded,
                 active: this.uploadWorkerPool.busyWorkers.size,
-                pendingFiles: this.state.pendingFileUploadKeys.length,
+                pendingFiles: this.state.files.length - this.state.totalFilesUploaded,
                 totalBytes: this.state.performance.uploadWorkers.bytes,
                 totalTime: this.state.performance.uploadWorkers.time,
-                completed: this.uploadWorkerPool.busyWorkers.size === 0 && this.state.files.length > 0 && this.state.totalFilesUploaded >= this.state.files.length
+                completed: this.uploadWorkerPool.busyWorkers.size === 0 && this.state.files.length > 0 && this.state.files.length === this.state.totalFilesUploaded
             }
         };
+        var hashing = this.state.files.length - this.state.totalFilesHashed > 0;
 
         return (
             <div className="bagger">
@@ -313,7 +231,7 @@ class Bagger extends React.Component {
 
                 <Dashboard {...stats} />
 
-                <BagContents files={this.state.files} total={this.state.totalBytes} hashing={this.state.hashing} />
+                <BagContents files={this.state.files} total={this.state.totalBytes} hashing={hashing} />
             </div>
         );
     }
