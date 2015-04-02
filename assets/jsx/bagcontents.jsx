@@ -49,7 +49,7 @@ class BagContents extends React.Component {
             manifestSHA256 = <Manifest files={this.props.files} hashType="sha256" />;
         }
 
-        var inProgress = !this.props.hashing;
+        var inProgress = this.props.hashing;
 
         var bagContentsTable = null;
 
