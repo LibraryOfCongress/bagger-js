@@ -47,21 +47,21 @@ class Bagger extends React.Component {
                 continue;
             }
 
-            rec.hashes = {};
-
             bagFiles.push(rec);
         }
 
         this.setState({files: bagFiles}, function() {
             for (var i in this.state.files) {
                 var file = this.state.files[i];
-                this.hashWorkerPool.postMessage(
-                    {
-                        'file': file.file,
-                        'fullPath': file.fullPath,
-                        'action': 'hash'
-                    }
-                );
+                if (file.hashes === undefined) {
+                    this.hashWorkerPool.postMessage(
+                        {
+                            'file': file.file,
+                            'fullPath': file.fullPath,
+                            'action': 'hash'
+                        }
+                    );
+                }
 
             }
         });
@@ -109,6 +109,7 @@ class Bagger extends React.Component {
 
                 console.log('Received hashes for file %s from worker %d', fullPath, workerId, d.output);
 
+                file.hashes = {};
                 for (var hashName in d.output) { // jshint -W089
                     file.hashes[hashName] = d.output[hashName];
                 }
