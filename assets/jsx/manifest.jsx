@@ -1,10 +1,12 @@
 var React = require('react/addons');
 
 class Manifest extends React.Component {
+
     constructor(props) {
         super(props);
     }
-    render() {
+
+    generateManifest(evt) {
         var manifest = [];
         var hashType = this.props.hashType;
 
@@ -14,10 +16,14 @@ class Manifest extends React.Component {
         });
 
         var href = 'data:text/plain,' + encodeURIComponent(manifest.join('\n'));
-        var filename = 'manifest-' + hashType;
+        evt.target.href = href;
+    }
+
+    render() {
+        var filename = 'manifest-' + this.props.hashType;
 
         return (
-            <a id={'manifest-'+hashType} href={href} target="_blank" download={filename}>{filename}</a>
+            <a onClick={this.generateManifest.bind(this)} target="_blank" download={filename}>{filename}</a>
         );
     }
 }
