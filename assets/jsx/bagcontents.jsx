@@ -41,7 +41,7 @@ class BagContents extends React.Component {
         var manifestSHA1 = null;
         var manifestSHA256 = null;
 
-        if (this.props.hashing) {
+        if (!this.props.hashing) {
             manifestSHA1 = <Manifest files={this.props.files} hashType="sha1" />;
             manifestSHA256 = <Manifest files={this.props.files} hashType="sha256" />;
         }
