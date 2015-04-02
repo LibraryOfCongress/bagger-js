@@ -25,10 +25,7 @@ class BagContents extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            collapsed: true,
-            files: props.files,
-            hashing: props.hashing,
-            total: props.total
+            collapsed: true
         };
     }
 
