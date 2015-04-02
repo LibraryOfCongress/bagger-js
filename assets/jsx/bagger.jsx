@@ -35,7 +35,8 @@ class Bagger extends React.Component {
     }
 
     handleFilesChanged(newFiles) {
-        var bagFiles = [].concat(this.state.files);
+        var bagFiles = this.state.files;
+        var newBagFiles = [];
 
         var uniqueFilenames = new Set(this.state.files.map(function (i) { return i.fullPath; }));
 
@@ -46,23 +47,22 @@ class Bagger extends React.Component {
                 console.log('Skipping duplicate file', rec.fullPath);
                 continue;
             }
-
-            bagFiles.push(rec);
+            rec.hashes = {};
+            newBagFiles.push(rec);
         }
 
-        this.setState({files: bagFiles}, function() {
-            for (var i in this.state.files) {
-                var file = this.state.files[i];
-                if (file.hashes === undefined) {
-                    this.hashWorkerPool.postMessage(
-                        {
-                            'file': file.file,
-                            'fullPath': file.fullPath,
-                            'action': 'hash'
-                        }
-                    );
-                }
+        bagFiles = bagFiles.concat(newBagFiles);
 
+        this.setState({files: bagFiles}, function() {
+            for (var i in newBagFiles) {
+                var file = newBagFiles[i];
+                this.hashWorkerPool.postMessage(
+                    {
+                        'file': file.file,
+                        'fullPath': file.fullPath,
+                        'action': 'hash'
+                    }
+                );
             }
         });
 
