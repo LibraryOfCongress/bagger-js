@@ -27,7 +27,7 @@ class BagContents extends React.Component {
         this.state = {
             collapsed: true,
             files: props.files,
-            bagging: props.bagging,
+            hashing: props.hashing,
             total: props.total
         };
     }
@@ -44,11 +44,12 @@ class BagContents extends React.Component {
         var manifestSHA1 = null;
         var manifestSHA256 = null;
 
-        if (this.props.bagging) {
+        if (this.props.hashing) {
             manifestSHA1 = <Manifest files={this.props.files} hashType="sha1" />;
             manifestSHA256 = <Manifest files={this.props.files} hashType="sha256" />;
         }
 
+        var inProgress = this.props.hashing;
 
         var bagContentsTable = null;
 
@@ -88,7 +89,8 @@ class BagContents extends React.Component {
                 </div>
 
                 <h2>
-                    Contents <small>{this.props.files.length.toLocaleString()} files ({filesize(this.props.total, {round: 0})})</small>
+                    Contents <small>{this.props.files.length.toLocaleString()} files
+                                    ({inProgress ? 'at least ': ''}{filesize(this.props.total, {round: 0})})</small>
                 </h2>
 
                 {bagContentsTable}
