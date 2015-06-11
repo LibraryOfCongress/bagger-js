@@ -1,6 +1,6 @@
 # bagger-js
 
-An experiment with a pure JavaScript implementation of the Bag-It specification
+An experiment with a pure JavaScript implementation of the BagIt specification
 and a simple web application which allows bagging and transferring local content
 
 
