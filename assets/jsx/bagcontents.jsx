@@ -87,7 +87,7 @@ class BagContents extends React.Component {
 
                 <h2>
                     Contents <small>{this.props.files.length.toLocaleString()} files
-                                    ({inProgress ? 'at least ': ''}{filesize(this.props.total, {round: 0})})</small>
+                                    ({inProgress ? 'at least ' : ''}{filesize(this.props.total, {round: 0})})</small>
                 </h2>
 
                 {bagContentsTable}

@@ -1,7 +1,5 @@
 var React = require('react');
 
-import { BagContents } from '../jsx/bagcontents.jsx';
-
 class SelectFiles extends React.Component {
     constructor(props) {
         super(props);
