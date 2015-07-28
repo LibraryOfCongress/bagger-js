@@ -12,6 +12,10 @@
         "strict": [0, "function"],
         "no-use-before-define": 0,
         "no-undef": 1,
-        "quotes": [1, "single", "avoid-escape"]
-    }
+        "quotes": [1, "single", "avoid-escape"],
+        "react/jsx-uses-vars": 1
+    },
+    "plugins": [
+        "eslint-plugin-react"
+    ]
 }
