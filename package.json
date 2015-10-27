@@ -29,6 +29,7 @@
     "vinyl-transform": "^1.0.0"
   },
   "dependencies": {
+    "aws-sdk": "^2.2.12",
     "connect": "^3.4.0",
     "morgan": "^1.6.1",
     "serve-static": "^1.10.0"

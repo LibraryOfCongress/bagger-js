@@ -34,16 +34,6 @@ gulp.task('browserify-hash-worker', function(){
         .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('browserify-upload-worker', function(){
-    var b = browserify({debug: true});
-    b.transform(babelify);
-    b.add('./assets/js/upload-worker.js');
-    return b.bundle()
-        .pipe(sourceStream('upload-worker.js'))
-        .pipe(transform(function () { return exorcist('dist/upload-worker.js.map'); }))
-        .pipe(gulp.dest('./dist'));
-});
-
 gulp.task('static', function () {
     gulp.src(['assets/html/index.html'])
         .pipe(gulp.dest('./dist'));
@@ -54,7 +44,7 @@ gulp.task('css', function () {
         .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('default', ['lint', 'browserify', 'browserify-hash-worker', 'browserify-upload-worker', 'static', 'css']);
+gulp.task('default', ['lint', 'browserify', 'browserify-hash-worker', 'static', 'css']);
 
 gulp.task('develop', ['default'], function() {
     var watcher = gulp.watch('assets/**/*.*', ['default']);

@@ -1,5 +1,7 @@
 var React = require('react/addons');
 
+var AWS = require('aws-sdk');
+
 import { BagContents } from '../jsx/bagcontents.jsx';
 import { SelectFiles } from '../jsx/selectfiles.jsx';
 import { Dashboard } from '../jsx/dashboard.jsx';
@@ -11,8 +13,6 @@ class Bagger extends React.Component {
         super(props);
 
         this.hashWorkerPool = new WorkerPool('hash-worker.js', 4, this.handleHashWorkerResponse.bind(this));
-
-        this.uploadWorkerPool = new WorkerPool('upload-worker.js', 4, this.handleUploadWorkerResponse.bind(this));
 
         this.state = {
             files: [],
@@ -95,12 +95,7 @@ class Bagger extends React.Component {
                     return;
                 }
 
-                this.uploadWorkerPool.postMessage(
-                    {
-                        'file': file.file,
-                        'fullPath': file.fullPath,
-                        'action': 'upload'
-                    });
+                this.uploadFile(file);
 
                 totalFilesHashed += 1;
 
@@ -141,62 +136,34 @@ class Bagger extends React.Component {
         }
     }
 
-    handleUploadWorkerResponse(evt) {
-        var d = evt.data,
-            workerId = d.workerId,
-            fullPath = d.fullPath,
-            fileSize = d.fileSize;
+    uploadFile(fileWrapper) {
+        var file = fileWrapper.file,
+            fullPath = fileWrapper.fullPath;
 
-        switch (d.action) {
-            case 'upload':
-                var file,
-                    files = this.state.files,
-                    totalUploaded = this.state.totalUploaded,
-                    totalFilesUploaded = this.state.totalFilesUploaded,
-                    performance = this.state.performance;
+        // FIXME: make this configurable!
+        AWS.config.update({
+            accessKeyId: '…',
+            secretAccessKey: '…',
+            region: 'us-east-1'
+        });
 
-                for (var i in files) {
-                    file = files[i];
-                    if (file.fullPath === fullPath) {
-                        break;
-                    }
-                }
+        console.log('Uploading %s (%d bytes)', fullPath, file.size);
 
-                if (!file) {
-                    console.error("Couldn't find file %s in files", fullPath, files);
-                    return;
-                }
+        var s3Object = new AWS.S3({
+            params: {
+                Bucket: 'bagger-js-testing',
+                Key: fullPath,
+                ContentType: file.type
+            }
+        });
 
-                totalUploaded += fileSize;
-                totalFilesUploaded += 1;
-
-                console.log('Received upload for file %s from worker %d', fullPath, workerId);
-
-                var taskPerf = d.performance;
-                console.log('Uploaded %d bytes in %s seconds (%s MB/s)', fileSize,
-                            taskPerf.seconds.toFixed(2),
-                            ((fileSize / 1048576) / taskPerf.seconds).toFixed(1));
-
-                this.setState({
-                    files: files,
-                    totalUploaded: totalUploaded,
-                    totalFilesUploaded: totalFilesUploaded,
-                    performance: React.addons.update(performance, {
-                        $merge: {
-                            uploadWorkers: {
-                                files: performance.uploadWorkers.files + 1,
-                                bytes: performance.uploadWorkers.bytes + fileSize,
-                                time: performance.uploadWorkers.time + taskPerf.seconds
-                            }
-                        }
-                    })
-                });
-
-                break;
-
-            default:
-                console.error('Received unknown %s message: %s', d.action, d);
-        }
+        s3Object.upload({Body: file}, function(isError, data) {
+            if (isError) {
+                console.error('Error uploading %s: %s', fullPath, data);
+            } else {
+                console.log('Successfully uploaded', fullPath);
+            }
+        });
     }
 
     render() {
@@ -214,13 +181,13 @@ class Bagger extends React.Component {
                 completed: this.hashWorkerPool.busyWorkers.size === 0 && this.state.files.length > 0 && this.state.files.length === this.state.totalFilesHashed
             },
             uploadWorkers: {
-                total: this.uploadWorkerPool.workers.length,
-                totalUploaded: this.state.totalFilesUploaded,
-                active: this.uploadWorkerPool.busyWorkers.size,
-                pendingFiles: this.state.files.length - this.state.totalFilesUploaded,
-                totalBytes: this.state.performance.uploadWorkers.bytes,
-                totalTime: this.state.performance.uploadWorkers.time,
-                completed: this.uploadWorkerPool.busyWorkers.size === 0 && this.state.files.length > 0 && this.state.files.length === this.state.totalFilesUploaded
+                total: 0,
+                totalUploaded: 0,
+                active: 0,
+                pendingFiles: 9999999,
+                totalBytes: 12345678901234567890,
+                totalTime: 42,
+                completed: false
             }
         };
         var hashing = this.state.files.length - this.state.totalFilesHashed > 0;
