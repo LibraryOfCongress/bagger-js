@@ -27,7 +27,7 @@ self.addEventListener('message', function(evt) {
             // Access size once so we can avoid paying the cost of repeated access in the future:
             var fileSize = file.size;
             response.fileSize = fileSize;
-            console.log('Processing %s (%d bytes)', fullPath, fileSize);
+            console.log('Processing %s (%i bytes)', fullPath, fileSize);
 
             var startTime = Date.now();
 
@@ -70,6 +70,6 @@ self.addEventListener('message', function(evt) {
             console.error('Unknown action: %s', action, d);
     }
 
-    console.log('Worker %d: returning %s response: %O', workerId, action, response);
+    console.log('Worker %i: returning %s response: %O', workerId, action, response);
     postMessage(response);
 });

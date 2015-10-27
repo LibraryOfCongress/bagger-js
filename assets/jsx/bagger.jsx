@@ -100,7 +100,7 @@ class Bagger extends React.Component {
                 file.size = fileSize;
                 totalBytes += fileSize;
 
-                console.log('Received hashes for file %s from worker %d', fullPath, workerId, d.output);
+                console.log('Received hashes for file %s from worker %i', fullPath, workerId, d.output);
 
                 file.hashes = {};
                 for (var hashName in d.output) { // jshint -W089
@@ -108,7 +108,7 @@ class Bagger extends React.Component {
                 }
 
                 var taskPerf = d.performance;
-                console.log('Hashed %d bytes in %s seconds (%s MB/s)', fileSize,
+                console.log('Hashed %i bytes in %s seconds (%s MB/s)', fileSize,
                             taskPerf.seconds.toFixed(2),
                             ((fileSize / 1048576) / taskPerf.seconds).toFixed(1));
 
@@ -147,7 +147,7 @@ class Bagger extends React.Component {
             region: 'us-east-1'
         });
 
-        console.log('Uploading %s (%d bytes)', fullPath, file.size);
+        console.log('Uploading %s (%i bytes)', fullPath, file.size);
 
         // TODO: set ContentMD5
         // TODO: make partSize, queueSize configurable
