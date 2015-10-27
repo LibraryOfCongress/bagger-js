@@ -95,8 +95,6 @@ class Bagger extends React.Component {
                     return;
                 }
 
-                this.uploadFile(file);
-
                 totalFilesHashed += 1;
 
                 file.size = fileSize;
@@ -115,19 +113,21 @@ class Bagger extends React.Component {
                             ((fileSize / 1048576) / taskPerf.seconds).toFixed(1));
 
                 this.setState({
-                    files: files,
-                    totalFilesHashed: totalFilesHashed,
-                    totalBytes: totalBytes,
-                    performance: React.addons.update(performance, {
-                        $merge: {
-                            hashWorkers: {
-                                files: performance.hashWorkers.files + 1,
-                                bytes: performance.hashWorkers.bytes + fileSize,
-                                time: performance.hashWorkers.time + taskPerf.seconds
+                        files: files,
+                        totalFilesHashed: totalFilesHashed,
+                        totalBytes: totalBytes,
+                        performance: React.addons.update(performance, {
+                            $merge: {
+                                hashWorkers: {
+                                    files: performance.hashWorkers.files + 1,
+                                    bytes: performance.hashWorkers.bytes + fileSize,
+                                    time: performance.hashWorkers.time + taskPerf.seconds
+                                }
                             }
-                        }
-                    })
-                });
+                        })
+                    },
+                    this.uploadFile.bind(this, file)
+                );
 
                 break;
 
@@ -149,28 +149,78 @@ class Bagger extends React.Component {
 
         console.log('Uploading %s (%d bytes)', fullPath, file.size);
 
-        var s3Object = new AWS.S3({
+        // TODO: set ContentMD5
+        // TODO: make partSize, queueSize configurable
+        // TODO: use leavePartsOnError to allow retries?
+
+        var startTime,
+            performance = this.state.performance;
+
+        var uploadCompletionCallback = function (isError, data) {
+            var elapsedSeconds = (Date.now() - startTime) / 1000;
+
+            if (isError) {
+                console.error('Error uploading %s: %s', fullPath, data);
+                fileWrapper.bytesUploaded = 0;
+                this.forceUpdate();
+            } else {
+                fileWrapper.bytesUploaded = file.size;
+
+                this.setState({
+                    totalFilesUploaded: this.state.totalFilesUploaded + 1,
+                    performance: React.addons.update(performance, {
+                        $merge: {
+                            uploadWorkers: {
+                                files: performance.uploadWorkers.files + 1,
+                                bytes: performance.uploadWorkers.bytes + file.size,
+                                time: performance.uploadWorkers.time + elapsedSeconds
+                            }
+                        }
+                    })
+                });
+                console.log('Successfully uploaded', fullPath);
+            }
+        };
+
+        var uploadProgressCallback = function (evt) {
+            fileWrapper.bytesUploaded = evt.loaded;
+            this.forceUpdate();
+        };
+
+        // We reset this to zero every time so our cumulative stats will be correct
+        // after failures or retries:
+        fileWrapper.bytesUploaded = 0;
+
+        // TODO: make partSize and queueSize configurable
+        var upload = new AWS.S3.ManagedUpload({
+            partSize: 8 * 1024 * 1024,
+            queueSize: 4,
             params: {
                 Bucket: 'bagger-js-testing',
                 Key: fullPath,
+                Body: file,
                 ContentType: file.type
             }
         });
 
-        s3Object.upload({Body: file}, function(isError, data) {
-            if (isError) {
-                console.error('Error uploading %s: %s', fullPath, data);
-            } else {
-                console.log('Successfully uploaded', fullPath);
-            }
-        });
+        upload.on('httpUploadProgress', uploadProgressCallback.bind(this));
+
+        startTime = Date.now();
+
+        upload.send(uploadCompletionCallback.bind(this));
     }
 
     render() {
+        var bytesUploaded = 0;
+        this.state.files.forEach(function (i) {
+            bytesUploaded += i.bytesUploaded || 0;
+        });
+
         var stats = {
             files: {
                 total: this.state.files.length,
-                size: this.state.totalBytes
+                size: this.state.totalBytes,
+                bytesUploaded: bytesUploaded
             },
             hashWorkers: {
                 total: this.hashWorkerPool.workers.length,
@@ -181,13 +231,11 @@ class Bagger extends React.Component {
                 completed: this.hashWorkerPool.busyWorkers.size === 0 && this.state.files.length > 0 && this.state.files.length === this.state.totalFilesHashed
             },
             uploadWorkers: {
-                total: 0,
-                totalUploaded: 0,
-                active: 0,
-                pendingFiles: 9999999,
-                totalBytes: 12345678901234567890,
-                totalTime: 42,
-                completed: false
+                totalUploaded: this.state.performance.uploadWorkers.files,
+                pendingFiles: this.state.files.length - this.state.totalFilesUploaded,
+                totalBytes: this.state.performance.uploadWorkers.bytes,
+                totalTime: this.state.performance.uploadWorkers.time,
+                completed: this.state.files.length > 0 && this.state.files.length === this.state.totalFilesUploaded
             }
         };
         var hashing = this.state.files.length - this.state.totalFilesHashed > 0;
