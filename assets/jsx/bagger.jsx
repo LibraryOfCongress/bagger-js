@@ -2,6 +2,7 @@ var React = require('react/addons');
 
 var AWS = require('aws-sdk');
 
+import { ServerInfo } from '../jsx/server-info.jsx';
 import { BagContents } from '../jsx/bagcontents.jsx';
 import { SelectFiles } from '../jsx/selectfiles.jsx';
 import { Dashboard } from '../jsx/dashboard.jsx';
@@ -15,6 +16,7 @@ class Bagger extends React.Component {
         this.hashWorkerPool = new WorkerPool('hash-worker.js', 4, this.handleHashWorkerResponse.bind(this));
 
         this.state = {
+            awsConfig: {},
             files: [],
             totalBytes: 0,
             totalFilesHashed: 0,
@@ -32,6 +34,13 @@ class Bagger extends React.Component {
                 }
             }
         };
+    }
+
+    updateServerInfo(k, v) {
+        var newConfig = {};
+        newConfig[k] = v;
+
+        this.setState({awsConfig: React.addons.update(this.state.awsConfig, {$merge: newConfig})});
     }
 
     handleFilesChanged(newFiles) {
@@ -142,9 +151,9 @@ class Bagger extends React.Component {
 
         // FIXME: make this configurable!
         AWS.config.update({
-            accessKeyId: '…',
-            secretAccessKey: '…',
-            region: 'us-east-1'
+            accessKeyId: this.state.awsConfig.accessKeyId,
+            secretAccessKey: this.state.awsConfig.secretAccessKey,
+            region: this.state.awsConfig.region
         });
 
         console.log('Uploading %s (%i bytes)', fullPath, file.size);
@@ -196,7 +205,7 @@ class Bagger extends React.Component {
             partSize: 8 * 1024 * 1024,
             queueSize: 4,
             params: {
-                Bucket: 'bagger-js-testing',
+                Bucket: this.state.awsConfig.bucket,
                 Key: fullPath,
                 Body: file,
                 ContentType: file.type
@@ -242,7 +251,8 @@ class Bagger extends React.Component {
 
         return (
             <div className="bagger">
-                <h1>Add files</h1>
+                <ServerInfo updateServerInfo={this.updateServerInfo.bind(this)} />
+
                 <SelectFiles onFilesChange={this.handleFilesChanged.bind(this)} />
 
                 <Dashboard {...stats} />
