@@ -15,8 +15,14 @@ class Bagger extends React.Component {
 
         this.hashWorkerPool = new WorkerPool('hash-worker.js', 4, this.handleHashWorkerResponse.bind(this));
 
+        // FIXME: allow awsConfig to be passed in using the querystring and/or data attributes:
         this.state = {
-            awsConfig: {},
+            awsConfig: {
+                accessKeyId: 'Not really',
+                secretAccessKey: 'Definitely Not',
+                bucket: 'bagger-js-testing',
+                region: 'us-east-1'
+            },
             files: [],
             totalBytes: 0,
             totalFilesHashed: 0,
@@ -251,7 +257,7 @@ class Bagger extends React.Component {
 
         return (
             <div className="bagger">
-                <ServerInfo updateServerInfo={this.updateServerInfo.bind(this)} />
+                <ServerInfo updateServerInfo={this.updateServerInfo.bind(this)} {...this.state.awsConfig} />
 
                 <SelectFiles onFilesChange={this.handleFilesChanged.bind(this)} />
 
