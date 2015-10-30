@@ -52,6 +52,19 @@ class Bagger extends React.Component {
         this.setState({awsConfig: React.addons.update(this.state.awsConfig, {$merge: newConfig})});
     }
 
+    configureAWS() {
+        AWS.config.update({
+            accessKeyId: this.state.awsConfig.accessKeyId,
+            secretAccessKey: this.state.awsConfig.secretAccessKey,
+            region: this.state.awsConfig.region
+        });
+    }
+
+    getS3Client() {
+        this.configureAWS();
+        return new AWS.S3();
+    }
+
     handleFilesChanged(newFiles) {
         var bagFiles = this.state.files;
         var newBagFiles = [];
@@ -217,13 +230,6 @@ class Bagger extends React.Component {
     }
 
     uploadFile(key, contentType, body, successCallback, errorCallback, progressCallback) {
-        // FIXME: better management of AWS config
-        AWS.config.update({
-            accessKeyId: this.state.awsConfig.accessKeyId,
-            secretAccessKey: this.state.awsConfig.secretAccessKey,
-            region: this.state.awsConfig.region
-        });
-
         var size = typeof body.size !== 'undefined' ? body.size : body.length;
 
         console.log('Uploading %s to %s (%i bytes)', key, this.state.awsConfig.bucket, size);
@@ -266,6 +272,8 @@ class Bagger extends React.Component {
         };
 
         key = key.replace('//', '/');
+
+        this.configureAWS();
 
         // TODO: make partSize and queueSize configurable
         var upload = new AWS.S3.ManagedUpload({
@@ -321,7 +329,7 @@ class Bagger extends React.Component {
 
         return (
             <div className="bagger">
-                <ServerInfo updateServerInfo={this.updateServerInfo.bind(this)} {...this.state.awsConfig} />
+                <ServerInfo updateServerInfo={this.updateServerInfo.bind(this)} getS3Client={this.getS3Client.bind(this)} {...this.state.awsConfig} />
 
                 <p>Uploading to <code>s3://{this.state.awsConfig.bucket}/{this.state.awsConfig.keyPrefix}</code></p>
 
