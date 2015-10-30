@@ -377,6 +377,21 @@ var Bagger = (function (_React$Component) {
             this.setState({ awsConfig: React.addons.update(this.state.awsConfig, { $merge: newConfig }) });
         }
     }, {
+        key: 'configureAWS',
+        value: function configureAWS() {
+            AWS.config.update({
+                accessKeyId: this.state.awsConfig.accessKeyId,
+                secretAccessKey: this.state.awsConfig.secretAccessKey,
+                region: this.state.awsConfig.region
+            });
+        }
+    }, {
+        key: 'getS3Client',
+        value: function getS3Client() {
+            this.configureAWS();
+            return new AWS.S3();
+        }
+    }, {
         key: 'handleFilesChanged',
         value: function handleFilesChanged(newFiles) {
             var bagFiles = this.state.files;
@@ -542,13 +557,6 @@ var Bagger = (function (_React$Component) {
         value: function uploadFile(key, contentType, body, successCallback, errorCallback, progressCallback) {
             var _this2 = this;
 
-            // FIXME: better management of AWS config
-            AWS.config.update({
-                accessKeyId: this.state.awsConfig.accessKeyId,
-                secretAccessKey: this.state.awsConfig.secretAccessKey,
-                region: this.state.awsConfig.region
-            });
-
             var size = typeof body.size !== 'undefined' ? body.size : body.length;
 
             console.log('Uploading %s to %s (%i bytes)', key, this.state.awsConfig.bucket, size);
@@ -592,8 +600,11 @@ var Bagger = (function (_React$Component) {
 
             key = key.replace('//', '/');
 
+            this.configureAWS();
+
             // TODO: make partSize and queueSize configurable
             var upload = new AWS.S3.ManagedUpload({
+                maxRetries: 6,
                 partSize: 8 * 1024 * 1024,
                 queueSize: 4,
                 params: {
@@ -647,7 +658,7 @@ var Bagger = (function (_React$Component) {
             return React.createElement(
                 'div',
                 { className: 'bagger' },
-                React.createElement(_jsxServerInfoJsx.ServerInfo, _extends({ updateServerInfo: this.updateServerInfo.bind(this) }, this.state.awsConfig)),
+                React.createElement(_jsxServerInfoJsx.ServerInfo, _extends({ updateServerInfo: this.updateServerInfo.bind(this), getS3Client: this.getS3Client.bind(this) }, this.state.awsConfig)),
                 React.createElement(
                     'p',
                     null,
@@ -1074,17 +1085,78 @@ var ServerInfo = (function (_React$Component) {
         _classCallCheck(this, ServerInfo);
 
         _get(Object.getPrototypeOf(ServerInfo.prototype), 'constructor', this).call(this, props);
+        this.state = {
+            configStatus: {
+                className: 'btn btn-default',
+                message: 'Untested'
+            }
+        };
     }
 
     _createClass(ServerInfo, [{
         key: 'handleChange',
         value: function handleChange(event) {
-            this.props.updateServerInfo(event.target.id, event.target.value);
+            var key = event.target.id,
+                value = event.target.value;
+            this.props.updateServerInfo(key, value);
+            this.setState({ key: value });
+        }
+    }, {
+        key: 'hasCredentials',
+        value: function hasCredentials() {
+            return this.props.accessKeyId && this.props.secretAccessKey && this.props.region;
+        }
+    }, {
+        key: 'testConfiguration',
+        value: function testConfiguration(evt) {
+            var _this = this;
+
+            // We'd like to be able to list buckets but that's impossible due to Amazon's CORS constraints:
+            // https://forums.aws.amazon.com/thread.jspa?threadID=179355&tstart=0
+
+            if (this.hasCredentials()) {
+                var s3 = this.props.getS3Client();
+
+                this.setState({ configStatus: {
+                        className: 'btn btn-info',
+                        message: 'Waiting…'
+                    } });
+
+                s3.getBucketCors({ Bucket: this.props.bucket }, function (isError, data) {
+                    if (isError) {
+                        var errMessage = 'ERROR';
+
+                        if (data) {
+                            errMessage += ' (' + data + ')';
+                        }
+
+                        _this.setState({
+                            configStatus: {
+                                className: 'btn btn-danger',
+                                message: errMessage
+                            }
+                        });
+                    } else {
+                        _this.setState({
+                            configStatus: {
+                                className: 'btn btn-success',
+                                message: 'OK'
+                            }
+                        });
+                    }
+                });
+            } else {
+                this.setState({ configStatus: { className: 'btn btn-default', message: 'Untested' } });
+            }
+
+            if (evt) {
+                evt.preventDefault();
+            }
         }
     }, {
         key: 'render',
         value: function render() {
-            var ConfigurationStatus = '';
+            var configStatus = this.state.configStatus;
 
             return React.createElement(
                 'div',
@@ -1101,7 +1173,7 @@ var ServerInfo = (function (_React$Component) {
                 ),
                 React.createElement(
                     'form',
-                    { className: 'form-horizontal' },
+                    { className: 'form-horizontal', onSubmit: this.testConfiguration.bind(this) },
                     React.createElement(
                         'div',
                         { className: 'form-group' },
@@ -1155,23 +1227,22 @@ var ServerInfo = (function (_React$Component) {
                         React.createElement(
                             'div',
                             { className: 'col-sm-10' },
-                            React.createElement('input', { type: 'text', className: 'form-control', id: 'bucket', value: this.props.bucket, onChange: this.handleChange.bind(this) }),
-                            React.createElement(
-                                'b',
-                                { className: 'text-danger' },
-                                'FIXME: retrieve list after keys are set'
-                            )
+                            React.createElement('input', { type: 'text', className: 'form-control', id: 'bucket', value: this.props.bucket, onChange: this.handleChange.bind(this) })
                         )
                     ),
                     React.createElement(
-                        'button',
-                        { type: 'submit', className: 'btn btn-default' },
-                        'Test Configuration'
-                    ),
-                    React.createElement(
-                        'p',
-                        { className: 'text-warning' },
-                        ConfigurationStatus
+                        'div',
+                        { className: 'form-group' },
+                        React.createElement(
+                            'div',
+                            { className: 'col-sm-12 text-center' },
+                            React.createElement(
+                                'button',
+                                { type: 'submit', className: configStatus.className },
+                                'Test Configuration: ',
+                                configStatus.message
+                            )
+                        )
                     ),
                     React.createElement(
                         'div',
