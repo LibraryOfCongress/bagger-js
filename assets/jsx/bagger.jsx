@@ -269,6 +269,7 @@ class Bagger extends React.Component {
 
         // TODO: make partSize and queueSize configurable
         var upload = new AWS.S3.ManagedUpload({
+            maxRetries: 6,
             partSize: 8 * 1024 * 1024,
             queueSize: 4,
             params: {
