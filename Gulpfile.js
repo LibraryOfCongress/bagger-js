@@ -8,7 +8,8 @@ var gulp = require('gulp'),
     babelify = require('babelify'),
     eslint = require('gulp-eslint'),
     exorcist = require('exorcist'),
-    replace = require('gulp-replace');
+    replace = require('gulp-replace'),
+    ghPages = require('gulp-gh-pages');
 
 gulp.task('browserify', function(){
     var b = browserify({debug: true});
@@ -61,4 +62,9 @@ gulp.task('lint', function () {
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failOnError());
+});
+
+gulp.task('deploy', function() {
+  return gulp.src('./dist/**/*')
+    .pipe(ghPages());
 });
