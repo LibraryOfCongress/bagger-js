@@ -197,7 +197,7 @@ class Bagger extends React.Component {
         // FIXME: Bag Info UI — https://github.com/LibraryOfCongress/bagger-js/issues/13
         var bagInfo = 'Bag-Size: ' + filesize(this.state.totalBytes, {round: 0});
 
-        bagInfo += 'Payload-Oxum: ' + this.state.totalBytes + '.' + this.state.files.length + '\n';
+        bagInfo += '\nPayload-Oxum: ' + this.state.totalBytes + '.' + this.state.files.length + '\n';
 
         this.uploadFile(keyPrefix + '/bag-info.txt', 'text/plain', bagInfo);
 
