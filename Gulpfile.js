@@ -35,7 +35,7 @@ gulp.task('browserify-hash-worker', function(){
 });
 
 gulp.task('static', function () {
-    gulp.src(['assets/html/index.html'])
+    gulp.src(['assets/html/index.html', 'assets/html/help.html'])
         .pipe(gulp.dest('./dist'));
 });
 

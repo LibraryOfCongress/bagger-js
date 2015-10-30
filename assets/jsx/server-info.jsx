@@ -14,7 +14,7 @@ class ServerInfo extends React.Component {
 
         return (
             <div className="server-info well well-sm clearfix">
-                <h3>S3 Configuration</h3>
+                <h3>S3 Configuration <a target="help" href="help.html#s3-cors"><i className="glyphicon glyphicon-question-sign"></i></a></h3>
 
                 <form>
                     <div className="form-group">
