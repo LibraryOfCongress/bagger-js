@@ -7,6 +7,7 @@ class FileRow extends React.Component {
     constructor(props) {
         super(props);
     }
+
     render() {
         var fileSize = this.props.file.size ? filesize(this.props.file.size) : '?';
 

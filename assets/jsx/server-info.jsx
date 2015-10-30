@@ -10,7 +10,7 @@ class ServerInfo extends React.Component {
     }
 
     render() {
-        var ConfigurationStatus = 'FIXME: implement S3 access check!';
+        var ConfigurationStatus = '';
 
         return (
             <div className="server-info well well-sm clearfix">
@@ -39,15 +39,23 @@ class ServerInfo extends React.Component {
                     </div>
 
                     <div className="form-group">
-                        <label className="col-sm-2 control-label" htmlFor="bucket">Bucket <b className="text-danger">FIXME: retrieve list after keys are set</b></label>
+                        <label className="col-sm-2 control-label" htmlFor="bucket">Bucket</label>
                         <div className="col-sm-10">
                             <input type="text" className="form-control" id="bucket" value={this.props.bucket} onChange={this.handleChange.bind(this)} />
+                            <b className="text-danger">FIXME: retrieve list after keys are set</b>
                         </div>
                     </div>
 
                     <button type="submit" className="btn btn-default">Test Configuration</button>
 
                     <p className="text-warning">{ConfigurationStatus}</p>
+
+                    <div className="form-group">
+                        <label className="col-sm-2 control-label" htmlFor="keyPrefix">Path Prefix</label>
+                        <div className="col-sm-10">
+                            <input type="text" className="form-control" id="keyPrefix" value={this.props.keyPrefix} onChange={this.handleChange.bind(this)} />
+                        </div>
+                    </div>
                 </form>
             </div>
         );

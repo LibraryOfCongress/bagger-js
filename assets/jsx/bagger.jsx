@@ -2,6 +2,8 @@ var React = require('react/addons');
 
 var AWS = require('aws-sdk');
 
+var filesize = require('filesize');
+
 import { ServerInfo } from '../jsx/server-info.jsx';
 import { BagContents } from '../jsx/bagcontents.jsx';
 import { SelectFiles } from '../jsx/selectfiles.jsx';
@@ -21,7 +23,8 @@ class Bagger extends React.Component {
                 accessKeyId: 'Not really',
                 secretAccessKey: 'Definitely Not',
                 bucket: 'bagger-js-testing',
-                region: 'us-east-1'
+                region: 'us-east-1',
+                keyPrefix: 'my-test-bag'
             },
             files: [],
             totalBytes: 0,
@@ -62,7 +65,7 @@ class Bagger extends React.Component {
                 console.log('Skipping duplicate file', rec.fullPath);
                 continue;
             }
-            rec.hashes = {};
+            rec.hashes = new Map();
             newBagFiles.push(rec);
         }
 
@@ -92,34 +95,33 @@ class Bagger extends React.Component {
 
         switch (d.action) {
             case 'hash':
-                var file,
+                var fileWrapper,
                     files = this.state.files,
                     totalBytes = this.state.totalBytes,
                     totalFilesHashed = this.state.totalFilesHashed,
                     performance = this.state.performance;
 
                 for (var i in files) {
-                    file = files[i];
-                    if (file.fullPath === fullPath) {
+                    if (files[i].fullPath === fullPath) {
+                        fileWrapper = files[i];
                         break;
                     }
                 }
 
-                if (!file) {
+                if (!fileWrapper) {
                     console.error("Couldn't find file %s in files", fullPath, files);
                     return;
                 }
 
                 totalFilesHashed += 1;
 
-                file.size = fileSize;
+                fileWrapper.size = fileSize;
                 totalBytes += fileSize;
 
                 console.log('Received hashes for file %s from worker %i', fullPath, workerId, d.output);
 
-                file.hashes = {};
                 for (var hashName in d.output) { // jshint -W089
-                    file.hashes[hashName] = d.output[hashName];
+                    fileWrapper.hashes[hashName] = d.output[hashName];
                 }
 
                 var taskPerf = d.performance;
@@ -141,7 +143,32 @@ class Bagger extends React.Component {
                             }
                         })
                     },
-                    this.uploadFile.bind(this, file)
+                    () => {
+                        var key = this.state.awsConfig.keyPrefix + '/data/' + fileWrapper.fullPath;
+
+                        // We reset this to zero every time so our cumulative stats will be correct
+                        // after failures or retries:
+                        fileWrapper.bytesUploaded = 0;
+
+                        this.uploadFile(key, fileWrapper.type, fileWrapper.file,
+                            () => { // Success
+                                fileWrapper.bytesUploaded = fileSize;
+                                this.forceUpdate();
+                            },
+
+                            () => { // Reset the total on error since S3 doesn't retain partials:
+                                fileWrapper.bytesUploaded = 0;
+                                this.forceUpdate();
+                            },
+
+                            (progressEvent) => {
+                                // Progress should update the status bar after each chunk for visible feedback
+                                // on large files:
+                                fileWrapper.bytesUploaded = progressEvent.loaded;
+                                this.forceUpdate();
+                            }
+                        );
+                    }
                 );
 
                 break;
@@ -151,18 +178,55 @@ class Bagger extends React.Component {
         }
     }
 
-    uploadFile(fileWrapper) {
-        var file = fileWrapper.file,
-            fullPath = fileWrapper.fullPath;
+    finalizeBag() {
+        var keyPrefix = this.state.awsConfig.keyPrefix;
 
-        // FIXME: make this configurable!
+        // FIXME: Bag Info UI — https://github.com/LibraryOfCongress/bagger-js/issues/13
+        var bagInfo = 'Bag-Size: ' + filesize(this.state.totalBytes, {round: 0});
+
+        bagInfo += 'Payload-Oxum: ' + this.state.totalBytes + '.' + this.state.files.length + '\n';
+
+        this.uploadFile(keyPrefix + '/bag-info.txt', 'text/plain', bagInfo);
+
+        this.uploadFile(keyPrefix + '/bagit.txt', 'text/plain',
+                        'BagIt-Version: 0.97\nTag-File-Character-Encoding: UTF-8\n');
+
+        var manifests = new Map();
+
+        // Map.forEach and for…of is silently broken on Chrome 46 & behaves as if empty
+
+        this.state.files.forEach((fileWrapper) => {
+
+            for (var hashName in fileWrapper.hashes) {
+                var hashValue = fileWrapper.hashes[hashName];
+
+                if (!(hashName in manifests)) {
+                    manifests[hashName] = [];
+                }
+
+                manifests[hashName].push(hashValue + ' data/' + fileWrapper.fullPath);
+            }
+        });
+
+        for (var hashName in manifests) {
+            var manifest = manifests[hashName].join('\n');
+            this.uploadFile(keyPrefix + '/manifest-' + hashName + '.txt', 'text/plain', manifest);
+        }
+
+        // FIXME: refactor total bytes / files counts to account for metadata files
+    }
+
+    uploadFile(key, contentType, body, successCallback, errorCallback, progressCallback) {
+        // FIXME: better management of AWS config
         AWS.config.update({
             accessKeyId: this.state.awsConfig.accessKeyId,
             secretAccessKey: this.state.awsConfig.secretAccessKey,
             region: this.state.awsConfig.region
         });
 
-        console.log('Uploading %s (%i bytes)', fullPath, file.size);
+        var size = typeof body.size !== 'undefined' ? body.size : body.length;
+
+        console.log('Uploading %s to %s (%i bytes)', key, this.state.awsConfig.bucket, size);
 
         // TODO: set ContentMD5
         // TODO: make partSize, queueSize configurable
@@ -171,15 +235,16 @@ class Bagger extends React.Component {
         var startTime,
             performance = this.state.performance;
 
-        var uploadCompletionCallback = function (isError, data) {
+        var uploadCompletionCallback = (isError, data) => {
             var elapsedSeconds = (Date.now() - startTime) / 1000;
 
             if (isError) {
-                console.error('Error uploading %s: %s', fullPath, data);
-                fileWrapper.bytesUploaded = 0;
-                this.forceUpdate();
+                console.error('Error uploading %s: %s', key, data);
+                if (typeof errorCallback === 'function') {
+                    errorCallback(data);
+                }
             } else {
-                fileWrapper.bytesUploaded = file.size;
+                console.log('Successfully uploaded', key);
 
                 this.setState({
                     totalFilesUploaded: this.state.totalFilesUploaded + 1,
@@ -187,24 +252,20 @@ class Bagger extends React.Component {
                         $merge: {
                             uploadWorkers: {
                                 files: performance.uploadWorkers.files + 1,
-                                bytes: performance.uploadWorkers.bytes + file.size,
+                                bytes: performance.uploadWorkers.bytes + size,
                                 time: performance.uploadWorkers.time + elapsedSeconds
                             }
                         }
                     })
                 });
-                console.log('Successfully uploaded', fullPath);
+
+                if (typeof successCallback === 'function') {
+                    successCallback(data);
+                }
             }
         };
 
-        var uploadProgressCallback = function (evt) {
-            fileWrapper.bytesUploaded = evt.loaded;
-            this.forceUpdate();
-        };
-
-        // We reset this to zero every time so our cumulative stats will be correct
-        // after failures or retries:
-        fileWrapper.bytesUploaded = 0;
+        key = key.replace('//', '/');
 
         // TODO: make partSize and queueSize configurable
         var upload = new AWS.S3.ManagedUpload({
@@ -212,17 +273,19 @@ class Bagger extends React.Component {
             queueSize: 4,
             params: {
                 Bucket: this.state.awsConfig.bucket,
-                Key: fullPath,
-                Body: file,
-                ContentType: file.type
+                Key: key,
+                Body: body,
+                ContentType: contentType
             }
         });
 
-        upload.on('httpUploadProgress', uploadProgressCallback.bind(this));
+        if (typeof progressCallback === 'function') {
+            upload.on('httpUploadProgress', progressCallback);
+        }
 
         startTime = Date.now();
 
-        upload.send(uploadCompletionCallback.bind(this));
+        upload.send(uploadCompletionCallback);
     }
 
     render() {
@@ -259,11 +322,15 @@ class Bagger extends React.Component {
             <div className="bagger">
                 <ServerInfo updateServerInfo={this.updateServerInfo.bind(this)} {...this.state.awsConfig} />
 
+                <p>Uploading to <code>s3://{this.state.awsConfig.bucket}/{this.state.awsConfig.keyPrefix}</code></p>
+
                 <SelectFiles onFilesChange={this.handleFilesChanged.bind(this)} />
 
                 <Dashboard {...stats} />
 
                 <BagContents files={this.state.files} total={this.state.totalBytes} hashing={hashing} />
+
+                <button className="btn btn-primary" onClick={this.finalizeBag.bind(this)}>Finalize!</button>
             </div>
         );
     }

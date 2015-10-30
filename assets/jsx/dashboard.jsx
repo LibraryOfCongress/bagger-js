@@ -57,8 +57,7 @@ class Dashboard extends React.Component {
                         </div>
                     </div>
 
-                    <p>{prettyBytesUploaded} bytes.</p>
-                    <p>Effective upload speed for completed files: {uploadSpeed}/s</p>
+                    <p>Completed: <code>{prettyBytesUploaded}</code>. Effective upload speed: <code>{uploadSpeed}</code>/s</p>
                 </div>
             </div>
         );
