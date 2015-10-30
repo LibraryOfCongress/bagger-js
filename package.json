@@ -26,9 +26,7 @@
     "react": "^0.13.3",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "vinyl-transform": "^1.0.0"
-  },
-  "dependencies": {
+    "vinyl-transform": "^1.0.0",
     "aws-sdk": "^2.2.12",
     "connect": "^3.4.0",
     "morgan": "^1.6.1",
