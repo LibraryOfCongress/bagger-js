@@ -13,7 +13,7 @@ var gulp = require('gulp'),
 
 gulp.task('browserify', function(){
     var b = browserify({debug: true});
-    b.transform(babelify);
+    b.transform(babelify, {presets: ['es2015', 'react']});
     b.add('./assets/js/main.js');
     return b.bundle()
         .pipe(sourceStream('main.js'))
@@ -23,7 +23,7 @@ gulp.task('browserify', function(){
 
 gulp.task('browserify-hash-worker', function(){
     var b = browserify({debug: true});
-    b.transform(babelify);
+    b.transform(babelify, {presets: ['es2015', 'react']});
     b.add('./assets/js/hash-worker.js');
     return b.bundle()
         .pipe(sourceStream('hash-worker.js'))
