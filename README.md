@@ -16,7 +16,7 @@ and a simple web application which allows bagging and transferring local content
 
 ## Docker
 
-To build and run via [Docker](https://www.docker.com) v1.5+(exclude sudo if running on mac):
+To build and run via [Docker](https://www.docker.com) v1.9.1+(exclude sudo if running on mac):
 
     % sudo docker build --tag bagger:dev .
     % sudo docker run -p 8000:8000 -d -t bagger:dev
