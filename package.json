@@ -1,6 +1,6 @@
 {
   "name": "bagger",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "private": true,
   "scripts": {
@@ -29,6 +29,7 @@
     "gulp-util": "^3.0.6",
     "morgan": "^1.6.1",
     "react": "^0.14.3",
+    "react-dom": "^0.14.3",
     "serve-static": "^1.10.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",

@@ -42,7 +42,7 @@ class SelectFiles extends React.Component {
         this.props.onFilesChange(files);
     }
     componentDidMount() {
-        var dropZone = this.refs.dropzone.getDOMNode();
+        var dropZone = this.refs.dropzone;
 
         var processFileList = this.processFileList.bind(this);
 

@@ -1,4 +1,4 @@
-FROM iojs:latest
+FROM node:latest
 RUN npm install -g gulp && npm cache clear
 RUN adduser --system --disabled-password --shell /bin/bash --group bagger --uid 1000
 RUN install -d /opt/bagger --owner=bagger --group=bagger
