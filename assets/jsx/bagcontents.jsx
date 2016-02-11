@@ -1,4 +1,4 @@
-var React = require('react/addons'),
+var React = require('react'),
     filesize = require('filesize');
 
 import { Manifest } from '../jsx/manifest.jsx';

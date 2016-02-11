@@ -1,4 +1,5 @@
-var React = require('react/addons');
+var React = require('react');
+var update = require('react-addons-update');
 
 var AWS = require('aws-sdk');
 
@@ -49,7 +50,7 @@ class Bagger extends React.Component {
         var newConfig = {};
         newConfig[k] = v;
 
-        this.setState({awsConfig: React.addons.update(this.state.awsConfig, {$merge: newConfig})});
+        this.setState({awsConfig: update(this.state.awsConfig, {$merge: newConfig})});
     }
 
     configureAWS() {
@@ -146,7 +147,7 @@ class Bagger extends React.Component {
                         files: files,
                         totalFilesHashed: totalFilesHashed,
                         totalBytes: totalBytes,
-                        performance: React.addons.update(performance, {
+                        performance: update(performance, {
                             $merge: {
                                 hashWorkers: {
                                     files: performance.hashWorkers.files + 1,
@@ -254,7 +255,7 @@ class Bagger extends React.Component {
 
                 this.setState({
                     totalFilesUploaded: this.state.totalFilesUploaded + 1,
-                    performance: React.addons.update(performance, {
+                    performance: update(performance, {
                         $merge: {
                             uploadWorkers: {
                                 files: performance.uploadWorkers.files + 1,
