@@ -1,26 +1,7 @@
 var React = require('react'),
     filesize = require('filesize');
 
-import { Manifest } from '../jsx/manifest.jsx';
-
-class FileRow extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        var fileSize = this.props.file.size ? filesize(this.props.file.size) : '?';
-
-        return (
-            <tr>
-                <td className="file-name">{this.props.file.fullPath}</td>
-                <td className="file-size">{fileSize}</td>
-                <td className="file-hash sha1" title={this.props.file.hashes.sha1}>{this.props.file.hashes.sha1}</td>
-                <td className="file-hash sha256" title={this.props.file.hashes.sha256}>{this.props.file.hashes.sha256}</td>
-            </tr>
-        );
-    }
-}
+import {Manifest} from '../jsx/manifest.jsx';
 
 class BagContents extends React.Component {
     constructor(props) {
@@ -31,30 +12,60 @@ class BagContents extends React.Component {
     }
 
     render() {
-        if (this.props.files.length < 1) {
+        if (this.props.files.size < 1) {
             return null;
         }
 
-        var files = this.props.files.map(function (file) {
-            return <FileRow file={file} key={file.fullPath} />;
+        var sizes = this.props.sizes;
+        var hashes = this.props.hashes;
+        var files = this.props.files.keySeq().map(function(path) {
+            var fileSize = '?';
+            if (sizes.has(path)) {
+                fileSize = filesize(sizes.get(path));
+            }
+            var h = hashes.get(path, new Map());
+            var sha1 = h.get('sha1');
+            var sha256 = h.get('sha256');
+            return (
+                <tr key={path}>
+                    <td className="file-name">
+                        {path}
+                    </td>
+                    <td className="file-size">
+                        {fileSize}
+                    </td>
+                    <td className="file-hash sha1" title={sha1}>
+                        {sha1}
+                    </td>
+                    <td className="file-hash sha256" title={sha256}>
+                        {sha256}
+                    </td>
+
+                </tr>
+            );
         });
 
-        var manifestSHA1 = null;
-        var manifestSHA256 = null;
+        var total = this.props.sizes.valueSeq().reduce((r, n) => r + n, 0);
 
-        if (!this.props.hashing) {
-            manifestSHA1 = <Manifest files={this.props.files} hashType="sha1" />;
-            manifestSHA256 = <Manifest files={this.props.files} hashType="sha256" />;
-        }
+        // FIXME: Bag Info UI — https://github.com/LibraryOfCongress/bagger-js/issues/13
+        var bagInfo = 'Bag-Size: ' + filesize(total, {round: 0});
 
-        var inProgress = this.props.hashing;
+        bagInfo += '\nPayload-Oxum: ' + total + '.' + this.props.files.length + '\n';
 
         var bagContentsTable = null;
 
         if (!this.state.collapsed) {
+            var manifestSHA1 = null;
+            var manifestSHA256 = null;
+            if (this.props.files.size === this.props.hashes.size) {
+                manifestSHA1 = <Manifest hashes={this.props.hashes} hashType="sha1"/>;
+                manifestSHA256 = <Manifest hashes={this.props.hashes} hashType="sha256"/>;
+            }
             bagContentsTable = (
                 <table className="table table-striped">
-                    <caption>Current Contents</caption>
+                    <caption>
+                        Current Contents
+                    </caption>
                     <thead>
                         <tr>
                             <th className="file-name">Filename</th>
@@ -69,9 +80,15 @@ class BagContents extends React.Component {
                     <tfoot>
                         <tr>
                             <th>Totals:</th>
-                            <td className="file-size total">{filesize(this.props.total)}</td>
-                            <td>{manifestSHA1}</td>
-                            <td>{manifestSHA256}</td>
+                            <td className="file-size total">
+                                {filesize(total)}
+                            </td>
+                            <td>
+                                {manifestSHA1}
+                            </td>
+                            <td>
+                                {manifestSHA256}
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
@@ -82,15 +99,22 @@ class BagContents extends React.Component {
             <div id="bag-contents" className="well well-sm">
                 <div className="pull-right">
                     <button className="btn btn-info btn-lg" onClick={this.toggleCollapse.bind(this)}>
-                        {this.state.collapsed ? 'Show' : 'Hide'} File List
+                        {this.state.collapsed
+                            ? 'Show'
+                            : 'Hide'}
+                        File List
                     </button>
                 </div>
-
                 <h2>
-                    Contents <small>{this.props.files.length.toLocaleString()} files
-                                    ({inProgress ? 'at least ' : ''}{filesize(this.props.total, {round: 0})})</small>
+                    Contents
+                    <small>
+                        {this.props.files.size.toLocaleString()}
+                        files ({this.props.files.size > this.props.sizes.size
+                            ? 'at least '
+                            : ''}{filesize(total, {round: 0})})
+                    </small>
                 </h2>
-
+                <pre>{bagInfo}</pre>
                 {bagContentsTable}
             </div>
         );
@@ -98,8 +122,10 @@ class BagContents extends React.Component {
 
     toggleCollapse(evt) {
         evt.preventDefault();
-        this.setState({collapsed: !this.state.collapsed});
+        this.setState({
+            collapsed: !this.state.collapsed
+        });
     }
 }
 
-export { BagContents };
+export {BagContents};

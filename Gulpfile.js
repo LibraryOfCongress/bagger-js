@@ -11,19 +11,31 @@ var gulp = require('gulp'),
     replace = require('gulp-replace'),
     ghPages = require('gulp-gh-pages');
 
-gulp.task('browserify', function(){
-    var b = browserify({debug: true});
-    b.transform(babelify, {presets: ['es2015', 'react']});
+gulp.task('browserify', function () {
+    var b = browserify({
+        debug: true
+    });
+    b.transform(babelify, {
+        presets: ['es2015', 'react'],
+        plugins: ['transform-object-rest-spread']
+    });
     b.add('./assets/js/main.js');
     return b.bundle()
         .pipe(sourceStream('main.js'))
-        .pipe(transform(function () { return exorcist('dist/main.js.map'); }))
+        .pipe(transform(function () {
+            return exorcist('dist/main.js.map');
+        }))
         .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('browserify-hash-worker', function(){
-    var b = browserify({debug: true});
-    b.transform(babelify, {presets: ['es2015', 'react']});
+gulp.task('browserify-hash-worker', function () {
+    var b = browserify({
+        debug: true
+    });
+    b.transform(babelify, {
+        presets: ['es2015', 'react'],
+        plugins: ['transform-object-rest-spread']
+    });
     b.add('./assets/js/hash-worker.js');
     return b.bundle()
         .pipe(sourceStream('hash-worker.js'))
@@ -31,7 +43,9 @@ gulp.task('browserify-hash-worker', function(){
         // module but since we're not debugging that module we'll just strip the
         // sourceMapping comment to avoid 404 warnings when opening the debugger
         .pipe(replace('//# sourceMappingURL=asmcrypto.js.map', ''))
-        .pipe(transform(function () { return exorcist('dist/hash-worker.js.map'); }))
+        .pipe(transform(function () {
+            return exorcist('dist/hash-worker.js.map');
+        }))
         .pipe(gulp.dest('./dist'));
 });
 
@@ -47,9 +61,9 @@ gulp.task('css', function () {
 
 gulp.task('default', ['lint', 'browserify', 'browserify-hash-worker', 'static', 'css']);
 
-gulp.task('develop', ['default'], function() {
+gulp.task('develop', ['default'], function () {
     var watcher = gulp.watch('assets/**/*.*', ['default']);
-    watcher.on('change', function(event) {
+    watcher.on('change', function (event) {
         console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
     });
 
@@ -58,13 +72,13 @@ gulp.task('develop', ['default'], function() {
 gulp.task('lint', function () {
     // Note: To have the process exit with an error code (1) on
     //  lint error, return the stream and pipe to failOnError last.
-    return gulp.src(['*.js', 'assets/js/*.js', 'assets/jsx/*.jsx'])
+    return gulp.src(['*.js', 'assets/js/*.js', 'assets/js/**/*.js', 'assets/jsx/*.jsx'])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failOnError());
 });
 
-gulp.task('deploy', function() {
-  return gulp.src('./dist/**/*')
-    .pipe(ghPages());
+gulp.task('deploy', function () {
+    return gulp.src('./dist/**/*')
+        .pipe(ghPages());
 });

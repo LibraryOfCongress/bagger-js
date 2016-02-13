@@ -9,10 +9,11 @@ class Manifest extends React.Component {
     generateManifest(evt) {
         var manifest = [];
         var hashType = this.props.hashType;
-
-        this.props.files.map(function (file) {
-            var hash = file.hashes[hashType];
-            manifest.push([hash, file.fullPath].join('\t'));
+        var hashes = this.props.hashes;
+        hashes.keySeq().forEach(function(path) {
+            var hash = hashes.get(path).get(hashType);
+            manifest.push([hash, path].join('\t'));
+            return true;
         });
 
         var href = 'data:text/plain,' + encodeURIComponent(manifest.join('\n'));
@@ -23,9 +24,11 @@ class Manifest extends React.Component {
         var filename = 'manifest-' + this.props.hashType;
 
         return (
-            <a onClick={this.generateManifest.bind(this)} target="_blank" download={filename}>{filename}</a>
+            <a onClick={this.generateManifest.bind(this)} target="_blank" download={filename}>
+                {filename}
+            </a>
         );
     }
 }
 
-export { Manifest };
+export {Manifest};

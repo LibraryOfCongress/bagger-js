@@ -1,75 +1,26 @@
-/* jslint browser: true, indent: 4 */
-/* global self, require, postMessage, asmCrypto, console, FileReaderSync */
+/* global self, require, postMessage, asmCrypto, FileReaderSync */
 
 require('asmcrypto.js');
 
-var blockSize = 1048576;
+const BLOCK_SIZE = 1048576;
 
-self.addEventListener('message', function(evt) {
-    // Unpack some variables for clarity below:
-    var d = evt.data,
-        workerId = d.workerId,
-        action = d.action,
-        file = d.file,
-        fullPath = d.fullPath,
-        response = {'file': file, 'fullPath': fullPath, 'action': action, 'workerId': workerId};
+self.addEventListener('message', ({data: {file, fullPath}}) => {
+    const sha256 = new asmCrypto.SHA256();
+    const startTime = Date.now();
+    const fileSize = file.size;
 
-    switch (action) {
-        case 'hash':
-            var reader = new FileReaderSync();
-            var hashes = {
-                'sha1': new asmCrypto.SHA1(),
-                'sha256': new asmCrypto.SHA256()
-            };
-
-            var currentOffset = 0;
-
-            // Access size once so we can avoid paying the cost of repeated access in the future:
-            var fileSize = file.size;
-            response.fileSize = fileSize;
-            console.log('Processing %s (%i bytes)', fullPath, fileSize);
-
-            var startTime = Date.now();
-
-            while (currentOffset < fileSize) {
-                var sliceStart = currentOffset;
-                var sliceEnd = sliceStart + Math.min(blockSize, fileSize - sliceStart);
-                var slice = file.slice(sliceStart, sliceEnd);
-
-                if (sliceStart <= fileSize) {
-                    currentOffset = sliceEnd;
-                    var bytes = reader.readAsArrayBuffer(slice);
-
-                    for (var alg in hashes) { // jshint -W089
-                        hashes[alg].process(bytes);
-                    }
-                } else {
-                    console.error('Attempted to read past end of file!');
-                }
-            }
-
-            var output = response.output = {};
-
-            for (var hashName in hashes) { // jshint -W089
-                var i = hashes[hashName].finish();
-                // jshint -W106
-                output[hashName] = asmCrypto.bytes_to_hex(i.result);
-                // jshint +W106
-            }
-
-            // Stop counter & convert from milliseconds:
-            var elapsedSeconds = (Date.now() - startTime) / 1000;
-            response.performance = {
-                'seconds': elapsedSeconds,
-                'startMilliseconds': startTime
-            };
-
-            break;
-
-        default:
-            console.error('Unknown action: %s', action, d);
+    for (let reader = new FileReaderSync(), sliceStart = 0, sliceEnd; sliceStart < fileSize; sliceStart = sliceEnd) {
+        sliceEnd = sliceStart + Math.min(BLOCK_SIZE, fileSize - sliceStart);
+        let slice = file.slice(sliceStart, sliceEnd);
+        let bytes = reader.readAsArrayBuffer(slice);
+        sha256.process(bytes);
     }
 
-    console.log('Worker %i: returning %s response: %O', workerId, action, response);
-    postMessage(response);
+    postMessage({
+        file,
+        fullPath,
+        fileSize,
+        sha256: asmCrypto.bytes_to_hex(sha256.finish().result),
+        elapsedSeconds: (Date.now() - startTime) / 1000
+    });
 });

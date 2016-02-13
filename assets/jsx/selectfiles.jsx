@@ -1,4 +1,4 @@
-var React = require('react');
+import React, {PropTypes} from 'react'
 
 class SelectFiles extends React.Component {
     constructor(props) {
@@ -7,10 +7,10 @@ class SelectFiles extends React.Component {
 
     processFileList(fileList) {
         /*
-         * Convert a FileList into a list of {file:, fullPath:} objects which are passed to
-         * this.props.onFilesChange so all downstream callers can reliably get the full path
-         */
-        var files = [];
+        * Convert a FileList into a map of fullpath to file which is passed to
+        * this.props.onFilesChange so all downstream callers can reliably get the full path
+        */
+        var files = new Map();
 
         for (var i = 0; i < fileList.length; i++) {
             var file = fileList[i],
@@ -21,23 +21,29 @@ class SelectFiles extends React.Component {
                 fileInfo = file;
             } else {
                 /*
-                   There's no standard interface for getting files with the context of a selected or dropped
-                   directory (see #1). Currently we're using a non-standard interface in Chrome and due to its
-                   limitations we have to store a fullPath property while recursing the directory tree (see
-                   walkDirectoryTree below) because we cannot update the built-in name property.
+                There's no standard interface for getting files with the context of a selected or dropped
+                directory (see #1). Currently we're using a non-standard interface in Chrome and due to its
+                limitations we have to store a fullPath property while recursing the directory tree (see
+                walkDirectoryTree below) because we cannot update the built-in name property.
 
-                   To avoid having to check everywhere we want to get the filename, we'll take the opposite
-                   approach and set fullPath from file.name if it's not already set so we can use it elsewhere
-                 */
+                To avoid having to check everywhere we want to get the filename, we'll take the opposite
+                approach and set fullPath from file.name if it's not already set so we can use it elsewhere
+                */
 
                 if ('webkitRelativePath' in file && file.webkitRelativePath.length > 0) {
-                    fileInfo = {file: file, fullPath: file.webkitRelativePath};
+                    fileInfo = {
+                        file,
+                        fullPath: file.webkitRelativePath
+                    };
                 } else {
-                    fileInfo = {file: file, fullPath: file.name};
+                    fileInfo = {
+                        file,
+                        fullPath: file.name
+                    };
                 }
             }
 
-            files.push(fileInfo);
+            files.set(fileInfo.fullPath, fileInfo.file);
         }
         this.props.onFilesChange(files);
     }
@@ -51,22 +57,31 @@ class SelectFiles extends React.Component {
 
             if (entry.isFile) {
                 entry.file(function(file) {
-                    var fullPath = basePath ? basePath + '/' + file.name : file.name;
-                    processFileList([{file: file, fullPath: fullPath}]);
+                    var fullPath = basePath
+                        ? basePath + '/' + file.name
+                        : file.name;
+                    processFileList([
+                        {
+                            file,
+                            fullPath
+                        }
+                    ]);
                 });
             } else if (entry.isDirectory) {
                 var dirReader = entry.createReader();
                 dirReader.readEntries(function(entries) {
                     for (var j = 0; j < entries.length; j++) {
                         var subEntry = entries[j],
-                            fullPath = basePath ? basePath + '/' + entry.name : entry.name;
+                            fullPath = basePath
+                                ? basePath + '/' + entry.name
+                                : entry.name;
                         walkDirectoryTree(subEntry, fullPath);
                     }
                 });
             }
         }
 
-        dropZone.addEventListener('drop', function (evt) {
+        dropZone.addEventListener('drop', function(evt) {
             evt.stopPropagation();
             evt.preventDefault();
 
@@ -88,18 +103,18 @@ class SelectFiles extends React.Component {
             dropZone.classList.remove('active');
         }, false);
 
-        dropZone.addEventListener('dragover', function (evt) {
+        dropZone.addEventListener('dragover', function(evt) {
             evt.stopPropagation();
             evt.preventDefault();
             evt.dataTransfer.dropEffect = 'copy';
             dropZone.classList.add('active');
         }, false);
 
-        dropZone.addEventListener('dragleave', function () {
+        dropZone.addEventListener('dragleave', function() {
             dropZone.classList.remove('active');
         }, false);
 
-        dropZone.addEventListener('dragend', function () {
+        dropZone.addEventListener('dragend', function() {
             dropZone.classList.remove('active');
         }, false);
     }
@@ -113,10 +128,15 @@ class SelectFiles extends React.Component {
     render() {
         return (
             <div ref="dropzone" id="dropzone" className="jumbotron text-center">
-                <p>Drag and drop files or directories here!</p>
+                <p>
+                    Drag and drop files or directories here!
+                </p>
                 <form className="form-horizontal">
                     <div className="form-group">
-                        <label>Select files: <input type="file" onChange={this.handleFileInputChange.bind(this)} multiple webkitdirectory /></label>
+                        <label>
+                            Select files:
+                            <input type="file" onChange={this.handleFileInputChange.bind(this)} multiple webkitdirectory/>
+                        </label>
                         <button className="btn btn-primary">Go!</button>
                     </div>
                 </form>
@@ -125,4 +145,8 @@ class SelectFiles extends React.Component {
     }
 }
 
-export { SelectFiles };
+SelectFiles.propTypes = {
+    onFilesChange: PropTypes.func.isRequired
+}
+
+export {SelectFiles};
