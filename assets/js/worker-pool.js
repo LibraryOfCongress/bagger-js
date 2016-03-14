@@ -45,7 +45,6 @@ var pool = new WorkerPool('hash-worker.js', 4, null);
 
 export function hash(message) {
     return new Promise(function (resolve, reject) {
-        // TODO: create worker here to start... then grab from pool here
         pool.callbacks.set(message.fullPath, function cb(evt) {
             resolve(evt);
         });

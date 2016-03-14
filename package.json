@@ -31,7 +31,6 @@
     "gulp-replace": "^0.5.3",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-util": "^3.0.6",
-    "immutable": "^3.7.6",
     "morgan": "^1.6.1",
     "react": "^0.14.7",
     "react-addons-update": "^0.14.7",

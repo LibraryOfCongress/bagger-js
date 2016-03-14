@@ -1,4 +1,4 @@
 export const ADD_FILES = 'ADD_FILES';
 export const CONFIG_STATUS = 'CONFIG_STATUS';
-export const CONFIG_UPDATE = 'CONFIG_UPDATEz';
+export const CONFIG_UPDATE = 'CONFIG_UPDATE';
 export const UPDATE_FILE_INFO = 'UPDATE_FILE_INFO'

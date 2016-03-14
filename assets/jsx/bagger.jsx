@@ -1,5 +1,4 @@
 var React = require('react');
-var Immutable = require('immutable');
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -14,28 +13,16 @@ import {ServerInfo} from '../jsx/server-info.jsx';
 class Bagger extends React.Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            bagInfo: new Immutable.OrderedMap([
-                ['Software', 'Bagger-js']
-            ])
-        };
     }
 
     componentDidMount() {
-        const { dispatch, numberOfHashWorkers } = this.props
-        //const actions = bindActionCreators(BagActions, dispatch);
+        const { dispatch } = this.props
         dispatch(BagActions.testConfiguration())
-    //     dispatch(actions.createHashWorkerPool(numberOfHashWorkers))
     }
-
-    // componentWillReceiveProps(nextProps) {
-    // }
 
     render() {
         const {files, hashes, sizes, dispatch} = this.props;
         const actions = bindActionCreators(BagActions, dispatch);
-        var S3 = ServerInfo
 
         return (
             <div className="bagger">
@@ -45,7 +32,7 @@ class Bagger extends React.Component {
                     <Hasher files={files} hashes={hashes} />
                     <Uploader files={files} hashes={hashes} />
                 </div>
-                <Bag files={files} sizes={sizes} hashes={hashes} bagInfo={this.state.bagInfo} uploader={S3}/>
+                <Bag files={files} sizes={sizes} hashes={hashes} />
             </div>
         );
     }
