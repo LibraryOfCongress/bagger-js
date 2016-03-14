@@ -11,7 +11,7 @@ class Uploader extends React.Component {
         if (this.props.files.size < 1) {
             return null;
         }
-        var bytesUploaded = 0; // TODO: this.state.bytesUploaded.valueSeq().reduce((r, n) => r + n, 0);
+        var bytesUploaded = [...this.props.bytesUploaded.values()].reduce((r, n) => r + n, 0);
 
         var prettyBytesUploaded = filesize(bytesUploaded, {round: 0});
 
@@ -19,7 +19,7 @@ class Uploader extends React.Component {
         var uploadBytesPerSecond = 0; // TODO: bytesUploaded / time || 0;
         var prettyUploadBytesPerSecond = filesize(uploadBytesPerSecond, {round: 1});
 
-        var total = 1231231412 // TODO: this.props.sizes.valueSeq().reduce((r, n) => r + n, 0);
+        var total = [...this.props.sizes.values()].reduce((r, n) => r + n, 0);
 
         var uploadComplete = (100 * (bytesUploaded / total)).toFixed(0);
 
@@ -59,7 +59,9 @@ class Uploader extends React.Component {
 
 Uploader.propTypes = {
     files: React.PropTypes.instanceOf(Map),
-    hashes: React.PropTypes.instanceOf(Map)
+    hashes: React.PropTypes.instanceOf(Map),
+    sizes: React.PropTypes.instanceOf(Map),
+    bytesUploaded: React.PropTypes.instanceOf(Map)
 }
 
 export {Uploader};

@@ -37,6 +37,10 @@ export default function (state = {
             hashes: new Map([...state.hashes]).set(action.fullPath, action.hashes),
             sizes: new Map([...state.sizes]).set(action.fullPath, action.size)
         }
+    case ActionTypes.UPDATE_BYTES_UPLOADED:
+        return {...state,
+            bytesUploaded: new Map([...state.bytesUploaded]).set(action.fullPath, action.bytesUploaded)
+        }
     case ActionTypes.SET_HASH_WORKERPOOL:
         return {...state,
             pool: action.pool

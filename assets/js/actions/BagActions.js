@@ -2,7 +2,8 @@ import {
     ADD_FILES,
     CONFIG_STATUS,
     CONFIG_UPDATE,
-    UPDATE_FILE_INFO
+    UPDATE_FILE_INFO,
+    UPDATE_BYTES_UPLOADED
 } from '../constants/ActionTypes';
 
 import {
@@ -24,6 +25,14 @@ export function updateFileInfo(fullPath, size, hashes) {
         fullPath,
         size,
         hashes
+    }
+}
+
+export function updateBytesUploaded(fullPath, bytesUploaded) {
+    return {
+        type: UPDATE_BYTES_UPLOADED,
+        fullPath,
+        bytesUploaded
     }
 }
 
@@ -60,9 +69,12 @@ export function addFilesAndHash(files) {
             fullPath,
             'action': 'hash'
         })
-        .then(result => dispatch(updateFileInfo(fullPath, file.size, new Map([
+        .then(result => {
+            dispatch(updateFileInfo(fullPath, file.size, new Map([
             ['sha256', result.data.sha256]
-        ]))))
+            ])))
+            dispatch(upload(fullPath, file, file.size, file.type))
+        })
         .catch(function (error) {
             console.log('Failed!', error);
         })));
@@ -129,21 +141,22 @@ export function testConfiguration() {
 
 export function upload(fullPath, file, size, type) {
     return (dispatch, getState) => {
-        var key = this.state.keyPrefix + '/data/' + fullPath;
+        const state = getState().Bag;
+        var key = state.keyPrefix + '/data/' + fullPath;
         key = key.replace('//', '/');
 
         // We reset this to zero every time so our cumulative stats will be correct
         // after failures or retries:
-        // dispatch(bytesUploaded(fullPath, 0));
+        dispatch(updateBytesUploaded(fullPath, 0));
 
         var startTime = Date.now();
         var body = file;
 
         var size = typeof body.size !== 'undefined' ? body.size : body.length;
 
-        console.log('Uploading %s to %s (%i bytes)', key, this.state.bucket, size);
+        console.log('Uploading %s to %s (%i bytes)', key, state.bucket, size);
 
-        this.configureAWS();
+        //this.configureAWS();
 
         // TODO: set ContentMD5
         // TODO: use leavePartsOnError to allow retries?
@@ -153,7 +166,7 @@ export function upload(fullPath, file, size, type) {
             partSize: 8 * 1024 * 1024,
             queueSize: 4,
             params: {
-                Bucket: this.state.bucket,
+                Bucket: state.bucket,
                 Key: key,
                 Body: body,
                 ContentType: type
@@ -163,17 +176,17 @@ export function upload(fullPath, file, size, type) {
         upload.on('httpUploadProgress', (progressEvent) => {
             // Progress should update the status bar after each chunk for visible feedback
             // on large files:
-            // dispatch(bytesUploaded(fullPath, progressEvent.loaded));
+            dispatch(updateBytesUploaded(fullPath, progressEvent.loaded));
         });
 
         upload.send((isError, data) => {
             if (isError) {
                 console.error('Error uploading %s: %s', key, data);
                 // Reset the total on error since S3 doesn't retain partials:
-                // dispatch(bytesUploaded(fullPath, 0));
+                dispatch(updateBytesUploaded(fullPath, 0));
             } else {
                 console.log('Successfully uploaded', key);
-                // dispatch(bytesUploaded(fullPath, size));
+                dispatch(updateBytesUploaded(fullPath, size));
                 // var elapsedSeconds = (Date.now() - startTime) / 1000;
             }
         });
