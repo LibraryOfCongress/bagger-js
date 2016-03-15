@@ -1,6 +1,3 @@
-/* jslint browser: true, indent: 4 */
-/* global require */
-
 import React from 'react'
 import { render } from 'react-dom'
 

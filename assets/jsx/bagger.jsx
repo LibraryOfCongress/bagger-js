@@ -6,8 +6,7 @@ import {bindActionCreators} from 'redux';
 import * as BagActions from '../js/actions/BagActions';
 
 import SelectFiles from '../jsx/selectfiles.jsx';
-import Hasher from '../jsx/hasher.jsx';
-import Uploader from '../jsx/uploader.jsx';
+import Dashboard from '../jsx/dashboard.jsx';
 import Bag from '../jsx/bag.jsx';
 import ServerInfo from '../jsx/server-info.jsx';
 
@@ -32,10 +31,7 @@ class Bagger extends React.Component {
                     <div>
                         <SelectFiles onFilesChange={actions.addFilesAndHash} />
                         {files.size > 0 && (
-                            <div className="dashboard well well-sm clearfix">
-                                <Hasher files={files} hashes={hashes} />
-                                <Uploader files={files} hashes={hashes} sizes={sizes} bytesUploaded={bytesUploaded} />
-                            </div>
+                            <Dashboard files={files} hashes={hashes} sizes={sizes} bytesUploaded={bytesUploaded} />
                         )}
                         {files.size > 0 && files.size === hashes.size && (
                             <Bag files={files} sizes={sizes} hashes={hashes} />
