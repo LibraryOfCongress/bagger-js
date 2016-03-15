@@ -4,6 +4,7 @@ export default function (state = {
     files: new Map(),
     hashes: new Map(),
     sizes: new Map(),
+    bytesUploaded: new Map(),
     accessKeyId: 'Not really',
     secretAccessKey: 'Definitely Not',
     bucket: 'bagger-js-testing',
