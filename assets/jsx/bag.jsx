@@ -21,6 +21,46 @@ class Bag extends React.Component {
                     </small>
                 </h2>
 
+                <table className="table table-striped">
+                    <caption>
+                        Current Contents
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th className="file-name">Filename</th>
+                            <th className="file-size">Size</th>
+                            <th className="file-hash sha256">SHA-256</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {[...this.props.files.entries()].map(([path, file, sha256 = this.props.hashes.get(path)]) =>
+                            <tr key={path}>
+                                <td className="file-name">
+                                    {path}
+                                </td>
+                                <td className="file-size">
+                                    {this.props.sizes.get(path)}
+                                </td>
+                                <td className="file-hash sha256" title={sha256}>
+                                    {sha256}
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Total:</th>
+                            <td className="file-size total">
+                                {filesize(total)}
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+
             </div>
         );
     }

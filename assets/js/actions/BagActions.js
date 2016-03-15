@@ -19,12 +19,12 @@ export function addFiles(files) {
     }
 }
 
-export function updateFileInfo(fullPath, size, hashes) {
+export function updateFileInfo(fullPath, size, hash) {
     return {
         type: UPDATE_FILE_INFO,
         fullPath,
         size,
-        hashes
+        hash
     }
 }
 
@@ -70,9 +70,7 @@ export function addFilesAndHash(files) {
             'action': 'hash'
         })
         .then(result => {
-            dispatch(updateFileInfo(fullPath, file.size, new Map([
-            ['sha256', result.data.sha256]
-            ])))
+            dispatch(updateFileInfo(fullPath, file.size, result.data.sha256))
             dispatch(upload(fullPath, file, file.size, file.type))
         })
         .catch(function (error) {

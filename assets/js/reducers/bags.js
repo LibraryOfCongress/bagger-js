@@ -35,7 +35,7 @@ export default function (state = {
         };
     case ActionTypes.UPDATE_FILE_INFO:
         return {...state,
-            hashes: new Map([...state.hashes]).set(action.fullPath, action.hashes),
+            hashes: new Map([...state.hashes]).set(action.fullPath, action.hash),
             sizes: new Map([...state.sizes]).set(action.fullPath, action.size)
         }
     case ActionTypes.UPDATE_BYTES_UPLOADED:

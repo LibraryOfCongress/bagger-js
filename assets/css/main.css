@@ -20,7 +20,6 @@ body {
 }
 
 #bag-contents thead th {
-	width: 20%;
 }
 
 #bag-contents thead th.file-name {
@@ -29,6 +28,10 @@ body {
 
 #bag-contents thead th.file-size {
 	width: 10%;
+}
+
+#bag-contents thead th.file-hash {
+	width: 40%;
 }
 
 #bag-contents td {
