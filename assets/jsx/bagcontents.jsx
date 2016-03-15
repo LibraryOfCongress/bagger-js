@@ -1,7 +1,7 @@
-var React = require('react'),
-    filesize = require('filesize');
+import React from 'react'
+import filesize from 'filesize'
 
-import {Manifest} from '../jsx/manifest.jsx';
+import Manifest from '../jsx/manifest.jsx';
 
 class BagContents extends React.Component {
     constructor(props) {
@@ -128,4 +128,4 @@ class BagContents extends React.Component {
     }
 }
 
-export {BagContents};
+export default BagContents;

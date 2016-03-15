@@ -1,6 +1,6 @@
 /* global self, require, postMessage, asmCrypto, FileReaderSync */
 
-require('asmcrypto.js');
+require('asmcrypto.js'); // TODO: import
 
 const BLOCK_SIZE = 1048576;
 

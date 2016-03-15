@@ -1,5 +1,5 @@
-var React = require('react'),
-    filesize = require('filesize');
+import React from 'react'
+import filesize from 'filesize'
 
 
 class Bag extends React.Component {
@@ -33,4 +33,4 @@ Bag.propTypes = {
     sizes: React.PropTypes.instanceOf(Map),
 }
 
-export {Bag};
+export default Bag;

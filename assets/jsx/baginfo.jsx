@@ -1,5 +1,5 @@
-var React = require('react');
-var filesize = require('filesize');
+import React from 'react'
+import filesize from 'filesize'
 
 class BagInfo extends React.Component {
 
@@ -21,4 +21,4 @@ class BagInfo extends React.Component {
     }
 }
 
-export {BagInfo};
+export default BagInfo;

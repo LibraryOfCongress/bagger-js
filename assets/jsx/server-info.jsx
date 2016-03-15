@@ -1,5 +1,5 @@
-var React = require('react');
-var filesize = require('filesize');
+import React from 'react'
+import filesize from 'filesize'
 
 class ServerInfo extends React.Component {
     constructor(props) {
@@ -85,4 +85,4 @@ class ServerInfo extends React.Component {
     }
 }
 
-export {ServerInfo};
+export default ServerInfo;

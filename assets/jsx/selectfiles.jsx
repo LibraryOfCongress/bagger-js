@@ -149,4 +149,4 @@ SelectFiles.propTypes = {
     onFilesChange: PropTypes.func.isRequired
 }
 
-export {SelectFiles};
+export default SelectFiles;

@@ -1,14 +1,15 @@
-var React = require('react');
+import React from 'react';
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
+
 import * as BagActions from '../js/actions/BagActions';
 
-import {SelectFiles} from '../jsx/selectfiles.jsx';
-import {Hasher} from '../jsx/hasher.jsx';
-import {Uploader} from '../jsx/uploader.jsx';
-import {Bag} from '../jsx/bag.jsx';
-import {ServerInfo} from '../jsx/server-info.jsx';
+import SelectFiles from '../jsx/selectfiles.jsx';
+import Hasher from '../jsx/hasher.jsx';
+import Uploader from '../jsx/uploader.jsx';
+import Bag from '../jsx/bag.jsx';
+import ServerInfo from '../jsx/server-info.jsx';
 
 class Bagger extends React.Component {
     constructor(props) {
@@ -40,4 +41,4 @@ class Bagger extends React.Component {
 
 Bagger = connect(state => state.Bag)(Bagger)
 
-export {Bagger}
+export default Bagger

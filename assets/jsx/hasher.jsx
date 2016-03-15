@@ -1,5 +1,6 @@
-var React = require('react');
-var filesize = require('filesize');
+import React from 'react'
+import filesize from 'filesize'
+
 
 class Hasher extends React.Component {
 
@@ -50,4 +51,4 @@ Hasher.propTypes = {
     hashes: React.PropTypes.instanceOf(Map)
 }
 
-export {Hasher};
+export default Hasher;

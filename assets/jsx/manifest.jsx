@@ -1,4 +1,4 @@
-var React = require('react');
+import React from 'react';
 
 class Manifest extends React.Component {
 
@@ -31,4 +31,4 @@ class Manifest extends React.Component {
     }
 }
 
-export {Manifest};
+export default Manifest;

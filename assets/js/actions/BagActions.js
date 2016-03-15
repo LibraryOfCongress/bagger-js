@@ -10,7 +10,7 @@ import {
     hash
 } from '../worker-pool.js';
 
-var AWS = require('aws-sdk');
+import * as AWS from 'aws-sdk';
 
 export function addFiles(files) {
     return {

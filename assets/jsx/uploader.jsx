@@ -1,5 +1,5 @@
-var React = require('react');
-var filesize = require('filesize');
+import React from 'react'
+import filesize from 'filesize'
 
 class Uploader extends React.Component {
 
@@ -64,4 +64,4 @@ Uploader.propTypes = {
     bytesUploaded: React.PropTypes.instanceOf(Map)
 }
 
-export {Uploader};
+export default Uploader;
