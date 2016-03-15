@@ -28,12 +28,20 @@ class Bagger extends React.Component {
         return (
             <div className="bagger">
                 <ServerInfo {...this.props} updateAndTestConfiguration={actions.updateAndTestConfiguration}/>
-                <SelectFiles onFilesChange={actions.addFilesAndHash} />
-                <div className="dashboard well well-sm clearfix">
-                    <Hasher files={files} hashes={hashes} />
-                    <Uploader files={files} hashes={hashes} sizes={sizes} bytesUploaded={bytesUploaded} />
-                </div>
-                <Bag files={files} sizes={sizes} hashes={hashes} />
+                {this.props.configStatus.message === 'OK' && (
+                    <div>
+                        <SelectFiles onFilesChange={actions.addFilesAndHash} />
+                        {files.size > 0 && (
+                            <div className="dashboard well well-sm clearfix">
+                                <Hasher files={files} hashes={hashes} />
+                                <Uploader files={files} hashes={hashes} sizes={sizes} bytesUploaded={bytesUploaded} />
+                            </div>
+                        )}
+                        {files.size > 0 && files.size === hashes.size && (
+                            <Bag files={files} sizes={sizes} hashes={hashes} />
+                        )}
+                    </div>
+                )}
             </div>
         );
     }
