@@ -1,13 +1,14 @@
 import {
     ADD_FILES,
     CONFIG_STATUS,
-    CONFIG_UPDATE,
-    UPDATE_FILE_INFO,
-    UPDATE_BYTES_UPLOADED
+    UPDATE_CONFIG,
+    UPDATE_HASH,
+    UPDATE_BYTES_UPLOADED,
+    UPDATE_BYTES_HASHED
 } from '../constants/ActionTypes';
 
 import {
-    hash
+    WorkerPool
 } from '../worker-pool.js';
 
 import * as AWS from 'aws-sdk';
@@ -19,9 +20,9 @@ export function addFiles(files) {
     }
 }
 
-export function updateFileInfo(fullPath, size, hash) {
+export function updateHash(fullPath, size, hash) {
     return {
-        type: UPDATE_FILE_INFO,
+        type: UPDATE_HASH,
         fullPath,
         size,
         hash
@@ -36,6 +37,14 @@ export function updateBytesUploaded(fullPath, bytesUploaded) {
     }
 }
 
+export function updateBytesHashed(fullPath, bytesHashed) {
+    return {
+        type: UPDATE_BYTES_HASHED,
+        fullPath,
+        bytesHashed
+    }
+}
+
 export function configStatus(status) {
     return {
         type: CONFIG_STATUS,
@@ -43,9 +52,9 @@ export function configStatus(status) {
     }
 }
 
-export function configUpdate(accessKeyId, secretAccessKey, bucket, region, keyPrefix) {
+export function updateConfig(accessKeyId, secretAccessKey, bucket, region, keyPrefix) {
     return {
-        type: CONFIG_UPDATE,
+        type: UPDATE_CONFIG,
         accessKeyId,
         secretAccessKey,
         bucket,
@@ -56,21 +65,24 @@ export function configUpdate(accessKeyId, secretAccessKey, bucket, region, keyPr
 
 export function updateAndTestConfiguration(accessKeyId, secretAccessKey, bucket, region, keyPrefix) {
     return dispatch => {
-        dispatch(configUpdate(accessKeyId, secretAccessKey, bucket, region, keyPrefix))
+        dispatch(updateConfig(accessKeyId, secretAccessKey, bucket, region, keyPrefix))
         dispatch(testConfiguration())
     }
 }
 
 export function addFilesAndHash(files) {
     return (dispatch, getState) => {
+        const hasher = new WorkerPool('hash-worker.js', 4, (fullPath, hashed) => {
+            dispatch(updateBytesHashed(fullPath, hashed))
+        })
         dispatch(addFiles(files));
-        return Promise.all([...files].map(([fullPath, file]) => hash({
+        return Promise.all([...files].map(([fullPath, file]) => hasher.hash({
             file,
             fullPath,
             'action': 'hash'
         })
         .then(result => {
-            dispatch(updateFileInfo(fullPath, file.size, result.data.sha256))
+            dispatch(updateHash(fullPath, file.size, result.data.sha256))
             dispatch(upload(fullPath, file, file.size, file.type))
         })
         .catch(function (error) {

@@ -21,7 +21,7 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        const {files, hashes, sizes, bytesUploaded: bytesUploadedMap} = this.props
+        const {files, hashes, sizes, bytesUploaded: bytesUploadedMap, bytesHashed: bytesHashedMap} = this.props
 
         if (files.size < 1) {
             return null;
@@ -31,10 +31,11 @@ class Dashboard extends React.Component {
         const activeHashers = 4; // TODO: this.hashWorkerPool.busyWorkers.size;
         const hashBytesPerSecond = 0; // TODO: this.state.bytes / this.state.time || 0;
         const bytesUploaded = [...bytesUploadedMap.values()].reduce((r, n) => r + n, 0);
+        const bytesHashed = [...bytesHashedMap.values()].reduce((r, n) => r + n, 0);
         const totalBytes = [...sizes.values()].reduce((r, n) => r + n, 0);
         const uploadBytesPerSecond = 0; // TODO: bytesUploaded / time || 0;
 
-        const hashComplete = (100 * (hashes.size / files.size)).toFixed(0);
+        const hashComplete = (100 * (bytesHashed / totalBytes)).toFixed(0);
         const hashProgressClasses = this.getProgressBarClasses(files.size === hashes.size);
 
         const uploadComplete = (100 * (bytesUploaded / totalBytes)).toFixed(0);

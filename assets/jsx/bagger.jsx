@@ -18,10 +18,11 @@ class Bagger extends React.Component {
     componentDidMount() {
         const { dispatch } = this.props
         dispatch(BagActions.testConfiguration())
+
     }
 
     render() {
-        const {files, hashes, sizes, bytesUploaded, dispatch} = this.props;
+        const {dispatch, files, hashes, sizes, bytesUploaded, bytesHashed} = this.props;
         const actions = bindActionCreators(BagActions, dispatch);
 
         return (
@@ -31,7 +32,7 @@ class Bagger extends React.Component {
                     <div>
                         <SelectFiles onFilesChange={actions.addFilesAndHash} />
                         {files.size > 0 && (
-                            <Dashboard files={files} hashes={hashes} sizes={sizes} bytesUploaded={bytesUploaded} />
+                            <Dashboard files={files} hashes={hashes} sizes={sizes} bytesUploaded={bytesUploaded} bytesHashed={bytesHashed} />
                         )}
                         {files.size > 0 && files.size === hashes.size && (
                             <Bag files={files} sizes={sizes} hashes={hashes} />

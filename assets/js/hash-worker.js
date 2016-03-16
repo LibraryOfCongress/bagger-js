@@ -14,12 +14,12 @@ self.addEventListener('message', ({data: {file, fullPath}}) => {
         let slice = file.slice(sliceStart, sliceEnd);
         let bytes = reader.readAsArrayBuffer(slice);
         sha256.process(bytes);
+        postMessage({type: 'PROGRESS_UPDATE', fullPath, hashed: sliceEnd})
     }
 
     postMessage({
-        file,
+        type: 'RESULT',
         fullPath,
-        fileSize,
         sha256: asmCrypto.bytes_to_hex(sha256.finish().result),
         elapsedSeconds: (Date.now() - startTime) / 1000
     });
