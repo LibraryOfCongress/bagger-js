@@ -21,14 +21,13 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        const {files, hashes, sizes, bytesUploaded: bytesUploadedMap, bytesHashed: bytesHashedMap} = this.props
+        const {files, hashes, sizes, hasherStats, bytesUploaded: bytesUploadedMap, bytesHashed: bytesHashedMap} = this.props
 
         if (files.size < 1) {
             return null;
         }
 
-        const totalHashers = 4; // TODO: this.hashWorkerPool.workers.length;
-        const activeHashers = 4; // TODO: this.hashWorkerPool.busyWorkers.size;
+        const {totalHashers, activeHashers} = hasherStats
         const hashBytesPerSecond = 0; // TODO: this.state.bytes / this.state.time || 0;
         const bytesUploaded = [...bytesUploadedMap.values()].reduce((r, n) => r + n, 0);
         const bytesHashed = [...bytesHashedMap.values()].reduce((r, n) => r + n, 0);

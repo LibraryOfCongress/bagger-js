@@ -22,7 +22,7 @@ class Bagger extends React.Component {
     }
 
     render() {
-        const {dispatch, files, hashes, sizes, bytesUploaded, bytesHashed} = this.props;
+        const {dispatch, files, hashes, sizes, bytesUploaded, bytesHashed, hasherStats} = this.props;
         const actions = bindActionCreators(BagActions, dispatch);
 
         return (
@@ -32,7 +32,7 @@ class Bagger extends React.Component {
                     <div>
                         <SelectFiles onFilesChange={actions.addFilesAndHash} />
                         {files.size > 0 && (
-                            <Dashboard files={files} hashes={hashes} sizes={sizes} bytesUploaded={bytesUploaded} bytesHashed={bytesHashed} />
+                            <Dashboard files={files} hashes={hashes} sizes={sizes} bytesUploaded={bytesUploaded} bytesHashed={bytesHashed} hasherStats={hasherStats} />
                         )}
                         {files.size > 0 && files.size === hashes.size && (
                             <Bag files={files} sizes={sizes} hashes={hashes} />

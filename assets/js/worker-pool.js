@@ -1,45 +1,52 @@
-class WorkerPool {
+export default class WorkerPool {
 
-    constructor(url, n, progressUpdate) {
+    constructor(url, n, progressUpdate, hasherStatsUpdate) {
+        this.n = n
+        this.hasherStatsUpdate = hasherStatsUpdate
         this.messages = [];
-        this.freeWorkers = new Set();
+        this.workers = new Set();
+        this.activeWorkers = new Set();
         this.callbacks = new Map();
         var pool = this;
         for (var i = 0; i < n; i++) {
-            var w = new Worker(url);
+            let w = new Worker(url);
             w.addEventListener('message', evt => {
-                console.log(evt);
                 switch (evt.data.type) {
                 case 'PROGRESS_UPDATE':
                     progressUpdate(evt.data.fullPath, evt.data.hashed)
+                    break
                 case 'RESULT':
+                    pool.activeWorkers.delete(w);
                     if (pool.callbacks.has(evt.data.fullPath)) {
                         const cb = pool.callbacks.get(evt.data.fullPath);
                         cb(evt);
                         pool.callbacks.delete(evt.fullPath);
                     }
-                    var message = pool.messages.shift();
-                    if (message !== undefined) {
-                        w.postMessage(message);
-                    } else {
-                        pool.freeWorkers.add(w);
-                    }
+                    this.dispatch()
                 }
             });
             w.addEventListener('error', error => console.log(error));
-            this.freeWorkers.add(w);
+            this.workers.add(w);
         }
-
     }
 
     postMessage(message) {
-        if (this.freeWorkers.size > 0) {
-            const [freeWorker, ] = this.freeWorkers;
-            this.freeWorkers.delete(freeWorker);
-            freeWorker.postMessage(message);
-        } else {
-            this.messages.push(message);
+        this.messages.push(message);
+        this.dispatch()
+    }
+
+    dispatch() {
+        const idleWorkers = new Set([...this.workers].filter(w => !this.activeWorkers.has(w)))
+        for (var w of idleWorkers) {
+            var message = this.messages.shift();
+            if (message !== undefined) {
+                this.activeWorkers.add(w)
+                w.postMessage(message);
+            } else {
+                break
+            }
         }
+        this.hasherStatsUpdate({activeHashers: this.activeWorkers.size, totalHashers: this.n})
     }
 
     hash(message) {
@@ -53,7 +60,3 @@ class WorkerPool {
         })
     }
 }
-
-export {
-    WorkerPool
-};

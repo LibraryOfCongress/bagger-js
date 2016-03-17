@@ -11,6 +11,10 @@ export default function (state = {
     bucket: 'bagger-js-testing',
     region: 'us-east-1',
     keyPrefix: 'my-test-bag',
+    hasherStats: {
+        totalHashers: 0,
+        activeHashers: 0
+    },
     configStatus: {
         className: 'btn btn-default',
         message: 'Untested'
@@ -39,6 +43,10 @@ export default function (state = {
     case ActionTypes.UPDATE_HASH:
         return {...state,
             hashes: new Map([...state.hashes]).set(action.fullPath, action.hash)
+        }
+    case ActionTypes.UPDATE_HASHER_STATS:
+        return {...state,
+            hasherStats: action.hasherStats
         }
     case ActionTypes.UPDATE_BYTES_HASHED:
         return {...state,

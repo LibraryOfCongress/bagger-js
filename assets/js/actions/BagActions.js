@@ -4,12 +4,11 @@ import {
     UPDATE_CONFIG,
     UPDATE_HASH,
     UPDATE_BYTES_UPLOADED,
-    UPDATE_BYTES_HASHED
+    UPDATE_BYTES_HASHED,
+    UPDATE_HASHER_STATS
 } from '../constants/ActionTypes';
 
-import {
-    WorkerPool
-} from '../worker-pool.js';
+import WorkerPool from '../worker-pool.js';
 
 import * as AWS from 'aws-sdk';
 
@@ -20,11 +19,10 @@ export function addFiles(files) {
     }
 }
 
-export function updateHash(fullPath, size, hash) {
+export function updateHash(fullPath, hash) {
     return {
         type: UPDATE_HASH,
         fullPath,
-        size,
         hash
     }
 }
@@ -42,6 +40,13 @@ export function updateBytesHashed(fullPath, bytesHashed) {
         type: UPDATE_BYTES_HASHED,
         fullPath,
         bytesHashed
+    }
+}
+
+export function updateHasherStats(hasherStats) {
+    return {
+        type: UPDATE_HASHER_STATS,
+        hasherStats
     }
 }
 
@@ -72,9 +77,12 @@ export function updateAndTestConfiguration(accessKeyId, secretAccessKey, bucket,
 
 export function addFilesAndHash(files) {
     return (dispatch, getState) => {
+        // TODO: create one hasher for the application to use instead
+        // TODO: write this so that it can be called while one is still in progress
         const hasher = new WorkerPool('hash-worker.js', 4, (fullPath, hashed) => {
             dispatch(updateBytesHashed(fullPath, hashed))
-        })
+        }, (hasherStats) => dispatch(updateHasherStats(hasherStats))
+        )
         dispatch(addFiles(files));
         return Promise.all([...files].map(([fullPath, file]) => hasher.hash({
             file,
