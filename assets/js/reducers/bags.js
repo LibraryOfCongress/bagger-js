@@ -18,7 +18,11 @@ export default function (state = {
     configStatus: {
         className: 'btn btn-default',
         message: 'Untested'
-    }
+    },
+    hashThroughput: [],
+    uploadThroughput: [],
+    hashBytesPerSecond: 0,
+    uploadBytesPerSecond: 0
 }, action) {
     switch (action.type) {
     case ActionTypes.ADD_FILES:
@@ -56,7 +60,22 @@ export default function (state = {
         return {...state,
             bytesUploaded: new Map([...state.bytesUploaded]).set(action.fullPath, action.bytesUploaded)
     }
-
+    case ActionTypes.UPDATE_THROUGHPUT:
+        let newState = state;
+        let hashBytesPerSecond = 0
+        let uploadBytesPerSecond = 0
+        const now = Date.now() / 1000.0;
+        const bytesHashed = [...state.bytesHashed.values()].reduce((r, n) => r + n, 0);
+        const bytesUploaded = [...state.bytesUploaded.values()].reduce((r, n) => r + n, 0);
+        if (state.hashThroughput.length > 0) {
+            const [t0, b0] = state.hashThroughput
+            hashBytesPerSecond = (bytesHashed - b0) / (now - t0)
+        }
+        if (state.uploadThroughput.length > 0) {
+            const [t0, b0] = state.uploadThroughput
+            uploadBytesPerSecond = (bytesUploaded - b0) / (now - t0)
+        }
+        return {...state, hashBytesPerSecond, uploadBytesPerSecond, hashThroughput: [now, bytesHashed], uploadThroughput: [now, bytesUploaded]}
     default:
         return state;
     }

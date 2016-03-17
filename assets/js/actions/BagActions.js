@@ -5,7 +5,8 @@ import {
     UPDATE_HASH,
     UPDATE_BYTES_UPLOADED,
     UPDATE_BYTES_HASHED,
-    UPDATE_HASHER_STATS
+    UPDATE_HASHER_STATS,
+    UPDATE_THROUGHPUT
 } from '../constants/ActionTypes';
 
 import WorkerPool from '../worker-pool.js';
@@ -47,6 +48,12 @@ export function updateHasherStats(hasherStats) {
     return {
         type: UPDATE_HASHER_STATS,
         hasherStats
+    }
+}
+
+export function updateThroughput() {
+    return {
+        type: UPDATE_THROUGHPUT
     }
 }
 
