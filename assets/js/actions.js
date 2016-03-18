@@ -69,55 +69,26 @@ export function updateConfig(accessKeyId, secretAccessKey, bucket, region, keyPr
 export function updateAndTestConfiguration(accessKeyId, secretAccessKey, bucket, region, keyPrefix) {
     return dispatch => {
         dispatch(updateConfig(accessKeyId, secretAccessKey, bucket, region, keyPrefix))
-        dispatch(testConfiguration())
+        dispatch(testConfiguration(accessKeyId, secretAccessKey, bucket, region, keyPrefix))
     }
 }
 
-export function addFilesAndHash(files) {
-    return dispatch => {
-        // TODO: create one hasher for the application to use instead
-        // TODO: write this so that it can be called while one is still in progress
-        const hasher = new WorkerPool('hash-worker.js', 4, (fullPath, hashed) => {
-            dispatch(updateBytesHashed(fullPath, hashed))
-        }, (hasherStats) => dispatch(updateHasherStats(hasherStats))
-        )
-        dispatch(addFiles(files));
-        return Promise.all([...files].map(([fullPath, file]) => hasher.hash({
-            file,
-            fullPath,
-            'action': 'hash'
-        })
-        .then(result => {
-            dispatch(updateHash(fullPath, file.size, result.data.sha256))
-            dispatch(upload(fullPath, file, file.size, file.type))
-        })
-        .catch(function (error) {
-            console.log('Failed!', error);
-        })));
-    }
+function configureAWS(accessKeyId, secretAccessKey, region) {
+    AWS.config.update({accessKeyId, secretAccessKey, region});
 }
 
-function configureAWS(state) {
-    AWS.config.update({
-        accessKeyId: state.accessKeyId,
-        secretAccessKey: state.secretAccessKey,
-        region: state.region
-    });
-}
-
-function getS3Client(state) {
-    configureAWS(state);
+function getS3Client(accessKeyId, secretAccessKey, region) {
+    configureAWS(accessKeyId, secretAccessKey, region);
     return new AWS.S3();
 }
 
-export function testConfiguration() {
-    return (dispatch, getState) => {
-        const state = getState().bag;
-            // We'd like to be able to list buckets but that's impossible due to Amazon's CORS constraints:
-            // https://forums.aws.amazon.com/thread.jspa?threadID=179355&tstart=0
+export function testConfiguration(accessKeyId, secretAccessKey, bucket, region, keyPrefix) {
+    return dispatch => {
+        // We'd like to be able to list buckets but that's impossible due to Amazon's CORS constraints:
+        // https://forums.aws.amazon.com/thread.jspa?threadID=179355&tstart=0
 
-        if (state.accessKeyId && state.secretAccessKey && state.region) {
-            var s3 = getS3Client(state);
+        if (accessKeyId && secretAccessKey && region) {
+            var s3 = getS3Client(accessKeyId, secretAccessKey, region);
 
             dispatch(configStatus({
                 className: 'btn btn-info',
@@ -125,7 +96,7 @@ export function testConfiguration() {
             }));
 
             s3.getBucketCors({
-                Bucket: state.bucket
+                Bucket: bucket
             }, (isError, data) => {
                 if (isError) {
                     var errMessage = 'ERROR';
@@ -155,10 +126,9 @@ export function testConfiguration() {
     }
 }
 
-export function upload(fullPath, file, size, type) {
-    return (dispatch, getState) => {
-        const state = getState().bag;
-        var key = state.keyPrefix + '/data/' + fullPath;
+export function upload(fullPath, file, size, type, bucket, keyPrefix) {
+    return dispatch => {
+        var key = keyPrefix + '/data/' + fullPath;
         key = key.replace('//', '/');
 
         // We reset this to zero every time so our cumulative stats will be correct
@@ -170,9 +140,7 @@ export function upload(fullPath, file, size, type) {
 
         var size = typeof body.size !== 'undefined' ? body.size : body.length;
 
-        console.log('Uploading %s to %s (%i bytes)', key, state.bucket, size);
-
-        //this.configureAWS();
+        console.log('Uploading %s to %s (%i bytes)', key, bucket, size);
 
         // TODO: set ContentMD5
         // TODO: use leavePartsOnError to allow retries?
@@ -182,7 +150,7 @@ export function upload(fullPath, file, size, type) {
             partSize: 8 * 1024 * 1024,
             queueSize: 4,
             params: {
-                Bucket: state.bucket,
+                Bucket: bucket,
                 Key: key,
                 Body: body,
                 Contenttype: ActionTypes.type
