@@ -12,6 +12,8 @@ import createLogger from 'redux-logger'
 import {bagger, hasher, uploader} from '../js/reducers';
 import Bagger from '../jsx/bagger.jsx';
 
+// http://redux.js.org/docs/basics/UsageWithReact.html
+
 const loggerMiddleware = createLogger()
 
 let createStoreWithMiddleware;

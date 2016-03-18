@@ -4,6 +4,8 @@ import WorkerPool from './worker-pool';
 
 import * as AWS from 'aws-sdk';
 
+// http://redux.js.org/docs/basics/Actions.html
+
 export function addFiles(files) {
     return {
         type: ActionTypes.ADD_FILES,

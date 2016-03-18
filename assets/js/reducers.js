@@ -1,5 +1,7 @@
 import * as ActionTypes from './ActionTypes';
 
+// http://redux.js.org/docs/basics/Reducers.html
+
 export function bagger(state = {
     files: new Map(),
     hashes: new Map(),
