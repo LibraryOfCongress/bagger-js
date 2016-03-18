@@ -21,15 +21,15 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        const {files, hashes, sizes, hasherStats, hashBytesPerSecond, uploadBytesPerSecond, bytesUploaded: bytesUploadedMap, bytesHashed: bytesHashedMap} = this.props
+        const {files, hashes, sizes, hasher, uploader} = this.props
 
         if (files.size < 1) {
             return null;
         }
 
-        const {totalHashers, activeHashers} = hasherStats
-        const bytesUploaded = [...bytesUploadedMap.values()].reduce((r, n) => r + n, 0);
-        const bytesHashed = [...bytesHashedMap.values()].reduce((r, n) => r + n, 0);
+        const {totalHashers, activeHashers} = hasher.hasherStats
+        const bytesUploaded = [...uploader.bytesUploaded.values()].reduce((r, n) => r + n, 0);
+        const bytesHashed = [...hasher.bytesHashed.values()].reduce((r, n) => r + n, 0);
         const totalBytes = [...sizes.values()].reduce((r, n) => r + n, 0);
 
         const hashComplete = (100 * (bytesHashed / totalBytes)).toFixed(0);
@@ -52,7 +52,7 @@ class Dashboard extends React.Component {
                             {hashComplete}%
                         </div>
                     </div>
-                    <p>{hashes.size} of {files.size} files hashed. average throughput: <code>{filesize(hashBytesPerSecond, {round: 1})}</code> per second. {activeHashers} of {totalHashers} hashers are active.</p>
+                    <p>{hashes.size} of {files.size} files hashed. average throughput: <code>{filesize(hasher.hashBytesPerSecond, {round: 1})}</code> per second. {activeHashers} of {totalHashers} hashers are active.</p>
                 </div>
                 <div className="col-sm-6 upload-stats">
                     <h5>Uploads</h5>
@@ -66,7 +66,7 @@ class Dashboard extends React.Component {
                     </div>
                     <p>Completed:
                         <code>{filesize(bytesUploaded, {round: 0})}</code>. Effective upload speed:
-                        <code>{filesize(uploadBytesPerSecond, {round: 1})}</code>/s</p>
+                        <code>{filesize(uploader.uploadBytesPerSecond, {round: 1})}</code>/s</p>
                 </div>
             </div>
         );

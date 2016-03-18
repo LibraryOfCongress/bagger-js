@@ -17,7 +17,7 @@ class Bagger extends React.Component {
     }
 
     componentDidMount() {
-        const { dispatch, accessKeyId, secretAccessKey, bucket, region, keyPrefix } = this.props
+        const { dispatch, uploader: {accessKeyId, secretAccessKey, bucket, region, keyPrefix}} = this.props
         dispatch(BagActions.testConfiguration(accessKeyId, secretAccessKey, bucket, region, keyPrefix))
         setInterval(() => dispatch(BagActions.updateThroughput()), 1000)
         const hasher = new WorkerPool('hash-worker.js', 4, (fullPath, hashed) => {
@@ -28,13 +28,13 @@ class Bagger extends React.Component {
     }
 
     render() {
-        const {dispatch, files, hashes, sizes, bytesUploaded, bytesHashed, hasherStats, hashBytesPerSecond, uploadBytesPerSecond, bucket, keyPrefix} = this.props;
+        const {dispatch, files, hashes, sizes, hasher, uploader} = this.props;
         const actions = bindActionCreators(BagActions, dispatch);
 
         return (
             <div className="bagger">
-                <ServerInfo {...this.props} updateAndTestConfiguration={actions.updateAndTestConfiguration}/>
-                {this.props.configStatus.message === 'OK' && (
+                <ServerInfo uploader={uploader} updateAndTestConfiguration={actions.updateAndTestConfiguration}/>
+                {uploader.configStatus.message === 'OK' && (
                     <div>
                         <SelectFiles onFilesChange={(files) => {
                             dispatch(BagActions.addFiles(files))
@@ -44,7 +44,7 @@ class Bagger extends React.Component {
                                 'action': 'hash'
                             }).then(result => {
                                 dispatch(BagActions.updateHash(fullPath, file.size, result.data.sha256))
-                                dispatch(BagActions.upload(fullPath, file, file.size, file.type, bucket, keyPrefix))
+                                dispatch(BagActions.upload(fullPath, file, file.size, file.type, uploader.bucket, uploader.keyPrefix))
                             }).catch(function (error) {
                                 console.log('Failed!', error);
                             })
@@ -54,9 +54,8 @@ class Bagger extends React.Component {
                         {files.size > 0 && (
                             <Dashboard
                                 files={files} hashes={hashes} sizes={sizes}
-                                bytesHashed={bytesHashed} hashBytesPerSecond={hashBytesPerSecond}
-                                bytesUploaded={bytesUploaded} uploadBytesPerSecond={uploadBytesPerSecond}
-                                hasherStats={hasherStats}
+                                hasher={hasher}
+                                uploader={uploader}
                             />
                         )}
                         {files.size > 0 && files.size === hashes.size && (
@@ -69,6 +68,6 @@ class Bagger extends React.Component {
     }
 }
 
-Bagger = connect(state => state.bag)(Bagger)
+Bagger = connect(state => ({...state.bagger, hasher: state.hasher, uploader: state.uploader}))(Bagger)
 
 export default Bagger
