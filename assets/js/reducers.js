@@ -1,6 +1,6 @@
-import * as ActionTypes from '../constants/ActionTypes';
+import * as ActionTypes from './ActionTypes';
 
-export default function (state = {
+export function bag(state = {
     files: new Map(),
     hashes: new Map(),
     sizes: new Map(),

@@ -3,7 +3,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import * as BagActions from '../js/actions/BagActions';
+import * as BagActions from '../js/actions';
 
 import SelectFiles from '../jsx/selectfiles.jsx';
 import Dashboard from '../jsx/dashboard.jsx';
@@ -49,6 +49,6 @@ class Bagger extends React.Component {
     }
 }
 
-Bagger = connect(state => state.Bag)(Bagger)
+Bagger = connect(state => state.bag)(Bagger)
 
 export default Bagger

@@ -1,28 +1,19 @@
-import {
-    ADD_FILES,
-    CONFIG_STATUS,
-    UPDATE_CONFIG,
-    UPDATE_HASH,
-    UPDATE_BYTES_UPLOADED,
-    UPDATE_BYTES_HASHED,
-    UPDATE_HASHER_STATS,
-    UPDATE_THROUGHPUT
-} from '../constants/ActionTypes';
+import * as ActionTypes from './ActionTypes';
 
-import WorkerPool from '../worker-pool.js';
+import WorkerPool from './worker-pool';
 
 import * as AWS from 'aws-sdk';
 
 export function addFiles(files) {
     return {
-        type: ADD_FILES,
+        type: ActionTypes.ADD_FILES,
         files
     }
 }
 
 export function updateHash(fullPath, hash) {
     return {
-        type: UPDATE_HASH,
+        type: ActionTypes.UPDATE_HASH,
         fullPath,
         hash
     }
@@ -30,7 +21,7 @@ export function updateHash(fullPath, hash) {
 
 export function updateBytesUploaded(fullPath, bytesUploaded) {
     return {
-        type: UPDATE_BYTES_UPLOADED,
+        type: ActionTypes.UPDATE_BYTES_UPLOADED,
         fullPath,
         bytesUploaded
     }
@@ -38,7 +29,7 @@ export function updateBytesUploaded(fullPath, bytesUploaded) {
 
 export function updateBytesHashed(fullPath, bytesHashed) {
     return {
-        type: UPDATE_BYTES_HASHED,
+        type: ActionTypes.UPDATE_BYTES_HASHED,
         fullPath,
         bytesHashed
     }
@@ -46,27 +37,27 @@ export function updateBytesHashed(fullPath, bytesHashed) {
 
 export function updateHasherStats(hasherStats) {
     return {
-        type: UPDATE_HASHER_STATS,
+        type: ActionTypes.UPDATE_HASHER_STATS,
         hasherStats
     }
 }
 
 export function updateThroughput() {
     return {
-        type: UPDATE_THROUGHPUT
+        type: ActionTypes.UPDATE_THROUGHPUT
     }
 }
 
 export function configStatus(status) {
     return {
-        type: CONFIG_STATUS,
+        type: ActionTypes.CONFIG_STATUS,
         status
     }
 }
 
 export function updateConfig(accessKeyId, secretAccessKey, bucket, region, keyPrefix) {
     return {
-        type: UPDATE_CONFIG,
+        type: ActionTypes.UPDATE_CONFIG,
         accessKeyId,
         secretAccessKey,
         bucket,
@@ -83,7 +74,7 @@ export function updateAndTestConfiguration(accessKeyId, secretAccessKey, bucket,
 }
 
 export function addFilesAndHash(files) {
-    return (dispatch, getState) => {
+    return dispatch => {
         // TODO: create one hasher for the application to use instead
         // TODO: write this so that it can be called while one is still in progress
         const hasher = new WorkerPool('hash-worker.js', 4, (fullPath, hashed) => {
@@ -121,7 +112,7 @@ function getS3Client(state) {
 
 export function testConfiguration() {
     return (dispatch, getState) => {
-        const state = getState().Bag;
+        const state = getState().bag;
             // We'd like to be able to list buckets but that's impossible due to Amazon's CORS constraints:
             // https://forums.aws.amazon.com/thread.jspa?threadID=179355&tstart=0
 
@@ -166,7 +157,7 @@ export function testConfiguration() {
 
 export function upload(fullPath, file, size, type) {
     return (dispatch, getState) => {
-        const state = getState().Bag;
+        const state = getState().bag;
         var key = state.keyPrefix + '/data/' + fullPath;
         key = key.replace('//', '/');
 
@@ -194,7 +185,7 @@ export function upload(fullPath, file, size, type) {
                 Bucket: state.bucket,
                 Key: key,
                 Body: body,
-                ContentType: type
+                Contenttype: ActionTypes.type
             }
         });
 
