@@ -21,7 +21,7 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        const {files, hashes, sizes, hasher, uploader} = this.props
+        const {bagger: {files, hashes, sizes}, hasher, uploader} = this.props
 
         if (files.size < 1) {
             return null;

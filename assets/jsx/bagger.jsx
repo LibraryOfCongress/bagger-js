@@ -28,7 +28,7 @@ class Bagger extends React.Component {
     }
 
     render() {
-        const {dispatch, files, hashes, sizes, hasher, uploader} = this.props;
+        const {dispatch, bagger, hasher, uploader} = this.props;
         const actions = bindActionCreators(BagActions, dispatch);
 
         return (
@@ -51,15 +51,15 @@ class Bagger extends React.Component {
                             ));
                         }}
                         />
-                        {files.size > 0 && (
+                        {bagger.files.size > 0 && (
                             <Dashboard
-                                files={files} hashes={hashes} sizes={sizes}
+                                bagger={bagger}
                                 hasher={hasher}
                                 uploader={uploader}
                             />
                         )}
-                        {files.size > 0 && files.size === hashes.size && (
-                            <Bag files={files} sizes={sizes} hashes={hashes} />
+                        {bagger.files.size > 0 && bagger.files.size === bagger.hashes.size && (
+                            <Bag bagger={bagger} />
                         )}
                     </div>
                 )}
@@ -68,6 +68,6 @@ class Bagger extends React.Component {
     }
 }
 
-Bagger = connect(state => ({...state.bagger, hasher: state.hasher, uploader: state.uploader}))(Bagger)
+Bagger = connect(state => state)(Bagger)
 
 export default Bagger
