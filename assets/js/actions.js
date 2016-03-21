@@ -1,7 +1,5 @@
 import * as ActionTypes from './ActionTypes';
 
-import WorkerPool from './worker-pool';
-
 import * as AWS from 'aws-sdk';
 
 // http://redux.js.org/docs/basics/Actions.html
@@ -71,7 +69,7 @@ export function updateConfig(accessKeyId, secretAccessKey, bucket, region, keyPr
 export function updateAndTestConfiguration(accessKeyId, secretAccessKey, bucket, region, keyPrefix) {
     return dispatch => {
         dispatch(updateConfig(accessKeyId, secretAccessKey, bucket, region, keyPrefix))
-        dispatch(testConfiguration(accessKeyId, secretAccessKey, bucket, region, keyPrefix))
+        dispatch(testConfiguration(accessKeyId, secretAccessKey, bucket, region))
     }
 }
 
@@ -84,7 +82,7 @@ function getS3Client(accessKeyId, secretAccessKey, region) {
     return new AWS.S3();
 }
 
-export function testConfiguration(accessKeyId, secretAccessKey, bucket, region, keyPrefix) {
+export function testConfiguration(accessKeyId, secretAccessKey, bucket, region) {
     return dispatch => {
         // We'd like to be able to list buckets but that's impossible due to Amazon's CORS constraints:
         // https://forums.aws.amazon.com/thread.jspa?threadID=179355&tstart=0
@@ -137,12 +135,9 @@ export function upload(fullPath, file, size, type, bucket, keyPrefix) {
         // after failures or retries:
         dispatch(updateBytesUploaded(fullPath, 0));
 
-        var startTime = Date.now();
         var body = file;
 
         var size = typeof body.size !== 'undefined' ? body.size : body.length;
-
-        console.log('Uploading %s to %s (%i bytes)', key, bucket, size);
 
         // TODO: set ContentMD5
         // TODO: use leavePartsOnError to allow retries?
@@ -165,15 +160,13 @@ export function upload(fullPath, file, size, type, bucket, keyPrefix) {
             dispatch(updateBytesUploaded(fullPath, progressEvent.loaded));
         });
 
-        upload.send((isError, data) => {
+        upload.send((isError) => {
             if (isError) {
-                console.error('Error uploading %s: %s', key, data);
+                // TODO: handle error
                 // Reset the total on error since S3 doesn't retain partials:
                 dispatch(updateBytesUploaded(fullPath, 0));
             } else {
-                console.log('Successfully uploaded', key);
                 dispatch(updateBytesUploaded(fullPath, size));
-                // var elapsedSeconds = (Date.now() - startTime) / 1000;
             }
         });
     }

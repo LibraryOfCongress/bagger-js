@@ -17,8 +17,8 @@ class Bagger extends React.Component {
     }
 
     componentDidMount() {
-        const { dispatch, uploader: {accessKeyId, secretAccessKey, bucket, region, keyPrefix}} = this.props
-        dispatch(BagActions.testConfiguration(accessKeyId, secretAccessKey, bucket, region, keyPrefix))
+        const { dispatch, uploader: {accessKeyId, secretAccessKey, bucket, region}} = this.props
+        dispatch(BagActions.testConfiguration(accessKeyId, secretAccessKey, bucket, region))
         setInterval(() => dispatch(BagActions.updateThroughput()), 1000)
         const hasher = new WorkerPool('hash-worker.js', 4, (fullPath, hashed) => {
             dispatch(BagActions.updateBytesHashed(fullPath, hashed))
@@ -46,7 +46,7 @@ class Bagger extends React.Component {
                                 dispatch(BagActions.updateHash(fullPath, file.size, result.data.sha256))
                                 dispatch(BagActions.upload(fullPath, file, file.size, file.type, uploader.bucket, uploader.keyPrefix))
                             }).catch(function (error) {
-                                console.log('Failed!', error);
+                                throw error
                             })
                             ));
                         }}
@@ -68,6 +68,4 @@ class Bagger extends React.Component {
     }
 }
 
-Bagger = connect(state => state)(Bagger)
-
-export default Bagger
+export default connect(state => state)(Bagger)

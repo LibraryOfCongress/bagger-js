@@ -35,7 +35,7 @@ class Bag extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {[...files.entries()].map(([path, file, sha256 = hashes.get(path)]) =>
+                        {[...files.entries()].map(([path, , sha256 = hashes.get(path)]) =>
                             <tr key={path}>
                                 <td className="file-name">
                                     {path}
@@ -72,7 +72,7 @@ class Bag extends React.Component {
 Bag.propTypes = {
     files: React.PropTypes.instanceOf(Map),
     hashes: React.PropTypes.instanceOf(Map),
-    sizes: React.PropTypes.instanceOf(Map),
+    sizes: React.PropTypes.instanceOf(Map)
 }
 
 export default Bag;

@@ -8,6 +8,7 @@
     "ecmaFeatures": {
         "jsx": true
     },
+    extends: "eslint:recommended",
     "rules": {
         "strict": [0, "function"],
         "no-use-before-define": 0,

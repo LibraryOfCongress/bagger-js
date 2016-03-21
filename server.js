@@ -1,3 +1,4 @@
+/*eslint no-console: "off" */
 /* global require, console */
 
 var connect = require('connect');

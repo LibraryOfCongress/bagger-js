@@ -3,8 +3,7 @@ import {Provider} from 'react-redux';
 import {
     createStore,
     applyMiddleware,
-    combineReducers,
-    compose
+    combineReducers
 } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import createLogger from 'redux-logger'

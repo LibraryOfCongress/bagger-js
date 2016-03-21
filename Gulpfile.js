@@ -1,3 +1,5 @@
+/*eslint-env node */
+/*eslint no-console: "off" */
 /* jslint indent: 4 */
 /* global require, console */
 

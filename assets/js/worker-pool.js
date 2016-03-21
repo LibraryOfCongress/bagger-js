@@ -25,7 +25,9 @@ export default class WorkerPool {
                     this.dispatch()
                 }
             });
-            w.addEventListener('error', error => console.log(error));
+            w.addEventListener('error', error => {
+                throw error
+            })
             this.workers.add(w);
         }
     }
@@ -50,13 +52,11 @@ export default class WorkerPool {
     }
 
     hash(message) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.callbacks.set(message.fullPath, function cb(evt) {
                 resolve(evt);
             });
             this.postMessage(message)
-        }).catch(function (error) {
-            console.log('Failed!', error);
         })
     }
 }

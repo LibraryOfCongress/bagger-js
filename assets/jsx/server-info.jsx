@@ -1,5 +1,4 @@
 import React from 'react'
-import filesize from 'filesize'
 
 class ServerInfo extends React.Component {
     constructor(props) {
