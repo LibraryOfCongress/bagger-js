@@ -135,7 +135,10 @@ class SelectFiles extends React.Component {
                     <div className="form-group">
                         <label>
                             Select files:
-                            <input type="file" onChange={this.handleFileInputChange.bind(this)} multiple webkitdirectory/>
+                            <input
+                                type="file"
+                                onChange={this.handleFileInputChange.bind(this)} multiple webkitdirectory
+                            />
                         </label>
                         <button className="btn btn-primary">Go!</button>
                     </div>

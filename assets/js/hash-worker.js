@@ -9,12 +9,12 @@ self.addEventListener('message', ({data: {file, fullPath}}) => {
     const startTime = Date.now();
     const fileSize = file.size;
 
-    for (let reader = new FileReaderSync(), sliceStart = 0, sliceEnd; sliceStart < fileSize; sliceStart = sliceEnd) {
-        sliceEnd = sliceStart + Math.min(BLOCK_SIZE, fileSize - sliceStart);
-        let slice = file.slice(sliceStart, sliceEnd);
+    for (let reader = new FileReaderSync(), start = 0, end; start < fileSize; start = end) {
+        end = start + Math.min(BLOCK_SIZE, fileSize - start);
+        let slice = file.slice(start, end);
         let bytes = reader.readAsArrayBuffer(slice);
         sha256.process(bytes);
-        postMessage({type: 'PROGRESS_UPDATE', fullPath, hashed: sliceEnd})
+        postMessage({type: 'PROGRESS_UPDATE', fullPath, hashed: end})
     }
 
     postMessage({

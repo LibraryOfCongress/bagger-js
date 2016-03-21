@@ -52,14 +52,25 @@ class Dashboard extends React.Component {
                             {hashComplete}%
                         </div>
                     </div>
-                    <p>{hashes.size} of {files.size} files hashed. average throughput: <code>{filesize(hasher.hashBytesPerSecond, {round: 1})}</code> per second. {activeHashers} of {totalHashers} hashers are active.</p>
+                    <p>
+                        {hashes.size} of {files.size} files hashed.
+                        average throughput:
+                        <code>{filesize(hasher.hashBytesPerSecond, {round: 1})}</code> per second.
+                        {activeHashers} of {totalHashers} hashers are active.
+                    </p>
                 </div>
                 <div className="col-sm-6 upload-stats">
                     <h5>Uploads</h5>
                     <div className="progress">
-                        <div className={uploadProgressClasses} role="progressbar" aria-valuenow={uploadComplete} aria-valuemin="0" aria-valuemax="100" style={{
-                            width: uploadComplete + '%'
-                        }}
+                        <div
+                            className={uploadProgressClasses}
+                            role="progressbar"
+                            aria-valuenow={uploadComplete}
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            style={{
+                                width: uploadComplete + '%'
+                            }}
                         >
                             {uploadComplete}%
                         </div>

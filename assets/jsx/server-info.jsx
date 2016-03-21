@@ -33,7 +33,13 @@ class ServerInfo extends React.Component {
                             Access Key
                         </label>
                         <div className="col-sm-10">
-                            <input ref={node => {accessKeyId = node}} type="text" className="form-control" id="accessKeyId" defaultValue={uploader.accessKeyId} />
+                            <input
+                                ref={node => {accessKeyId = node}}
+                                type="text"
+                                className="form-control"
+                                id="accessKeyId"
+                                defaultValue={uploader.accessKeyId}
+                            />
                         </div>
                     </div>
 
@@ -42,21 +48,39 @@ class ServerInfo extends React.Component {
                             Secret Key
                         </label>
                         <div className="col-sm-10">
-                            <input ref={node => {secretAccessKey = node}} type="password" className="form-control" id="secretAccessKey" defaultValue={uploader.secretAccessKey} />
+                            <input
+                                ref={node => {secretAccessKey = node}}
+                                type="password"
+                                className="form-control"
+                                id="secretAccessKey"
+                                defaultValue={uploader.secretAccessKey}
+                            />
                         </div>
                     </div>
 
                     <div className="form-group">
                         <label className="col-sm-2 control-label" htmlFor="region">Region</label>
                         <div className="col-sm-10">
-                            <input ref={node => {region = node}} type="text" className="form-control" id="region" defaultValue={uploader.region} />
+                            <input
+                                ref={node => {region = node}}
+                                type="text"
+                                className="form-control"
+                                id="region"
+                                defaultValue={uploader.region}
+                            />
                         </div>
                     </div>
 
                     <div className="form-group">
                         <label className="col-sm-2 control-label" htmlFor="bucket">Bucket</label>
                         <div className="col-sm-10">
-                            <input ref={node => {bucket = node}} type="text" className="form-control" id="bucket" defaultValue={uploader.bucket} />
+                            <input
+                                ref={node => {bucket = node}}
+                                type="text"
+                                className="form-control"
+                                id="bucket"
+                                defaultValue={uploader.bucket}
+                            />
                         </div>
                     </div>
 
@@ -73,7 +97,13 @@ class ServerInfo extends React.Component {
                             Path Prefix
                         </label>
                         <div className="col-sm-10">
-                            <input ref={node => {keyPrefix = node}} type="text" className="form-control" id="keyPrefix" defaultValue={uploader.keyPrefix} />
+                            <input
+                                ref={node => {keyPrefix = node}}
+                                type="text"
+                                className="form-control"
+                                id="keyPrefix"
+                                defaultValue={uploader.keyPrefix}
+                            />
                         </div>
                     </div>
                 </form>

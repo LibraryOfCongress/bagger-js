@@ -33,7 +33,10 @@ class Bagger extends React.Component {
 
         return (
             <div className="bagger">
-                <ServerInfo uploader={uploader} updateAndTestConfiguration={actions.updateAndTestConfiguration}/>
+                <ServerInfo
+                    uploader={uploader}
+                    updateAndTestConfiguration={actions.updateAndTestConfiguration}
+                />
                 {uploader.configStatus.message === 'OK' && (
                     <div>
                         <SelectFiles onFilesChange={(files) => {
@@ -44,7 +47,8 @@ class Bagger extends React.Component {
                                 'action': 'hash'
                             }).then(result => {
                                 dispatch(BagActions.updateHash(fullPath, file.size, result.data.sha256))
-                                dispatch(BagActions.upload(fullPath, file, file.size, file.type, uploader.bucket, uploader.keyPrefix))
+                                dispatch(BagActions.upload(fullPath, file, file.size, file.type,
+                                uploader.bucket, uploader.keyPrefix))
                             }).catch(function (error) {
                                 throw error
                             })
