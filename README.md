@@ -53,7 +53,7 @@ At this point the compiled JavaScript, CSS and HTML is in the `dist/` directory 
 
 ## Contributor Guidelines
 
-The included .jshintrc documents the basic JavaScript requirements. Use of a Git pre-commit hook such as
-https://gist.github.com/acdha/8717683/ is recommended to ensure that JSHint is already run.
+The included .eslintrc documents the basic JavaScript requirements. These requirements are checked as part of the gulp lint target - which is included in the default target. Use of a Git pre-commit hook such as
+https://gist.github.com/acdha/8717683/ can be helpful, as well.
 
 ## [![node dev deps](https://david-dm.org/libraryofcongress/bagger-js/dev-status.png)](https://david-dm.org/libraryofcongress/bagger-js#dev-badge-embed=&info=devDependencies&view=table) ##

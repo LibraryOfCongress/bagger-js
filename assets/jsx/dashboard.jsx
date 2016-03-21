@@ -1,13 +1,19 @@
-var React = require('react'),
-    filesize = require('filesize');
+import React from 'react'
+import filesize from 'filesize'
+
 
 class Dashboard extends React.Component {
-    getProgressBarClasses(workerStats) {
-        var res = ['progress-bar'];
 
-        if (workerStats.completed) {
+    constructor(props) {
+        super(props);
+    }
+
+    getProgressBarClasses(completed) {
+        let res = ['progress-bar'];
+
+        if (completed) {
             res.push('progress-bar-success');
-        } else if (workerStats.active > 0) {
+        } else { // TODO: add back active bit
             res = res.concat(['progress-bar-striped', 'active']);
         }
 
@@ -15,53 +21,74 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        var files = this.props.files,
-            hashWorkers = this.props.hashWorkers,
-            uploadWorkers = this.props.uploadWorkers;
+        const {bagger: {files, hashes, sizes}, hasher, uploader} = this.props
 
-        if (files.total < 1) {
+        if (files.size < 1) {
             return null;
         }
 
-        var hashComplete = (100 * (1 - (hashWorkers.pendingFiles / files.total))).toFixed(0),
-            hashBytesPerSecond = hashWorkers.totalBytes / hashWorkers.totalTime || 0,
-            hashSpeed = filesize(hashBytesPerSecond, {round: 1});
+        const {totalHashers, activeHashers} = hasher.hasherStats
+        const bytesUploaded = [...uploader.bytesUploaded.values()].reduce((r, n) => r + n, 0);
+        const bytesHashed = [...hasher.bytesHashed.values()].reduce((r, n) => r + n, 0);
+        const totalBytes = [...sizes.values()].reduce((r, n) => r + n, 0);
 
-        var uploadComplete = (100 * (files.bytesUploaded / hashWorkers.totalBytes)).toFixed(0),
-            uploadCompleteStyle = {width: uploadComplete + '%'},
-            uploadBytesPerSecond = uploadWorkers.totalBytes / uploadWorkers.totalTime || 0,
-            uploadSpeed = filesize(uploadBytesPerSecond, {round: 1}),
-            prettyBytesUploaded = filesize(files.bytesUploaded, {round: 0});
+        const hashComplete = (100 * (bytesHashed / totalBytes)).toFixed(0);
+        const hashProgressClasses = this.getProgressBarClasses(files.size === hashes.size);
 
-        var hashProgressClasses = this.getProgressBarClasses(hashWorkers),
-            uploadProgressClasses = this.getProgressBarClasses(uploadWorkers);
+        const uploadComplete = (100 * (bytesUploaded / totalBytes)).toFixed(0);
+        const uploadProgressClasses = this.getProgressBarClasses(bytesUploaded === totalBytes);
 
         return (
             <div className="dashboard well well-sm clearfix">
                 <div className="col-sm-6 hash-stats">
                     <h5>Hashing</h5>
                     <div className="progress">
-                        <div className={hashProgressClasses} role="progressbar" aria-valuenow={{width: hashComplete + '%'}} aria-valuemin="0" aria-valuemax="100" style={{width: hashComplete + '%'}}>
+                        <div className={hashProgressClasses} role="progressbar" aria-valuenow={{
+                            width: hashComplete + '%'
+                        }} aria-valuemin="0" aria-valuemax="100" style={{
+                            width: hashComplete + '%'
+                        }}
+                        >
                             {hashComplete}%
                         </div>
                     </div>
-
-                    <p>{hashWorkers.active} / {hashWorkers.total} active, average throughput: {hashSpeed}/s</p>
+                    <p>
+                        {hashes.size} of {files.size} files hashed.
+                        average throughput:
+                        <code>{filesize(hasher.hashBytesPerSecond, {round: 1})}</code> per second.
+                        {activeHashers} of {totalHashers} hashers are active.
+                    </p>
                 </div>
                 <div className="col-sm-6 upload-stats">
                     <h5>Uploads</h5>
-
                     <div className="progress">
-                        <div className={uploadProgressClasses} role="progressbar" aria-valuenow="{uploadComplete}" aria-valuemin="0" aria-valuemax="100" style={uploadCompleteStyle}>
+                        <div
+                            className={uploadProgressClasses}
+                            role="progressbar"
+                            aria-valuenow={uploadComplete}
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            style={{
+                                width: uploadComplete + '%'
+                            }}
+                        >
                             {uploadComplete}%
                         </div>
                     </div>
-
-                    <p>Completed: <code>{prettyBytesUploaded}</code>. Effective upload speed: <code>{uploadSpeed}</code>/s</p>
+                    <p>Completed:
+                        <code>{filesize(bytesUploaded, {round: 0})}</code>. Effective upload speed:
+                        <code>{filesize(uploader.uploadBytesPerSecond, {round: 1})}</code>/s</p>
                 </div>
             </div>
         );
     }
 }
 
-export { Dashboard };
+Dashboard.propTypes = {
+    files: React.PropTypes.instanceOf(Map),
+    hashes: React.PropTypes.instanceOf(Map),
+    sizes: React.PropTypes.instanceOf(Map),
+    bytesUploaded: React.PropTypes.instanceOf(Map)
+}
+
+export default Dashboard;

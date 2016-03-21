@@ -1,49 +1,62 @@
-class WorkerPool {
+export default class WorkerPool {
 
-    constructor(url, n, responseHandler) {
-        this.n = n;
-        this.workers = [];
+    constructor(url, n, progressUpdate, hasherStatsUpdate) {
+        this.n = n
+        this.hasherStatsUpdate = hasherStatsUpdate
         this.messages = [];
-
+        this.workers = new Set();
+        this.activeWorkers = new Set();
+        this.callbacks = new Map();
+        var pool = this;
         for (var i = 0; i < n; i++) {
-            var w = new Worker(url);
-            w.addEventListener('message', this.handleWorkerResponse.bind(this));
-            this.workers.push(w);
-        }
-
-        this.busyWorkers = new Set();
-        this.responseHandler = responseHandler;
-    }
-
-    handleWorkerResponse(evt) {
-        this.busyWorkers.delete(evt.data.workerId);
-        this.responseHandler(evt);
-        var message = this.messages.shift();
-        if (message !== undefined) {
-            this.postMessage(message);
+            let w = new Worker(url);
+            w.addEventListener('message', evt => {
+                switch (evt.data.type) {
+                case 'PROGRESS_UPDATE':
+                    progressUpdate(evt.data.fullPath, evt.data.hashed)
+                    break
+                case 'RESULT':
+                    pool.activeWorkers.delete(w);
+                    if (pool.callbacks.has(evt.data.fullPath)) {
+                        const cb = pool.callbacks.get(evt.data.fullPath);
+                        cb(evt);
+                        pool.callbacks.delete(evt.fullPath);
+                    }
+                    this.dispatch()
+                }
+            });
+            w.addEventListener('error', error => {
+                throw error
+            })
+            this.workers.add(w);
         }
     }
 
     postMessage(message) {
-        if (this.workers.length > this.busyWorkers.size) {
-            var nextWorkerId;
+        this.messages.push(message);
+        this.dispatch()
+    }
 
-            for (var i = 0; i < this.workers.length; i++) {
-                if (!this.busyWorkers.has(i)) {
-                    this.busyWorkers.add(i);
-                    nextWorkerId = i;
-                    break;
-                }
+    dispatch() {
+        const idleWorkers = new Set([...this.workers].filter(w => !this.activeWorkers.has(w)))
+        for (var w of idleWorkers) {
+            var message = this.messages.shift();
+            if (message !== undefined) {
+                this.activeWorkers.add(w)
+                w.postMessage(message);
+            } else {
+                break
             }
-            if (nextWorkerId === null) {
-                throw new Error('Could not find a free worker as expected');
-            }
-            message.workerId = nextWorkerId;
-            this.workers[nextWorkerId].postMessage(message);
-        } else {
-            this.messages.push(message);
         }
+        this.hasherStatsUpdate({activeHashers: this.activeWorkers.size, totalHashers: this.n})
+    }
+
+    hash(message) {
+        return new Promise((resolve) => {
+            this.callbacks.set(message.fullPath, function cb(evt) {
+                resolve(evt);
+            });
+            this.postMessage(message)
+        })
     }
 }
-
-export { WorkerPool };
