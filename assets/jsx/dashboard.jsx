@@ -80,7 +80,7 @@ class Dashboard extends React.Component {
                         <code>{filesize(bytesUploaded, {round: 0})}</code>. Effective upload speed:
                         <code>{filesize(uploader.uploadBytesPerSecond, {round: 1})}</code>/s
                         Time remaining:
-                        <code>{humanizeDuration(uploader.timeRemaining * 1000, {round: true})}</code>
+                        <code>{humanizeDuration(uploader.secondsRemaining * 1000, {round: true})}</code>
                     </p>
                 </div>
             </div>

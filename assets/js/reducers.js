@@ -117,11 +117,11 @@ export function uploader(state = {
             const [t0, b0] = state.uploadThroughput
             uploadBytesPerSecond = (bytesUploaded - b0) / (now - t0)
         }
-        const timeRemaining = (total - bytesUploaded) / uploadBytesPerSecond
+        const secondsRemaining = (total - bytesUploaded) / uploadBytesPerSecond
         return {...state,
             uploadBytesPerSecond,
             uploadThroughput: [now, bytesUploaded],
-            timeRemaining
+            secondsRemaining
         }
     }
     default: {
