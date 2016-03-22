@@ -11,6 +11,7 @@ var gulp = require('gulp'),
     eslint = require('gulp-eslint'),
     exorcist = require('exorcist'),
     replace = require('gulp-replace'),
+    sass = require('gulp-sass'),
     ghPages = require('gulp-gh-pages');
 
 gulp.task('browserify', function () {
@@ -56,12 +57,13 @@ gulp.task('static', function () {
         .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('css', function () {
-    gulp.src('assets/css/*.css')
-        .pipe(gulp.dest('./dist'));
+gulp.task('sass', function () {
+    return gulp.src('assets/sass/*.scss')
+        .pipe(sass().on('error', sass.logError))
+        .pipe(gulp.dest('./dist/css'));
 });
 
-gulp.task('default', ['lint', 'browserify', 'browserify-hash-worker', 'static', 'css']);
+gulp.task('default', ['lint', 'browserify', 'browserify-hash-worker', 'static', 'sass']);
 
 gulp.task('develop', ['default'], function () {
     var watcher = gulp.watch('assets/**/*.*', ['default']);
