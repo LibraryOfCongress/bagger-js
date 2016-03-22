@@ -76,6 +76,7 @@ export function uploader(state = {
         className: 'btn btn-default',
         message: 'Untested'
     },
+    sizes: new Map(),
     bytesUploaded: new Map(),
     uploadThroughput: [],
     uploadBytesPerSecond: 0
@@ -95,6 +96,13 @@ export function uploader(state = {
             keyPrefix: action.keyPrefix
         };
     }
+    case ActionTypes.ADD_FILES: {
+        const newSizes = new Map([...action.files].map(([fullPath, file]) => ([fullPath, file.size])))
+        const sizes = new Map([...state.sizes, ...newSizes])
+        return {...state,
+            sizes
+        };
+    }
     case ActionTypes.UPDATE_BYTES_UPLOADED: {
         return {...state,
             bytesUploaded: new Map([...state.bytesUploaded]).set(action.fullPath, action.bytesUploaded)
@@ -104,13 +112,16 @@ export function uploader(state = {
         let uploadBytesPerSecond = 0
         const now = Date.now() / 1000.0;
         const bytesUploaded = [...state.bytesUploaded.values()].reduce((r, n) => r + n, 0);
+        var total = [...state.sizes.values()].reduce((r, n) => r + n, 0);
         if (state.uploadThroughput.length > 0) {
             const [t0, b0] = state.uploadThroughput
             uploadBytesPerSecond = (bytesUploaded - b0) / (now - t0)
         }
+        const secondsRemaining = (total - bytesUploaded) / uploadBytesPerSecond
         return {...state,
             uploadBytesPerSecond,
-            uploadThroughput: [now, bytesUploaded]
+            uploadThroughput: [now, bytesUploaded],
+            secondsRemaining
         }
     }
     default: {
