@@ -66,13 +66,6 @@ export function updateConfig(accessKeyId, secretAccessKey, bucket, region, keyPr
     }
 }
 
-export function updateAndTestConfiguration(accessKeyId, secretAccessKey, bucket, region, keyPrefix) {
-    return dispatch => {
-        dispatch(updateConfig(accessKeyId, secretAccessKey, bucket, region, keyPrefix))
-        dispatch(testConfiguration(accessKeyId, secretAccessKey, bucket, region))
-    }
-}
-
 function configureAWS(accessKeyId, secretAccessKey, region) {
     AWS.config.update({accessKeyId, secretAccessKey, region});
 }
@@ -82,10 +75,12 @@ function getS3Client(accessKeyId, secretAccessKey, region) {
     return new AWS.S3();
 }
 
-export function testConfiguration(accessKeyId, secretAccessKey, bucket, region) {
-    return dispatch => {
+export function testConfiguration() {
+    return (dispatch, getState) => {
         // We'd like to be able to list buckets but that's impossible due to Amazon's CORS constraints:
         // https://forums.aws.amazon.com/thread.jspa?threadID=179355&tstart=0
+
+        const {uploader: {accessKeyId, secretAccessKey, bucket, region}} = getState()
 
         if (accessKeyId && secretAccessKey && region) {
             var s3 = getS3Client(accessKeyId, secretAccessKey, region);

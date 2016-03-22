@@ -5,10 +5,20 @@ class ServerInfo extends React.Component {
         super(props);
     }
 
+    handleChange(event) {
+        event.preventDefault()
+        this.props.updateConfig(
+            this.accessKeyId.value,
+            this.secretAccessKey.value,
+            this.bucket.value,
+            this.region.value,
+            this.keyPrefix.value
+        )
+    }
+
     render() {
         const {uploader} = this.props
         const configStatus = uploader.configStatus;
-        let accessKeyId, secretAccessKey, region, bucket, keyPrefix
         return (
             <div className="server-info well well-sm clearfix">
                 <h3>
@@ -20,12 +30,7 @@ class ServerInfo extends React.Component {
 
                 <form className="form-horizontal" onSubmit={e => {
                     e.preventDefault()
-                    this.props.updateAndTestConfiguration(accessKeyId.value,
-                    secretAccessKey.value,
-                    bucket.value,
-                    region.value,
-                    keyPrefix.value
-                    )
+                    this.props.testConfiguration()
                 }}
                 >
                     <div className="form-group">
@@ -34,11 +39,12 @@ class ServerInfo extends React.Component {
                         </label>
                         <div className="col-sm-10">
                             <input
-                                ref={node => {accessKeyId = node}}
+                                ref={node => {this.accessKeyId = node}}
                                 type="text"
                                 className="form-control"
                                 id="accessKeyId"
-                                defaultValue={uploader.accessKeyId}
+                                value={uploader.accessKeyId}
+                                onChange={(e) => this.handleChange(e)}
                             />
                         </div>
                     </div>
@@ -49,11 +55,12 @@ class ServerInfo extends React.Component {
                         </label>
                         <div className="col-sm-10">
                             <input
-                                ref={node => {secretAccessKey = node}}
+                                ref={node => {this.secretAccessKey = node}}
                                 type="password"
                                 className="form-control"
                                 id="secretAccessKey"
-                                defaultValue={uploader.secretAccessKey}
+                                value={uploader.secretAccessKey}
+                                onChange={(e) => this.handleChange(e)}
                             />
                         </div>
                     </div>
@@ -62,11 +69,12 @@ class ServerInfo extends React.Component {
                         <label className="col-sm-2 control-label" htmlFor="region">Region</label>
                         <div className="col-sm-10">
                             <input
-                                ref={node => {region = node}}
+                                ref={node => {this.region = node}}
                                 type="text"
                                 className="form-control"
                                 id="region"
-                                defaultValue={uploader.region}
+                                value={uploader.region}
+                                onChange={(e) => this.handleChange(e)}
                             />
                         </div>
                     </div>
@@ -75,11 +83,12 @@ class ServerInfo extends React.Component {
                         <label className="col-sm-2 control-label" htmlFor="bucket">Bucket</label>
                         <div className="col-sm-10">
                             <input
-                                ref={node => {bucket = node}}
+                                ref={node => {this.bucket = node}}
                                 type="text"
                                 className="form-control"
                                 id="bucket"
-                                defaultValue={uploader.bucket}
+                                value={uploader.bucket}
+                                onChange={(e) => this.handleChange(e)}
                             />
                         </div>
                     </div>
@@ -98,11 +107,12 @@ class ServerInfo extends React.Component {
                         </label>
                         <div className="col-sm-10">
                             <input
-                                ref={node => {keyPrefix = node}}
+                                ref={node => {this.keyPrefix = node}}
                                 type="text"
                                 className="form-control"
                                 id="keyPrefix"
-                                defaultValue={uploader.keyPrefix}
+                                value={uploader.keyPrefix}
+                                onChange={(e) => this.handleChange(e)}
                             />
                         </div>
                     </div>

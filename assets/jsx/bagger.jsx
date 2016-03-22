@@ -17,8 +17,19 @@ class Bagger extends React.Component {
     }
 
     componentDidMount() {
-        const { dispatch, uploader: {accessKeyId, secretAccessKey, bucket, region}} = this.props
-        dispatch(BagActions.testConfiguration(accessKeyId, secretAccessKey, bucket, region))
+        const { dispatch } = this.props
+        const b = document.getElementById('bagger');
+        if (b.dataset.accessKeyId !== undefined) { // TODO: any? all? add fine grain actions?
+            const dataset = b.dataset
+            dispatch(BagActions.updateConfig(
+                dataset.accessKeyId,
+                dataset.secretAccessKey,
+                dataset.bucket,
+                dataset.region,
+                dataset.keyPrefix
+                ))
+        }
+        dispatch(BagActions.testConfiguration())
         setInterval(() => dispatch(BagActions.updateThroughput()), 1000)
         const hasher = new WorkerPool('hash-worker.js', 4, (fullPath, hashed) => {
             dispatch(BagActions.updateBytesHashed(fullPath, hashed))
@@ -35,7 +46,8 @@ class Bagger extends React.Component {
             <div className="bagger">
                 <ServerInfo
                     uploader={uploader}
-                    updateAndTestConfiguration={actions.updateAndTestConfiguration}
+                    updateConfig={actions.updateConfig}
+                    testConfiguration={actions.testConfiguration}
                 />
                 {uploader.configStatus.message === 'OK' && (
                     <div>

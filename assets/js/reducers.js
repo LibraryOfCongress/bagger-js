@@ -67,11 +67,11 @@ export function hasher(state = {
 }
 
 export function uploader(state = {
-    accessKeyId: 'Not really',
-    secretAccessKey: 'Definitely Not',
-    bucket: 'bagger-js-testing',
-    region: 'us-east-1',
-    keyPrefix: 'my-test-bag',
+    accessKeyId: '',
+    secretAccessKey: '',
+    bucket: '',
+    region: '',
+    keyPrefix: '',
     configStatus: {
         className: 'btn btn-default',
         message: 'Untested'
