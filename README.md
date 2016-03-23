@@ -1,5 +1,12 @@
 # bagger-js
 
+<p align="center">
+  <a href="https://travis-ci.org/LibraryOfCongress/bagger-js">
+    <img src="https://travis-ci.org/LibraryOfCongress/bagger-js.svg?branch=master"
+         alt="build status">
+  </a>
+</p>
+
 An experiment with a pure JavaScript implementation of the BagIt specification
 and a simple web application which allows bagging and transferring local content
 
