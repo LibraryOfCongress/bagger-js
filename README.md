@@ -5,6 +5,9 @@
     <img src="https://travis-ci.org/LibraryOfCongress/bagger-js.svg?branch=master"
          alt="build status">
   </a>
+  <a href="https://david-dm.org/libraryofcongress/bagger-js#info=devDependencies" title="devDependency status">
+     <img src="https://david-dm.org/libraryofcongress/bagger-js/dev-status.svg"/>
+  </a>
 </p>
 
 An experiment with a pure JavaScript implementation of the BagIt specification
@@ -63,4 +66,3 @@ At this point the compiled JavaScript, CSS and HTML is in the `dist/` directory 
 The included .eslintrc documents the basic JavaScript requirements. These requirements are checked as part of the gulp lint target - which is included in the default target. Use of a Git pre-commit hook such as
 https://gist.github.com/acdha/8717683/ can be helpful, as well.
 
-## [![node dev deps](https://david-dm.org/libraryofcongress/bagger-js/dev-status.png)](https://david-dm.org/libraryofcongress/bagger-js#dev-badge-embed=&info=devDependencies&view=table) ##
