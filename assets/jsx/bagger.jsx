@@ -19,15 +19,11 @@ class Bagger extends React.Component {
     componentDidMount() {
         const { dispatch } = this.props
         const b = document.getElementById('bagger');
-        if (b.dataset.accessKeyId !== undefined) { // TODO: any? all? add fine grain actions?
-            const dataset = b.dataset
-            dispatch(BagActions.updateConfig(
-                dataset.accessKeyId,
-                dataset.secretAccessKey,
-                dataset.bucket,
-                dataset.region,
-                dataset.keyPrefix
-                ))
+        const dataset = b.dataset
+        const args = [dataset.accessKeyId, dataset.secretAccessKey, dataset.bucket, dataset.region,
+                        dataset.keyPrefix]
+        if (args.some(arg => arg !== undefined)) {
+            dispatch(BagActions.updateConfig(...args))
         }
         dispatch(BagActions.testConfiguration())
         setInterval(() => dispatch(BagActions.updateThroughput()), 1000)
