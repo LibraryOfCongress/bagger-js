@@ -27,7 +27,7 @@ function configureStore(initialState) {
 
 const store = configureStore();
 
-export default React.createClass({
+class App extends React.Component {
     render() {
         return (
             <div>
@@ -35,6 +35,8 @@ export default React.createClass({
                     <Bagger/>
                 </Provider>
             </div>
-        );
+        )
     }
-});
+}
+
+export default App
