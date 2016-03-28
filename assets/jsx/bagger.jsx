@@ -12,9 +12,6 @@ import ServerInfo from '../jsx/server-info.jsx';
 import WorkerPool from '../js/worker-pool';
 
 class Bagger extends React.Component {
-    constructor(props) {
-        super(props);
-    }
 
     componentDidMount() {
         const { dispatch } = this.props

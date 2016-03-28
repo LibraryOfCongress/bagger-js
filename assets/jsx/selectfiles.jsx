@@ -1,9 +1,6 @@
 import React, {PropTypes} from 'react'
 
 class SelectFiles extends React.Component {
-    constructor(props) {
-        super(props);
-    }
 
     processFileList(fileList) {
         /*

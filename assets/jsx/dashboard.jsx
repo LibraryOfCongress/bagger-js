@@ -5,10 +5,6 @@ import humanizeDuration from 'humanize-duration'
 
 class Dashboard extends React.Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     getProgressBarClasses(completed) {
         let res = ['progress-bar'];
 

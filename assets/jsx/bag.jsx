@@ -3,9 +3,6 @@ import filesize from 'filesize'
 
 
 class Bag extends React.Component {
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         const {files, hashes, sizes} = this.props.bagger

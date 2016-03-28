@@ -1,9 +1,6 @@
 import React from 'react'
 
 class ServerInfo extends React.Component {
-    constructor(props) {
-        super(props);
-    }
 
     handleChange(event) {
         event.preventDefault()
@@ -117,8 +114,6 @@ class ServerInfo extends React.Component {
                         </div>
                     </div>
                 </form>
-
-
 
             </div>
         );
