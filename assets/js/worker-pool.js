@@ -12,17 +12,17 @@ export default class WorkerPool {
             let w = new Worker(url);
             w.addEventListener('message', evt => {
                 switch (evt.data.type) {
-                case 'PROGRESS_UPDATE':
-                    progressUpdate(evt.data.fullPath, evt.data.hashed)
-                    break
-                case 'RESULT':
-                    pool.activeWorkers.delete(w);
-                    if (pool.callbacks.has(evt.data.fullPath)) {
-                        const cb = pool.callbacks.get(evt.data.fullPath);
-                        cb(evt);
-                        pool.callbacks.delete(evt.fullPath);
-                    }
-                    this.dispatch()
+                    case 'PROGRESS_UPDATE':
+                        progressUpdate(evt.data.fullPath, evt.data.hashed)
+                        break
+                    case 'RESULT':
+                        pool.activeWorkers.delete(w);
+                        if (pool.callbacks.has(evt.data.fullPath)) {
+                            const cb = pool.callbacks.get(evt.data.fullPath);
+                            cb(evt);
+                            pool.callbacks.delete(evt.fullPath);
+                        }
+                        this.dispatch()
                 }
             });
             w.addEventListener('error', error => {
@@ -48,7 +48,7 @@ export default class WorkerPool {
                 break
             }
         }
-        this.hasherStatsUpdate({activeHashers: this.activeWorkers.size, totalHashers: this.n})
+        this.hasherStatsUpdate({ activeHashers: this.activeWorkers.size, totalHashers: this.n })
     }
 
     hash(message) {
