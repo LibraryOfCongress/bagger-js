@@ -27,6 +27,7 @@
     "gulp": "^3.9.0",
     "gulp-eslint": "^2.0.0",
     "gulp-gh-pages": "^0.5.4",
+    "gulp-jsbeautifier": "^2.0.2",
     "gulp-replace": "^0.5.3",
     "gulp-sass": "^2.2.0",
     "humanize-duration": "^3.7.0",

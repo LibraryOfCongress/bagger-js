@@ -12,6 +12,7 @@ var gulp = require('gulp'),
     exorcist = require('exorcist'),
     replace = require('gulp-replace'),
     sass = require('gulp-sass'),
+    prettify = require('gulp-jsbeautifier'),
     ghPages = require('gulp-gh-pages');
 
 gulp.task('browserify', function () {
@@ -76,10 +77,16 @@ gulp.task('develop', ['default'], function () {
 gulp.task('lint', function () {
     // Note: To have the process exit with an error code (1) on
     //  lint error, return the stream and pipe to failOnError last.
-    return gulp.src(['*.js', 'assets/js/*.js', 'assets/js/**/*.js', 'assets/jsx/*.jsx'])
+    return gulp.src(['*.js', 'assets/js/*.js', 'assets/jsx/*.jsx'])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failOnError());
+});
+
+gulp.task('prettify', function() {
+    gulp.src(['./assets/js/*.js', './assets/jsx/*.jsx'], {base: './'})
+        .pipe(prettify())
+        .pipe(gulp.dest('./'));
 });
 
 gulp.task('deploy', function () {

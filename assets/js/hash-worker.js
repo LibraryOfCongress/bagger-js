@@ -4,7 +4,7 @@ require('asmcrypto.js'); // TODO: import
 
 const BLOCK_SIZE = 1048576;
 
-self.addEventListener('message', ({data: {file, fullPath}}) => {
+self.addEventListener('message', ({ data: { file, fullPath } }) => {
     const sha256 = new asmCrypto.SHA256();
     const startTime = Date.now();
     const fileSize = file.size;
@@ -14,7 +14,7 @@ self.addEventListener('message', ({data: {file, fullPath}}) => {
         let slice = file.slice(start, end);
         let bytes = reader.readAsArrayBuffer(slice);
         sha256.process(bytes);
-        postMessage({type: 'PROGRESS_UPDATE', fullPath, hashed: end})
+        postMessage({ type: 'PROGRESS_UPDATE', fullPath, hashed: end })
     }
 
     postMessage({

@@ -67,7 +67,7 @@ export function updateConfig(accessKeyId, secretAccessKey, bucket, region, keyPr
 }
 
 function configureAWS(accessKeyId, secretAccessKey, region) {
-    AWS.config.update({accessKeyId, secretAccessKey, region});
+    AWS.config.update({ accessKeyId, secretAccessKey, region });
 }
 
 function getS3Client(accessKeyId, secretAccessKey, region) {
@@ -80,7 +80,7 @@ export function testConfiguration() {
         // We'd like to be able to list buckets but that's impossible due to Amazon's CORS constraints:
         // https://forums.aws.amazon.com/thread.jspa?threadID=179355&tstart=0
 
-        const {uploader: {accessKeyId, secretAccessKey, bucket, region}} = getState()
+        const { uploader: { accessKeyId, secretAccessKey, bucket, region } } = getState()
 
         if (accessKeyId && secretAccessKey && region) {
             var s3 = getS3Client(accessKeyId, secretAccessKey, region);
