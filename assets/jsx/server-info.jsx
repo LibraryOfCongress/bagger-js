@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {PropTypes} from 'react'
 
 class ServerInfo extends React.Component {
 
@@ -118,6 +118,11 @@ class ServerInfo extends React.Component {
             </div>
         );
     }
+}
+
+ServerInfo.propTypes = {
+    updateConfig: PropTypes.func.isRequired,
+    testConfiguration: PropTypes.func.isRequired
 }
 
 export default ServerInfo;
