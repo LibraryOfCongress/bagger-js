@@ -51,7 +51,7 @@ class Bagger extends React.Component {
                                 fullPath,
                                 'action': 'hash'
                             }).then(result => {
-                                dispatch(BagActions.updateHash(fullPath, file.size, result.data.sha256))
+                                dispatch(BagActions.updateHash(fullPath, result.data.sha256))
                                 dispatch(BagActions.upload(fullPath, file, file.size, file.type,
                                 uploader.bucket, uploader.keyPrefix))
                             }).catch(function (error) {
