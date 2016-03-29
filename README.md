@@ -1,14 +1,4 @@
-# bagger-js
-
-<p align="center">
-  <a href="https://travis-ci.org/LibraryOfCongress/bagger-js">
-    <img src="https://travis-ci.org/LibraryOfCongress/bagger-js.svg?branch=master"
-         alt="build status">
-  </a>
-  <a href="https://david-dm.org/libraryofcongress/bagger-js#info=devDependencies" title="devDependency status">
-     <img src="https://david-dm.org/libraryofcongress/bagger-js/dev-status.svg"/>
-  </a>
-</p>
+# bagger-js [![Build Status](https://img.shields.io/travis/LibraryOfCongress/bagger-js.svg?branch=master)](https://travis-ci.org/LibraryOfCongress/bagger-js) [![devDependency status(https://img.shields.io/david/dev/LibraryOfCongress/bagger-js.svg)](https://david-dm.org/libraryofcongress/bagger-js#info=devDependencies) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](README.md#Contributor Guidelines)
 
 An experiment with a pure JavaScript implementation of the BagIt specification
 and a simple web application which allows bagging and transferring local content
