@@ -9,12 +9,12 @@ import SelectFiles from '../jsx/selectfiles.jsx';
 import Dashboard from '../jsx/dashboard.jsx';
 import Bag from '../jsx/bag.jsx';
 import ServerInfo from '../jsx/server-info.jsx';
-import WorkerPool from '../js/worker-pool';
 
 class Bagger extends React.Component {
 
     componentDidMount() {
         const { dispatch } = this.props
+
         const b = document.getElementById('bagger');
         const dataset = b.dataset
         const args = [dataset.accessKeyId, dataset.secretAccessKey, dataset.bucket, dataset.region,
@@ -23,12 +23,10 @@ class Bagger extends React.Component {
             dispatch(BagActions.updateConfig(...args))
         }
         dispatch(BagActions.testConfiguration())
+
         setInterval(() => dispatch(BagActions.updateThroughput()), 1000)
-        const hasher = new WorkerPool('hash-worker.js', 4, (fullPath, hashed) => {
-            dispatch(BagActions.updateBytesHashed(fullPath, hashed))
-        }, (hasherStats) => dispatch(BagActions.updateHasherStats(hasherStats))
-        )
-        this.hasher = hasher;
+
+        dispatch(BagActions.createHasher())
     }
 
     render() {
@@ -44,22 +42,7 @@ class Bagger extends React.Component {
                 />
                 {uploader.configStatus.message === 'OK' && (
                     <div>
-                        <SelectFiles onFilesChange={(files) => {
-                            dispatch(BagActions.addFiles(files))
-                            Promise.all([...files].map(([fullPath, file]) => this.hasher.hash({
-                                file,
-                                fullPath,
-                                'action': 'hash'
-                            }).then(result => {
-                                dispatch(BagActions.updateHash(fullPath, result.data.sha256))
-                                dispatch(BagActions.upload(fullPath, file, file.size, file.type,
-                                uploader.bucket, uploader.keyPrefix))
-                            }).catch(function (error) {
-                                throw error
-                            })
-                            ));
-                        }}
-                        />
+                        <SelectFiles onFilesChange={(files) => dispatch(BagActions.addFiles(files))} />
                         {bagger.files.size > 0 && (
                             <Dashboard
                                 bagger={bagger}

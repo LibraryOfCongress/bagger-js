@@ -8,7 +8,7 @@ export function bagger(state = {
     sizes: new Map()
 }, action) {
     switch (action.type) {
-        case ActionTypes.ADD_FILES:
+        case ActionTypes.UPDATE_FILES:
             {
                 const files = new Map([...state.files, ...action.files])
                 const sizes = new Map([...files].map(([fullPath, file]) => ([fullPath, file.size])))
@@ -31,6 +31,7 @@ export function bagger(state = {
 }
 
 export function hasher(state = {
+    hasher: undefined,
     bytesHashed: new Map(),
     hashBytesPerSecond: 0,
     hashThroughput: [],
@@ -40,6 +41,8 @@ export function hasher(state = {
     }
 }, action) {
     switch (action.type) {
+        case ActionTypes.UPDATE_HASHER:
+            return {...state, hasher: action.hasher}
         case ActionTypes.UPDATE_BYTES_HASHED:
             {
                 return {...state,
@@ -105,7 +108,7 @@ export function uploader(state = {
                     keyPrefix: action.keyPrefix
                 };
             }
-        case ActionTypes.ADD_FILES:
+        case ActionTypes.UPDATE_FILES:
             {
                 const newSizes = new Map([...action.files].map(([fullPath, file]) => ([fullPath, file.size])))
                 const sizes = new Map([...state.sizes, ...newSizes])

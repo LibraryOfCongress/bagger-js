@@ -1,12 +1,13 @@
 import * as ActionTypes from './ActionTypes';
 
 import * as AWS from 'aws-sdk';
+import WorkerPool from '../js/worker-pool';
 
 // http://redux.js.org/docs/basics/Actions.html
 
-export function addFiles(files) {
+export function updateFiles(files) {
     return {
-        type: ActionTypes.ADD_FILES,
+        type: ActionTypes.UPDATE_FILES,
         files
     }
 }
@@ -63,6 +64,40 @@ export function updateConfig(accessKeyId, secretAccessKey, bucket, region, keyPr
         bucket,
         region,
         keyPrefix
+    }
+}
+
+export function updateHasher(hasher) {
+    return {
+        type: ActionTypes.UPDATE_HASHER,
+        hasher
+    }
+}
+export function createHasher() {
+    return (dispatch) => {
+        const hasher = new WorkerPool('hash-worker.js', 4, (fullPath, hashed) => {
+            dispatch(updateBytesHashed(fullPath, hashed))
+        }, (hasherStats) => dispatch(updateHasherStats(hasherStats))
+        )
+        dispatch(updateHasher(hasher))
+    }
+}
+
+export function addFiles(files) {
+    return (dispatch, getState) => {
+        const { uploader: { bucket, keyPrefix } , hasher: {hasher} } = getState()
+        dispatch(updateFiles(files))
+        Promise.all([...files].map(([fullPath, file]) => hasher.hash({
+            file,
+            fullPath,
+            'action': 'hash'
+        }).then(result => {
+            dispatch(updateHash(fullPath, result.data.sha256))
+            dispatch(upload(fullPath, file, file.size, file.type, bucket, keyPrefix))
+        }).catch(function (error) {
+            throw error
+        })
+        ));
     }
 }
 
