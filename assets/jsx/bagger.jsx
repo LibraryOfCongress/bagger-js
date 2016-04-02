@@ -1,10 +1,5 @@
 import React from 'react';
 
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-
-import * as BagActions from '../js/actions';
-
 import SelectFiles from '../jsx/selectfiles.jsx';
 import Dashboard from '../jsx/dashboard.jsx';
 import Bag from '../jsx/bag.jsx';
@@ -13,25 +8,24 @@ import ServerInfo from '../jsx/server-info.jsx';
 class Bagger extends React.Component {
 
     componentDidMount() {
-        const { dispatch } = this.props
+        const {actions} = this.props;
 
         const b = document.getElementById('bagger');
         const dataset = b.dataset
         const args = [dataset.accessKeyId, dataset.secretAccessKey, dataset.bucket, dataset.region,
                         dataset.keyPrefix]
         if (args.some(arg => arg !== undefined)) {
-            dispatch(BagActions.updateConfig(...args))
+            actions.updateConfig(...args)
         }
-        dispatch(BagActions.testConfiguration())
+        actions.testConfiguration()
 
-        setInterval(() => dispatch(BagActions.updateThroughput()), 1000)
+        setInterval(() => actions.updateThroughput(), 1000)
 
-        dispatch(BagActions.createHasher())
+        actions.createHasher()
     }
 
     render() {
-        const {dispatch, bagger, hasher, uploader} = this.props;
-        const actions = bindActionCreators(BagActions, dispatch);
+        const {bagger, hasher, uploader, actions} = this.props;
 
         return (
             <div className="bagger">
@@ -42,7 +36,7 @@ class Bagger extends React.Component {
                 />
                 {uploader.configStatus.message === 'OK' && (
                     <div>
-                        <SelectFiles onFilesChange={(files) => dispatch(BagActions.addFiles(files))} />
+                        <SelectFiles onFilesChange={(files) => actions.addFiles(files)} />
                         {bagger.files.size > 0 && (
                             <Dashboard
                                 bagger={bagger}
@@ -56,8 +50,8 @@ class Bagger extends React.Component {
                     </div>
                 )}
             </div>
-        );
+        )
     }
 }
 
-export default connect(state => state)(Bagger)
+export default Bagger
