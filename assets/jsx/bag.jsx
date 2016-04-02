@@ -5,18 +5,16 @@ import filesize from 'filesize'
 class Bag extends React.Component {
 
     render() {
-        const {files, hashes, sizes} = this.props.bagger
+        const {files} = this.props
 
-        var total = [...sizes.values()].reduce((r, n) => r + n, 0);
+        var total = [...files.values()].reduce((r, f) => r + f.fileSize, 0);
 
         return (
             <div id="bag-contents" className="well well-sm">
                 <h2>Content
                     <small>
                         &nbsp;{files.size.toLocaleString()} files
-                        ({files.size > sizes.size
-                            ? 'at least '
-                        : ''} {filesize(total, {round: 0})})
+                        ({filesize(total, {round: 0})})
                     </small>
                 </h2>
 
@@ -32,16 +30,16 @@ class Bag extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {[...files.entries()].map(([path, , sha256 = hashes.get(path)]) =>
+                        {[...files.values()].map(({path, fileSize, hash}) =>
                             <tr key={path}>
                                 <td className="file-name">
                                     {path}
                                 </td>
                                 <td className="file-size">
-                                    {sizes.get(path)}
+                                    {fileSize}
                                 </td>
-                                <td className="file-hash sha256" title={sha256}>
-                                    {sha256}
+                                <td className="file-hash sha256" title={hash}>
+                                    {hash}
                                 </td>
                             </tr>
                         )}
@@ -66,10 +64,10 @@ class Bag extends React.Component {
 
 }
 
-Bag.propTypes = {
-    files: React.PropTypes.instanceOf(Map),
-    hashes: React.PropTypes.instanceOf(Map),
-    sizes: React.PropTypes.instanceOf(Map)
-}
+// Bag.propTypes = {
+//     files: React.PropTypes.instanceOf(Map),
+//     hashes: React.PropTypes.instanceOf(Map),
+//     sizes: React.PropTypes.instanceOf(Map)
+// }
 
 export default Bag;

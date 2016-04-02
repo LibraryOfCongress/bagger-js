@@ -15,7 +15,15 @@ class ServerInfo extends React.Component {
 
     render() {
         const {uploader} = this.props
-        const configStatus = uploader.configStatus;
+
+        const statusToClassName = {
+            Testing: 'btn btn-info',
+            Unsuccessful: 'btn btn-danger',
+            Successful: 'btn btn-success',
+            Untested: 'btn btn-default'
+        }
+        const testButtonClassName = statusToClassName[uploader.status]
+
         return (
             <div className="server-info well well-sm clearfix">
                 <h3>
@@ -27,7 +35,8 @@ class ServerInfo extends React.Component {
 
                 <form className="form-horizontal" onSubmit={e => {
                     e.preventDefault()
-                    this.props.testConfiguration()
+                    const {accessKeyId, secretAccessKey, bucket, region} = uploader
+                    this.props.testConfiguration(accessKeyId, secretAccessKey, bucket, region)
                 }}
                 >
                     <div className="form-group">
@@ -92,8 +101,8 @@ class ServerInfo extends React.Component {
 
                     <div className="form-group">
                         <div className="col-sm-12 text-center">
-                            <button type="submit" className={configStatus.className}>
-                                Test Configuration: {configStatus.message}
+                            <button type="submit" className={testButtonClassName}>
+                                Test Configuration: {uploader.message}
                             </button>
                         </div>
                     </div>
