@@ -43,12 +43,6 @@ export function updateHasherStats(hasherStats) {
     }
 }
 
-export function updateThroughput() {
-    return {
-        type: ActionTypes.UPDATE_THROUGHPUT
-    }
-}
-
 export function configStatus(status) {
     return {
         type: ActionTypes.CONFIG_STATUS,
@@ -156,7 +150,7 @@ export function testConfiguration() {
     }
 }
 
-export function upload(fullPath, file, size, type, bucket, keyPrefix) {
+export function upload(fullPath, body, size, type, bucket, keyPrefix) {
     return dispatch => {
         var key = keyPrefix + '/data/' + fullPath;
         key = key.replace('//', '/');
@@ -164,10 +158,6 @@ export function upload(fullPath, file, size, type, bucket, keyPrefix) {
         // We reset this to zero every time so our cumulative stats will be correct
         // after failures or retries:
         dispatch(updateBytesUploaded(fullPath, 0));
-
-        var body = file;
-
-        var size = typeof body.size !== 'undefined' ? body.size : body.length;
 
         // TODO: set ContentMD5
         // TODO: use leavePartsOnError to allow retries?
@@ -180,7 +170,7 @@ export function upload(fullPath, file, size, type, bucket, keyPrefix) {
                 Bucket: bucket,
                 Key: key,
                 Body: body,
-                Contenttype: ActionTypes.type
+                Contenttype: type
             }
         });
 

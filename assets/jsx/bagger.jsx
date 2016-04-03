@@ -1,7 +1,8 @@
 import React from 'react';
 
 import SelectFiles from '../jsx/selectfiles.jsx';
-import Dashboard from '../jsx/dashboard.jsx';
+import Progress from '../jsx/progress.jsx';
+import Throughput from '../jsx/throughput.jsx';
 import Bag from '../jsx/bag.jsx';
 import ServerInfo from '../jsx/server-info.jsx';
 
@@ -19,13 +20,17 @@ class Bagger extends React.Component {
         }
         actions.testConfiguration()
 
-        setInterval(() => actions.updateThroughput(), 1000)
-
         actions.createHasher()
     }
 
     render() {
         const {bagger, hasher, uploader, actions} = this.props;
+
+        const bytesUploaded = [...uploader.bytesUploaded.values()].reduce((r, n) => r + n, 0);
+        const bytesHashed = [...hasher.bytesHashed.values()].reduce((r, n) => r + n, 0);
+        const totalBytes = [...bagger.sizes.values()].reduce((r, n) => r + n, 0);
+
+        const {totalHashers, activeHashers} = hasher.hasherStats
 
         return (
             <div className="bagger">
@@ -38,11 +43,19 @@ class Bagger extends React.Component {
                     <div>
                         <SelectFiles onFilesChange={(files) => actions.addFiles(files)} />
                         {bagger.files.size > 0 && (
-                            <Dashboard
-                                bagger={bagger}
-                                hasher={hasher}
-                                uploader={uploader}
-                            />
+                            <div className="dashboard well well-sm clearfix">
+                                <div className="col-sm-6 hash-stats">
+                                    <h5>Hashing</h5>
+                                    <Progress current={bytesHashed} total={totalBytes} />
+                                    <Throughput current={bytesHashed} total={totalBytes} />
+                                    {activeHashers} of {totalHashers} hashers are active.
+                                </div>
+                                <div className="col-sm-6 upload-stats">
+                                    <h5>Uploads</h5>
+                                    <Progress current={bytesUploaded} total={totalBytes} />
+                                    <Throughput current={bytesUploaded} total={totalBytes} />
+                                </div>
+                            </div>
                         )}
                         {bagger.files.size > 0 && bagger.files.size === bagger.hashes.size && (
                             <Bag bagger={bagger} />

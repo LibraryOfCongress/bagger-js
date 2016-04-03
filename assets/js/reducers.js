@@ -33,8 +33,6 @@ export function bagger(state = {
 export function hasher(state = {
     hasher: undefined,
     bytesHashed: new Map(),
-    hashBytesPerSecond: 0,
-    hashThroughput: [],
     hasherStats: {
         totalHashers: 0,
         activeHashers: 0
@@ -47,20 +45,6 @@ export function hasher(state = {
             {
                 return {...state,
                     bytesHashed: new Map([...state.bytesHashed]).set(action.fullPath, action.bytesHashed)
-                }
-            }
-        case ActionTypes.UPDATE_THROUGHPUT:
-            {
-                let hashBytesPerSecond = 0
-                const now = Date.now() / 1000.0;
-                const bytesHashed = [...state.bytesHashed.values()].reduce((r, n) => r + n, 0);
-                if (state.hashThroughput.length > 0) {
-                    const [t0, b0] = state.hashThroughput
-                    hashBytesPerSecond = (bytesHashed - b0) / (now - t0)
-                }
-                return {...state,
-                    hashBytesPerSecond,
-                    hashThroughput: [now, bytesHashed]
                 }
             }
         case ActionTypes.UPDATE_HASHER_STATS:
@@ -87,9 +71,7 @@ export function uploader(state = {
         message: 'Untested'
     },
     sizes: new Map(),
-    bytesUploaded: new Map(),
-    uploadThroughput: [],
-    uploadBytesPerSecond: 0
+    bytesUploaded: new Map()
 }, action) {
     switch (action.type) {
         case ActionTypes.CONFIG_STATUS:
@@ -121,23 +103,6 @@ export function uploader(state = {
                 return {...state,
                     bytesUploaded: new Map([...state.bytesUploaded])
                         .set(action.fullPath, action.bytesUploaded)
-                }
-            }
-        case ActionTypes.UPDATE_THROUGHPUT:
-            {
-                let uploadBytesPerSecond = 0
-                const now = Date.now() / 1000.0;
-                const bytesUploaded = [...state.bytesUploaded.values()].reduce((r, n) => r + n, 0);
-                var total = [...state.sizes.values()].reduce((r, n) => r + n, 0);
-                if (state.uploadThroughput.length > 0) {
-                    const [t0, b0] = state.uploadThroughput
-                    uploadBytesPerSecond = (bytesUploaded - b0) / (now - t0)
-                }
-                const secondsRemaining = (total - bytesUploaded) / uploadBytesPerSecond
-                return {...state,
-                    uploadBytesPerSecond,
-                    uploadThroughput: [now, bytesUploaded],
-                    secondsRemaining
                 }
             }
         default:
