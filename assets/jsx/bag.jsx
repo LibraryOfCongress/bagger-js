@@ -1,8 +1,15 @@
+// @flow
 import React from 'react'
 import filesize from 'filesize'
 
+import BagFile from '../js/BagFile'
+import {Map} from 'immutable';
 
 class Bag extends React.Component {
+
+    props: {
+        files: Map<string, BagFile>
+    };
 
     render() {
         const {files} = this.props
@@ -63,11 +70,5 @@ class Bag extends React.Component {
     }
 
 }
-
-// Bag.propTypes = {
-//     files: React.PropTypes.instanceOf(Map),
-//     hashes: React.PropTypes.instanceOf(Map),
-//     sizes: React.PropTypes.instanceOf(Map)
-// }
 
 export default Bag;
