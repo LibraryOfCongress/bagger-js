@@ -5,7 +5,6 @@ import type {Action} from './Actions';
 import Immutable from 'immutable';
 import {ReduceStore} from 'flux/utils';
 import BagFile from './BagFile';
-import Dispatcher from './Dispatcher';
 
 type State = Immutable.OrderedMap<string, BagFile>;
 
@@ -36,7 +35,4 @@ class BagStore extends ReduceStore<State> {
 
 }
 
-// Export a singleton instance of the store, could do this some other way if
-// you want to avoid singletons.
-const instance = new BagStore(Dispatcher);
-export default instance;
+export default BagStore;

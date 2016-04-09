@@ -1,7 +1,7 @@
 // @flow
 
 import { ReduceStore } from 'flux/utils';
-import Dispatcher from './Dispatcher';
+
 import Immutable from 'immutable';
 
 import type { Action } from './Actions';
@@ -60,7 +60,4 @@ class UploadStore extends ReduceStore <State> {
 
 }
 
-// Export a singleton instance of the store, could do this some other way if
-// you want to avoid singletons.
-const instance = new UploadStore(Dispatcher);
-export default instance;
+export default UploadStore;

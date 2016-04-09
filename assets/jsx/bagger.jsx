@@ -3,12 +3,31 @@
 import React, {Component} from 'react'; // eslint-disable-line no-unused-vars
 import {Container} from 'flux/utils';
 
+import type {Action} from '../js/Actions';
+
+import {Dispatcher} from 'flux';
+
+const dispatcher: Dispatcher<Action> = new Dispatcher();
+
+export function dispatch(action: Action): void {
+    return dispatcher.dispatch(action)
+}
+
 import BagStore from '../js/BagStore';
 import HashStore from '../js/HashStore';
 import UploadStore from '../js/UploadStore';
 import type {State as UploadState} from '../js/UploadStore'
 
-import {filesSelected, configurationUpdated, testConfiguration} from '../js/ActionCreators'
+import {actions as UploadActions} from '../js/UploadActions'
+
+const bagStore = new BagStore(dispatcher)
+const hashStore = new HashStore(dispatcher)
+const uploadStore = new UploadStore(dispatcher)
+
+const hashFile = hashFileAction(dispatch)
+const uploadActions = UploadActions(dispatch)
+
+import {hashFileAction} from '../js/HashActions'
 
 import SelectFiles from './selectfiles.jsx';
 import Progress from './progress.jsx';
@@ -26,19 +45,35 @@ type BaggerState = {
     upload: UploadState
 };
 
+function filesSelected(files: Map<string, File>): void {
+    dispatch({ type: 'bag/filesSelected', files });
+    // $FlowIssue - https://github.com/facebook/flow/issues/1059
+    [...files].map(
+        ([fullPath, file]) => hashFile(fullPath, file)
+        .then((result) => {
+            const {fullPath: path, sha256: hash} = result
+            dispatch({ type: 'bag/fileHashed', path, hash });
+            const {bucket, keyPrefix} = uploadStore.getState();
+            uploadActions.upload(path, file, file.size, file.type, bucket, keyPrefix)
+        }).catch(function(error) {
+            throw error
+        })
+    )
+}
+
 class BaggerApp extends Component<any, any, BaggerState> {
 
     state: BaggerState;
 
     static getStores(): Array<Store> {
-        return [BagStore, HashStore, UploadStore];
+        return [bagStore, hashStore, uploadStore];
     }
 
     static calculateState(prevState: ?BaggerState): BaggerState { // eslint-disable-line no-unused-vars
         return {
-            bagFiles: BagStore.getState(),
-            bytesHashed: HashStore.getState(),
-            upload: UploadStore.getState()
+            bagFiles: bagStore.getState(),
+            bytesHashed: hashStore.getState(),
+            upload: uploadStore.getState()
         };
     }
 
@@ -48,9 +83,9 @@ class BaggerApp extends Component<any, any, BaggerState> {
         const args = [dataset.accessKeyId, dataset.secretAccessKey, dataset.bucket, dataset.region,
                         dataset.keyPrefix]
         if (args.some(arg => arg !== undefined)) {
-            configurationUpdated(...args)
+            uploadActions.configurationUpdated(...args)
         }
-        testConfiguration(...args)
+        uploadActions.testConfiguration(...args)
     }
 
     render(): ?React.Element {
@@ -63,7 +98,8 @@ class BaggerApp extends Component<any, any, BaggerState> {
         return (
             <div className="bagger">
                 <ServerInfo uploader={upload}
-                    updateConfig={configurationUpdated}  testConfiguration={testConfiguration}
+                    updateConfig={(args) => uploadStore.configurationUpdated(...args)}
+                    testConfiguration={uploadStore.testConfiguration}
                 />
                 {upload.message === 'OK' && (
                     <div>
