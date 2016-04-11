@@ -1,6 +1,6 @@
 import type { Action } from './Actions';
 
-import * as AWS from 'aws-sdk'; // TODO: remove use of *
+import AWS from 'aws-sdk';
 
 function configureAWS(accessKeyId, secretAccessKey, region) {
     AWS.config.update({ accessKeyId, secretAccessKey, region });
