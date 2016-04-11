@@ -26,6 +26,7 @@ const uploadStore = new UploadStore(dispatcher)
 
 const hashFile = hashFileAction(dispatch)
 const uploadActions = UploadActions(dispatch)
+const upload = uploadActions.upload(() => uploadStore.getState())
 
 import {hashFileAction} from '../js/HashActions'
 
@@ -53,8 +54,7 @@ function filesSelected(files: Map<string, File>): void {
         .then((result) => {
             const {fullPath: path, sha256: hash} = result
             dispatch({ type: 'bag/fileHashed', path, hash });
-            const {bucket, keyPrefix} = uploadStore.getState();
-            uploadActions.upload(path, file, file.size, file.type, bucket, keyPrefix)
+            upload(path, file, file.size, file.type)
         }).catch(function(error) {
             throw error
         })
@@ -85,7 +85,7 @@ class BaggerApp extends Component<any, any, BaggerState> {
         if (args.some(arg => arg !== undefined)) {
             uploadActions.configurationUpdated(...args)
         }
-        uploadActions.testConfiguration(...args)
+        uploadActions.testConfiguration(() => uploadStore.getState())()
     }
 
     render(): ?React.Element {
@@ -98,8 +98,8 @@ class BaggerApp extends Component<any, any, BaggerState> {
         return (
             <div className="bagger">
                 <ServerInfo uploader={upload}
-                    updateConfig={(args) => uploadStore.configurationUpdated(...args)}
-                    testConfiguration={uploadStore.testConfiguration}
+                    updateConfig={(...args) => uploadActions.configurationUpdated(...args)}
+                    testConfiguration={uploadActions.testConfiguration(() => uploadStore.getState())}
                 />
                 {upload.message === 'OK' && (
                     <div>
