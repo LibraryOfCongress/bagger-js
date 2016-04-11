@@ -1,12 +1,8 @@
 // @flow
 
 import {ReduceStore} from 'flux/utils';
-
+import type {Action, State} from './HashTypes';
 import Immutable from 'immutable';
-
-import type {Action} from './Actions';
-
-type State = Immutable.OrderedMap<string, number>;
 
 class HashStore extends ReduceStore<State> {
 

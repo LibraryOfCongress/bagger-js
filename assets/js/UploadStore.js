@@ -1,21 +1,8 @@
 // @flow
 
 import { ReduceStore } from 'flux/utils';
-
+import type {Action, State} from './UploadTypes'
 import Immutable from 'immutable';
-
-import type { Action } from './Actions';
-
-export type State = {
-    bytesUploaded: Immutable.OrderedMap <string, number>,
-    accessKeyId: string,
-    secretAccessKey: string,
-    bucket: string,
-    region: string,
-    keyPrefix: string,
-    status: string, // TODO: 'Untested' | 'Untested' | 'Successful' | 'Unsuccessful',
-    message: string
-}
 
 class UploadStore extends ReduceStore <State> {
 

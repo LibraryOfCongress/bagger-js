@@ -1,5 +1,5 @@
 // @flow
-import type { Action } from './Actions';
+import type {Action} from './HashTypes'
 
 import WorkerPool from '../js/worker-pool';
 

@@ -1,6 +1,5 @@
 // @flow
-import type { Action } from './Actions';
-import type {State as UploadState} from '../js/UploadStore'
+import type {Action, State} from './UploadTypes'
 
 import AWS from 'aws-sdk';
 
@@ -14,11 +13,11 @@ function getS3Client(accessKeyId, secretAccessKey, region) {
 }
 
 export function actions(dispatch: (action: Action) => void): {
-    upload: (getState: () => UploadState) =>
+    upload: (getState: () => State) =>
                 (path: string, body: File, size: number, type: string) => void,
     configurationUpdated: (accessKeyId: string, secretAccessKey: string, bucket: string,
         region: string, keyPrefix: string) => void,
-    testConfiguration: (getState: () => UploadState) => () => void
+    testConfiguration: (getState: () => State) => () => void
 } {
     return {
         configurationUpdated(accessKeyId, secretAccessKey, bucket, region, keyPrefix) {

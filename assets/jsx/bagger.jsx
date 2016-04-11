@@ -16,7 +16,8 @@ export function dispatch(action: Action): void {
 import BagStore from '../js/BagStore';
 import HashStore from '../js/HashStore';
 import UploadStore from '../js/UploadStore';
-import type {State as UploadState} from '../js/UploadStore'
+
+import type {State as UploadState} from '../js/UploadTypes'
 
 import {actions as UploadActions} from '../js/UploadActions'
 
