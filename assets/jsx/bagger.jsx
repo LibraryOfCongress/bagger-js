@@ -1,25 +1,28 @@
 // @flow
-
 import React, {Component} from 'react'; // eslint-disable-line no-unused-vars
-import {Container} from 'flux/utils';
-
-import type {Action} from '../js/Actions';
-
 import {Dispatcher} from 'flux';
+import {Container} from 'flux/utils';
+import type {Store} from 'flux/utils';
 
-const dispatcher: Dispatcher<Action> = new Dispatcher();
-
-export function dispatch(action: Action): void {
-    return dispatcher.dispatch(action)
-}
+import type {Action, State} from '../js/BaggerTypes'
 
 import BagStore from '../js/BagStore';
 import HashStore from '../js/HashStore';
 import UploadStore from '../js/UploadStore';
 
-import type {State as UploadState} from '../js/UploadTypes'
-
+import {hashFileAction} from '../js/HashActions'
 import {actions as UploadActions} from '../js/UploadActions'
+
+import SelectFiles from './selectfiles.jsx';
+import Progress from './progress.jsx';
+import Throughput from './throughput.jsx';
+import Bag from './bag.jsx';
+import ServerInfo from './server-info.jsx';
+
+const dispatcher: Dispatcher<Action> = new Dispatcher();
+function dispatch(action: Action): void {
+    return dispatcher.dispatch(action)
+}
 
 const bagStore = new BagStore(dispatcher)
 const hashStore = new HashStore(dispatcher)
@@ -28,24 +31,6 @@ const uploadStore = new UploadStore(dispatcher)
 const hashFile = hashFileAction(dispatch)
 const uploadActions = UploadActions(dispatch)
 const upload = uploadActions.upload(() => uploadStore.getState())
-
-import {hashFileAction} from '../js/HashActions'
-
-import SelectFiles from './selectfiles.jsx';
-import Progress from './progress.jsx';
-import Throughput from './throughput.jsx';
-import Bag from './bag.jsx';
-import ServerInfo from './server-info.jsx';
-
-import type Immutable from 'immutable';
-import type {Store} from 'flux/utils';
-import type BagFile from '../js/BagFile';
-
-type BaggerState = {
-    bagFiles: Immutable.Map<string, BagFile>,
-    bytesHashed: Immutable.Map<string, number>,
-    upload: UploadState
-};
 
 function filesSelected(files: Map<string, File>): void {
     dispatch({ type: 'bag/filesSelected', files });
@@ -62,15 +47,15 @@ function filesSelected(files: Map<string, File>): void {
     )
 }
 
-class BaggerApp extends Component<any, any, BaggerState> {
+class BaggerApp extends Component<any, any, State> {
 
-    state: BaggerState;
+    state: State;
 
     static getStores(): Array<Store> {
         return [bagStore, hashStore, uploadStore];
     }
 
-    static calculateState(prevState: ?BaggerState): BaggerState { // eslint-disable-line no-unused-vars
+    static calculateState(prevState: ?State): State { // eslint-disable-line no-unused-vars
         return {
             bagFiles: bagStore.getState(),
             bytesHashed: hashStore.getState(),

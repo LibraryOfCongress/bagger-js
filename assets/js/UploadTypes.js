@@ -1,6 +1,7 @@
+// @flow
 import Immutable from 'immutable';
 
-export type Actions = {
+export type Action = {
     type: 'upload/bytesUploaded',
     path: string,
     bytesUploaded: number
