@@ -21,7 +21,7 @@ gulp.task('browserify', function () {
     });
     b.transform(babelify, {
         presets: ['es2015', 'react'],
-        plugins: ['transform-object-rest-spread']
+        plugins: ['transform-object-rest-spread', 'transform-flow-strip-types', 'transform-class-properties']
     });
     b.add('./assets/js/main.js');
     return b.bundle()
@@ -38,7 +38,7 @@ gulp.task('browserify-hash-worker', function () {
     });
     b.transform(babelify, {
         presets: ['es2015', 'react'],
-        plugins: ['transform-object-rest-spread']
+        plugins: ['transform-object-rest-spread', 'transform-flow-strip-types', 'transform-class-properties']
     });
     b.add('./assets/js/hash-worker.js');
     return b.bundle()

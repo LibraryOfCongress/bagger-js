@@ -5,7 +5,7 @@ class SelectFiles extends React.Component {
     processFileList(fileList) {
         /*
         * Convert a FileList into a map of fullpath to file which is passed to
-        * this.props.onFilesChange so all downstream callers can reliably get the full path
+        * this.props.onFilesSelected so all downstream callers can reliably get the full path
         */
         var files = new Map();
 
@@ -42,7 +42,7 @@ class SelectFiles extends React.Component {
 
             files.set(fileInfo.fullPath, fileInfo.file);
         }
-        this.props.onFilesChange(files);
+        this.props.onFilesSelected(files);
     }
     componentDidMount() {
         var dropZone = this.refs.dropzone;
@@ -146,7 +146,7 @@ class SelectFiles extends React.Component {
 }
 
 SelectFiles.propTypes = {
-    onFilesChange: PropTypes.func.isRequired
+    onFilesSelected: PropTypes.func.isRequired
 }
 
 export default SelectFiles;

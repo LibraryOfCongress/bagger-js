@@ -19,7 +19,7 @@ export default class WorkerPool {
                         pool.activeWorkers.delete(w);
                         if (pool.callbacks.has(evt.data.fullPath)) {
                             const cb = pool.callbacks.get(evt.data.fullPath);
-                            cb(evt);
+                            cb(evt.data);
                             pool.callbacks.delete(evt.fullPath);
                         }
                         this.dispatch()
