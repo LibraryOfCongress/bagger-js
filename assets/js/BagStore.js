@@ -1,12 +1,9 @@
 // @flow
-
-import type {Action} from './Actions';
+import type {Action, State} from './BagTypes';
 
 import Immutable from 'immutable';
 import {ReduceStore} from 'flux/utils';
 import BagFile from './BagFile';
-
-type State = Immutable.OrderedMap<string, BagFile>;
 
 class BagStore extends ReduceStore<State> {
 

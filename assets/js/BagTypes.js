@@ -1,7 +1,5 @@
-// @flow
-
-import type {Action as HashAction} from './HashTypes'
-import type {Action as UploadAction} from './UploadTypes'
+import type Immutable from 'immutable';
+import type BagFile from '../js/BagFile';
 
 export type Action = {
     type: 'bag/filesSelected',
@@ -10,4 +8,6 @@ export type Action = {
     type: 'bag/fileHashed',
     path: string,
     hash: string,
-} | HashAction | UploadAction;
+}
+
+export type State = Immutable.Map<string, BagFile>
