@@ -14,8 +14,7 @@ import {hashFileAction} from '../js/HashActions'
 import {actions as UploadActions} from '../js/UploadActions'
 
 import SelectFiles from './selectfiles.jsx';
-import Progress from './progress.jsx';
-import Throughput from './throughput.jsx';
+import Dashboard from './dashboard.jsx'
 import Bag from './bag.jsx';
 import ServerInfo from './server-info.jsx';
 
@@ -75,40 +74,17 @@ class BaggerApp extends Component<any, any, State> {
     }
 
     render(): ?React.Element {
-        // TODO: move calculations into stores
-        const bytesHashed = [...this.state.bytesHashed.values()].reduce((r, n) => r + n, 0);
-        const totalBytes = [...this.state.bagFiles.values()].reduce((r, f) => r + f.fileSize, 0);
-        const {upload, bagFiles} = this.state
-        const bytesUploaded = [...this.state.upload.bytesUploaded.values()].reduce((r, n) => r + n, 0);
-
+        const {upload, bagFiles, bytesHashed, upload: {bytesUploaded}} = this.state
         return (
             <div className="bagger">
                 <ServerInfo uploader={upload}
                     updateConfig={(...args) => uploadActions.configurationUpdated(...args)}
                     testConfiguration={uploadActions.testConfiguration(() => uploadStore.getState())}
-                />
-                {upload.message === 'OK' && (
-                    <div>
-                        <SelectFiles onFilesSelected={(files) => filesSelected(files)} />
-                        {bagFiles.size > 0 && (
-                            <div>
-                                <div className="dashboard well well-sm clearfix">
-                                    <div className="col-sm-6">
-                                        <h5>Hashing</h5>
-                                        <Progress current={bytesHashed} total={totalBytes} />
-                                        <Throughput current={bytesHashed} total={totalBytes} />
-                                    </div>
-                                    <div className="col-sm-6">
-                                        <h5>Uploading</h5>
-                                        <Progress current={bytesUploaded} total={totalBytes} />
-                                        <Throughput current={bytesUploaded} total={totalBytes} />
-                                    </div>
-                                </div>
-                                <Bag files={bagFiles} />
-                            </div>
-                        )}
-                    </div>
-                )}
+                >
+                    <SelectFiles onFilesSelected={(files) => filesSelected(files)} />
+                    <Dashboard bagFiles={bagFiles} bytesHashed={bytesHashed} bytesUploaded={bytesUploaded} />
+                    <Bag files={bagFiles} />
+                </ServerInfo>
             </div>
         );
     }

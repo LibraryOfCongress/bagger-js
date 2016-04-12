@@ -5,16 +5,16 @@ class ServerInfo extends React.Component {
     handleChange(event) {
         event.preventDefault()
         this.props.updateConfig(
-            this.accessKeyId.value,
-            this.secretAccessKey.value,
-            this.bucket.value,
-            this.region.value,
-            this.keyPrefix.value
+            this.accessKeyIdNode.value,
+            this.secretAccessKeyNode.value,
+            this.bucketNode.value,
+            this.regionNode.value,
+            this.keyPrefixNode.value
         )
     }
 
     render() {
-        const {uploader} = this.props
+        const {uploader: {accessKeyId, secretAccessKey, bucket, region, keyPrefix, message}} = this.props
 
         const statusToClassName = {
             Testing: 'btn btn-info',
@@ -22,109 +22,123 @@ class ServerInfo extends React.Component {
             Successful: 'btn btn-success',
             Untested: 'btn btn-default'
         }
-        const testButtonClassName = statusToClassName[uploader.status]
+        const testButtonClassName = statusToClassName[status]
+
+        const edit = (
+            <form className="form-horizontal" onSubmit={e => {
+                e.preventDefault()
+                this.props.testConfiguration(accessKeyId, secretAccessKey, bucket, region)
+            }}
+            >
+                <div className="form-group">
+                    <label className="col-sm-2 control-label" htmlFor="accessKeyId">
+                        Access Key
+                    </label>
+                    <div className="col-sm-10">
+                        <input
+                            ref={node => {this.accessKeyIdNode = node}}
+                            type="text"
+                            className="form-control"
+                            id="accessKeyId"
+                            value={accessKeyId}
+                            onChange={(e) => this.handleChange(e)}
+                        />
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label className="col-sm-2 control-label" htmlFor="secretAccessKey">
+                        Secret Key
+                    </label>
+                    <div className="col-sm-10">
+                        <input
+                            ref={node => {this.secretAccessKeyNode = node}}
+                            type="password"
+                            className="form-control"
+                            id="secretAccessKey"
+                            value={secretAccessKey}
+                            onChange={(e) => this.handleChange(e)}
+                        />
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label className="col-sm-2 control-label" htmlFor="region">Region</label>
+                    <div className="col-sm-10">
+                        <input
+                            ref={node => {this.regionNode = node}}
+                            type="text"
+                            className="form-control"
+                            id="region"
+                            value={region}
+                            onChange={(e) => this.handleChange(e)}
+                        />
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label className="col-sm-2 control-label" htmlFor="bucket">Bucket</label>
+                    <div className="col-sm-10">
+                        <input
+                            ref={node => {this.bucketNode = node}}
+                            type="text"
+                            className="form-control"
+                            id="bucket"
+                            value={bucket}
+                            onChange={(e) => this.handleChange(e)}
+                        />
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <div className="col-sm-12 text-center">
+                        <button type="submit" className={testButtonClassName}>
+                            Test Configuration: {message}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label className="col-sm-2 control-label" htmlFor="keyPrefix">
+                        Path Prefix
+                    </label>
+                    <div className="col-sm-10">
+                        <input
+                            ref={node => {this.keyPrefixNode = node}}
+                            type="text"
+                            className="form-control"
+                            id="keyPrefix"
+                            value={keyPrefix}
+                            onChange={(e) => this.handleChange(e)}
+                        />
+                    </div>
+                </div>
+            </form>
+        )
+        const view = (
+            <dl className="dl-horizontal">
+                <dt>Region</dt>
+                <dd>{region}</dd>
+                <dt>Bucket</dt>
+                <dd>{bucket}</dd>
+                <dt>Key Prefix</dt>
+                <dd>{keyPrefix}</dd>
+            </dl>
+        )
 
         return (
-            <div className="server-info well well-sm clearfix">
-                <h3>
-                    S3 Configuration
-                    <a target="help" href="help.html#s3-cors">
-                        <i className="glyphicon glyphicon-question-sign"></i>
-                    </a>
-                </h3>
-
-                <form className="form-horizontal" onSubmit={e => {
-                    e.preventDefault()
-                    const {accessKeyId, secretAccessKey, bucket, region} = uploader
-                    this.props.testConfiguration(accessKeyId, secretAccessKey, bucket, region)
-                }}
-                >
-                    <div className="form-group">
-                        <label className="col-sm-2 control-label" htmlFor="accessKeyId">
-                            Access Key
-                        </label>
-                        <div className="col-sm-10">
-                            <input
-                                ref={node => {this.accessKeyId = node}}
-                                type="text"
-                                className="form-control"
-                                id="accessKeyId"
-                                value={uploader.accessKeyId}
-                                onChange={(e) => this.handleChange(e)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label className="col-sm-2 control-label" htmlFor="secretAccessKey">
-                            Secret Key
-                        </label>
-                        <div className="col-sm-10">
-                            <input
-                                ref={node => {this.secretAccessKey = node}}
-                                type="password"
-                                className="form-control"
-                                id="secretAccessKey"
-                                value={uploader.secretAccessKey}
-                                onChange={(e) => this.handleChange(e)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label className="col-sm-2 control-label" htmlFor="region">Region</label>
-                        <div className="col-sm-10">
-                            <input
-                                ref={node => {this.region = node}}
-                                type="text"
-                                className="form-control"
-                                id="region"
-                                value={uploader.region}
-                                onChange={(e) => this.handleChange(e)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label className="col-sm-2 control-label" htmlFor="bucket">Bucket</label>
-                        <div className="col-sm-10">
-                            <input
-                                ref={node => {this.bucket = node}}
-                                type="text"
-                                className="form-control"
-                                id="bucket"
-                                value={uploader.bucket}
-                                onChange={(e) => this.handleChange(e)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <div className="col-sm-12 text-center">
-                            <button type="submit" className={testButtonClassName}>
-                                Test Configuration: {uploader.message}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label className="col-sm-2 control-label" htmlFor="keyPrefix">
-                            Path Prefix
-                        </label>
-                        <div className="col-sm-10">
-                            <input
-                                ref={node => {this.keyPrefix = node}}
-                                type="text"
-                                className="form-control"
-                                id="keyPrefix"
-                                value={uploader.keyPrefix}
-                                onChange={(e) => this.handleChange(e)}
-                            />
-                        </div>
-                    </div>
-                </form>
-
-            </div>
+            <span>
+                <div className="server-info well well-sm clearfix">
+                    <h3>
+                        Bag Destination <small>S3 Configuration</small>
+                        <a target="help" href="help.html#s3-cors">
+                            <i className="glyphicon glyphicon-question-sign"></i>
+                        </a>
+                    </h3>
+                    {message === 'OK' ? view : edit}
+                </div>
+                {message === 'OK' && this.props.children}
+            </span>
         );
     }
 }
