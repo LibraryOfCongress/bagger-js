@@ -11,7 +11,11 @@ import HashStore from '../js/HashStore';
 import UploadStore from '../js/UploadStore';
 
 import {hashFileAction} from '../js/HashActions'
-import {actions as UploadActions} from '../js/UploadActions'
+import {
+    testConfigurationAction,
+    configurationUpdatedAction,
+    uploadAction
+} from '../js/UploadActions'
 
 import SelectFiles from './selectfiles.jsx';
 import Dashboard from './dashboard.jsx'
@@ -28,8 +32,9 @@ const hashStore = new HashStore(dispatcher)
 const uploadStore = new UploadStore(dispatcher)
 
 const hashFile = hashFileAction(dispatch)
-const uploadActions = UploadActions(dispatch)
-const upload = uploadActions.upload(() => uploadStore.getState())
+const testConfiguration = testConfigurationAction(dispatch, () => uploadStore.getState())
+const configurationUpdated = configurationUpdatedAction(dispatch)
+const upload = uploadAction(dispatch, () => uploadStore.getState())
 
 function filesSelected(files: Map<string, File>): void {
     dispatch({ type: 'bag/filesSelected', files });
@@ -68,9 +73,9 @@ class BaggerApp extends Component<any, any, State> {
         const args = [dataset.accessKeyId, dataset.secretAccessKey, dataset.bucket, dataset.region,
                         dataset.keyPrefix]
         if (args.some(arg => arg !== undefined)) {
-            uploadActions.configurationUpdated(...args)
+            configurationUpdated(...args)
         }
-        uploadActions.testConfiguration(() => uploadStore.getState())()
+        testConfiguration()
     }
 
     render(): ?React.Element {
@@ -78,8 +83,8 @@ class BaggerApp extends Component<any, any, State> {
         return (
             <div className="bagger">
                 <ServerInfo uploader={upload}
-                    updateConfig={(...args) => uploadActions.configurationUpdated(...args)}
-                    testConfiguration={uploadActions.testConfiguration(() => uploadStore.getState())}
+                    updateConfig={(...args) => configurationUpdated(...args)}
+                    testConfiguration={testConfiguration}
                 >
                     <SelectFiles onFilesSelected={(files) => filesSelected(files)} />
                     <Dashboard bagFiles={bagFiles} bytesHashed={bytesHashed} bytesUploaded={bytesUploaded} />

@@ -28,3 +28,5 @@ export type State = {
     status: string, // TODO: 'Untested' | 'Untested' | 'Successful' | 'Unsuccessful',
     message: string
 }
+
+export type Dispatch = (action: Action) => void
