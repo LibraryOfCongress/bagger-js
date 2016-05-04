@@ -1,23 +1,19 @@
+// @flow
 import React, {PropTypes} from 'react'
 
 class SelectFiles extends React.Component {
 
-    processFileList(fileList) {
+    processFileList(fileList: Array<any>) {
         /*
-        * Convert a FileList into a map of fullpath to file which is passed to
-        * this.props.onFilesSelected so all downstream callers can reliably get the full path
-        */
+         * Convert a FileList into a map of fullpath to file which is passed to
+         * this.props.onFilesSelected so all downstream callers can reliably get the full path
+         */
+
         var files = new Map();
 
         for (var i = 0; i < fileList.length; i++) {
-            var file = fileList[i],
-                fileInfo;
-
-            if ('file' in file && 'fullPath' in file) {
-                // Our "file" is already in the format we need:
-                fileInfo = file;
-            } else {
-                /*
+            var file = fileList[i], fileInfo;
+            /*
                 There's no standard interface for getting files with the context of a selected or dropped
                 directory (see #1). Currently we're using a non-standard interface in Chrome and due to its
                 limitations we have to store a fullPath property while recursing the directory tree (see
@@ -25,21 +21,24 @@ class SelectFiles extends React.Component {
 
                 To avoid having to check everywhere we want to get the filename, we'll take the opposite
                 approach and set fullPath from file.name if it's not already set so we can use it elsewhere
-                */
-
-                if ('webkitRelativePath' in file && file.webkitRelativePath.length > 0) {
-                    fileInfo = {
-                        file,
-                        fullPath: file.webkitRelativePath
-                    };
-                } else {
-                    fileInfo = {
-                        file,
-                        fullPath: file.name
-                    };
-                }
+            */
+            if ('webkitRelativePath' in file && file.webkitRelativePath.length > 0) {
+                fileInfo = {file, fullPath: file.webkitRelativePath};
+            } else {
+                fileInfo = {file, fullPath: file.name};
             }
-
+            files.set(fileInfo.fullPath, fileInfo.file);
+        }
+        this.props.onFilesSelected(files);
+    }
+    processFileInfoList(fileList: Array<{file: File, fullPath: string}>) {
+        /*
+        * Convert a FileList into a map of fullpath to file which is passed to
+        * this.props.onFilesSelected so all downstream callers can reliably get the full path
+        */
+        var files = new Map();
+        for (var i = 0; i < fileList.length; i++) {
+            var fileInfo = fileList[i];
             files.set(fileInfo.fullPath, fileInfo.file);
         }
         this.props.onFilesSelected(files);
@@ -48,6 +47,7 @@ class SelectFiles extends React.Component {
         var dropZone = this.refs.dropzone;
 
         var processFileList = this.processFileList.bind(this);
+        var processFileInfoList = this.processFileInfoList.bind(this);
 
         function walkDirectoryTree(entry, basePath) {
             basePath = basePath || '';
@@ -57,7 +57,7 @@ class SelectFiles extends React.Component {
                     var fullPath = basePath
                         ? basePath + '/' + file.name
                         : file.name;
-                    processFileList([
+                    processFileInfoList([
                         {
                             file,
                             fullPath
@@ -116,7 +116,7 @@ class SelectFiles extends React.Component {
         }, false);
     }
 
-    handleFileInputChange(e) {
+    handleFileInputChange(e: any) {
         e.preventDefault();
         this.processFileList(e.target.files);
         return;

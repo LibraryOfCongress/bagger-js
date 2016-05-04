@@ -1,5 +1,5 @@
 // @flow
-import Immutable from 'immutable';
+import {Map} from 'immutable';
 
 export type Action = {
     type: 'upload/bytesUploaded',
@@ -19,7 +19,7 @@ export type Action = {
 }
 
 export type State = {
-    bytesUploaded: Immutable.OrderedMap <string, number>,
+    bytesUploaded: Map <string, number>,
     accessKeyId: string,
     secretAccessKey: string,
     bucket: string,

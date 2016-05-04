@@ -1,8 +1,15 @@
+// @flow
 import React, {PropTypes} from 'react'
 
 class ServerInfo extends React.Component {
 
-    handleChange(event) {
+    accessKeyIdNode: {value: string};
+    secretAccessKeyNode: {value: string};
+    bucketNode: {value: string};
+    regionNode: {value: string};
+    keyPrefixNode: {value: string};
+
+    handleChange(event: Event) {
         event.preventDefault()
         this.props.updateConfig(
             this.accessKeyIdNode.value,

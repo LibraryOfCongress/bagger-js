@@ -2,13 +2,13 @@
 
 import { ReduceStore } from 'flux/utils';
 import type {Action, State} from './UploadTypes'
-import Immutable from 'immutable';
+import {Map} from 'immutable';
 
 class UploadStore extends ReduceStore <State> {
 
     getInitialState(): State {
         return {
-            bytesUploaded: Immutable.OrderedMap(),
+            bytesUploaded: Map(),
             accessKeyId: '',
             secretAccessKey: '',
             bucket: '',

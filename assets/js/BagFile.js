@@ -1,8 +1,8 @@
 // @flow
 
-import Immutable from 'immutable';
+import {Record} from 'immutable';
 
-const BagFileRecord = Immutable.Record({
+const BagFileRecord = Record({
     path: undefined,
     file: undefined,
     fileSize: undefined,

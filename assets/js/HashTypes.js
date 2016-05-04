@@ -1,5 +1,5 @@
 // @flow
-import Immutable from 'immutable';
+import {Map} from 'immutable';
 
 export type Action = {
     type: 'hash/bytesHashed',
@@ -10,4 +10,4 @@ export type Action = {
     hasherStats: any
 }
 
-export type State = Immutable.Map<string, number>
+export type State = Map<string, number>

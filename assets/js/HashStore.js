@@ -2,12 +2,12 @@
 
 import {ReduceStore} from 'flux/utils';
 import type {Action, State} from './HashTypes';
-import Immutable from 'immutable';
+import {OrderedMap} from 'immutable';
 
 class HashStore extends ReduceStore<State> {
 
     getInitialState(): State {
-        return Immutable.OrderedMap();
+        return new OrderedMap();
     }
 
     reduce (state: State, action: Action): State {

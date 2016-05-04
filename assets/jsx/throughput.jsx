@@ -1,16 +1,24 @@
+// @flow
 import React from 'react'
 import filesize from 'filesize'
 import humanizeDuration from 'humanize-duration'
 
-class Throughput extends React.Component {
+type State = {
+    history: Array<any>,
+    perSecond: number
+}
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            history: [],
-            perSecond: 0
-        }
-    }
+class Throughput extends React.Component<any, any, State> {
+
+    props: {
+        current: number,
+        total: number
+    };
+
+    state: State = {
+        history: [],
+        perSecond: 0
+    };
 
     componentDidMount() {
         setInterval(() => {

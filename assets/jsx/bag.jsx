@@ -14,7 +14,10 @@ class Bag extends React.Component {
     render() {
         const {files} = this.props
 
+        // $FlowIssue - https://github.com/facebook/flow/issues/1059
         var total = [...files.values()].reduce((r, f) => r + f.fileSize, 0);
+        // $FlowIssue - https://github.com/facebook/flow/issues/1059
+        let filesValues = [...files.values()]
 
         return (
             <div id="bag-contents" className="well well-sm">
@@ -37,7 +40,7 @@ class Bag extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {[...files.values()].map(({path, fileSize, hash}) =>
+                        {filesValues.map(({path, fileSize, hash}) =>
                             <tr key={path}>
                                 <td className="file-name">
                                     {path}
