@@ -10,7 +10,7 @@ and a simple web application which allows bagging and transferring local content
 * [x] [Recursive directory drag and drop or selection](https://github.com/loc-rdc/bagger-js/pull/1) (currently supported only in Chrome; see #1)
 * [x] Incremental hashing
 * [ ] Multi-threading
-* [ ] Uploads to S3
+* [x] Uploads to S3
 * [ ] Ability to resume interrupted transfers
 * [ ] Ability to download the generated bag rather than individual files
 
