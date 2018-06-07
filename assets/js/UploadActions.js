@@ -9,7 +9,7 @@ function configureAWS(accessKeyId, secretAccessKey, region) {
 
 function getS3Client(accessKeyId, secretAccessKey, region) {
     configureAWS(accessKeyId, secretAccessKey, region);
-    return new AWS.S3();
+    return new AWS.S3({signatureVersion: 'v4'});
 }
 
 export function testConfigurationAction(dispatch: Dispatch, getState: () => State): () => void {
