@@ -27,6 +27,72 @@ The build system requires [npm](https://npmjs.org) and [gulp](http://gulpjs.com)
 
     % npm install -g gulp
 
+### Configure your S3 test bucket
+
+The two key parts are having a working [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) configuration attached to the bucket and a policy attached to the IAM user granting enough access to upload files. 
+
+This CORS configuration is known to work as of June 2018:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+<CORSRule>
+    <AllowedOrigin>*</AllowedOrigin>
+    <AllowedMethod>PUT</AllowedMethod>
+    <AllowedMethod>POST</AllowedMethod>
+    <AllowedMethod>DELETE</AllowedMethod>
+    <AllowedMethod>GET</AllowedMethod>
+    <AllowedMethod>HEAD</AllowedMethod>
+    <AllowedHeader>*</AllowedHeader>
+    <AllowedHeader>authorization</AllowedHeader>
+    <AllowedHeader>content-type</AllowedHeader>
+    <AllowedHeader>x-amz-date</AllowedHeader>
+    <AllowedHeader>x-amz-user-agent</AllowedHeader>
+    <ExposeHeader>ETag</ExposeHeader>
+    <ExposeHeader>x-amz-server-side-encryption</ExposeHeader>
+    <ExposeHeader>x-amz-request-id</ExposeHeader>
+    <ExposeHeader>x-amz-id-2</ExposeHeader>
+</CORSRule>
+</CORSConfiguration>
+```
+
+This IAM policy is known to work as of June 2018, but note the hard-coded bucket name which you'll need to change:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowListingAllBuckets",
+            "Effect": "Allow",
+            "Action": "s3:ListAllMyBuckets",
+            "Resource": "*"
+        },
+        {
+            "Sid": "AllowWritingToSelectedBucket",
+            "Effect": "Allow",
+            "Action": [
+                "s3:CreateBucket",
+                "s3:HeadBucket",
+                "s3:DeleteObject",
+                "s3:ListMultipartUploadParts",
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:AbortMultipartUpload",
+                "s3:ListBucketMultipartUploads",
+                "s3:GetBucketCORS",
+                "s3:GetBucketLocation",
+                "s3:GetObjectVersion"
+            ],
+            "Resource": [
+                "arn:aws:s3:::your-test-bucket/*",
+                "arn:aws:s3:::your-test-bucket"
+            ]
+        }
+    ]
+}
+```
 
 ### Install dependencies
 
