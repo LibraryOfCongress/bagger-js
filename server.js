@@ -1,5 +1,5 @@
 /*eslint no-console: "off" */
-/* global require, console */
+/* global require, console, process */
 
 var connect = require('connect');
 var directory = './dist';

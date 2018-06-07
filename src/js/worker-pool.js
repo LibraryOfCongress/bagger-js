@@ -1,8 +1,7 @@
 export default class WorkerPool {
-
     constructor(url, n, progressUpdate, hasherStatsUpdate) {
-        this.n = n
-        this.hasherStatsUpdate = hasherStatsUpdate
+        this.n = n;
+        this.hasherStatsUpdate = hasherStatsUpdate;
         this.messages = [];
         this.workers = new Set();
         this.activeWorkers = new Set();
@@ -10,53 +9,61 @@ export default class WorkerPool {
         var pool = this;
         for (var i = 0; i < n; i++) {
             let w = new Worker(url);
-            w.addEventListener('message', evt => {
+            w.addEventListener("message", evt => {
                 switch (evt.data.type) {
-                    case 'PROGRESS_UPDATE':
-                        progressUpdate(evt.data.fullPath, evt.data.hashed)
-                        break
-                    case 'RESULT':
+                    case "PROGRESS_UPDATE":
+                        progressUpdate(evt.data);
+                        break;
+                    case "RESULT":
                         pool.activeWorkers.delete(w);
                         if (pool.callbacks.has(evt.data.fullPath)) {
                             const cb = pool.callbacks.get(evt.data.fullPath);
                             cb(evt.data);
                             pool.callbacks.delete(evt.fullPath);
                         }
-                        this.dispatch()
+                        this.dispatch();
                 }
             });
-            w.addEventListener('error', error => {
-                throw error
-            })
+            w.addEventListener("error", error => {
+                // These events have very limited information by design and are
+                // thus minimally useful for debugging so we'll make sure our
+                // error message at least includes some context:
+                throw `Web worker fatal error: ${error}`;
+            });
             this.workers.add(w);
         }
     }
 
     postMessage(message) {
         this.messages.push(message);
-        this.dispatch()
+        this.dispatch();
     }
 
     dispatch() {
-        const idleWorkers = new Set([...this.workers].filter(w => !this.activeWorkers.has(w)))
+        const idleWorkers = new Set(
+            [...this.workers].filter(w => !this.activeWorkers.has(w))
+        );
         for (var w of idleWorkers) {
             var message = this.messages.shift();
             if (message !== undefined) {
-                this.activeWorkers.add(w)
+                this.activeWorkers.add(w);
                 w.postMessage(message);
             } else {
-                break
+                break;
             }
         }
-        this.hasherStatsUpdate({ activeHashers: this.activeWorkers.size, totalHashers: this.n })
+        this.hasherStatsUpdate({
+            activeHashers: this.activeWorkers.size,
+            totalHashers: this.n
+        });
     }
 
     hash(message) {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             this.callbacks.set(message.fullPath, function cb(evt) {
                 resolve(evt);
             });
-            this.postMessage(message)
-        })
+            this.postMessage(message);
+        });
     }
 }

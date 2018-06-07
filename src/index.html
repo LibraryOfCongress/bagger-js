@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <title>
+            BaggerJS: BagIt uploads to S3 from your browser
+        </title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w="
+            crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap-theme.min.css"
+            integrity="sha256-ZT4HPpdCOt2lvDkXokHuhJfdOKSPFLzeAJik5U/Q+l4=" crossorigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="prefetch" as="script" crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/asmCrypto/2.0.1/asmcrypto.all.es5.min.js">
+    </head>
+
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                        aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">BaggerJS</a>
+                </div>
+                <div id="navbar" class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a href="#">Send Files</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div id="directory-support-warning" class="alert alert-warning alert-dismissible hidden" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                The browser which you are using allows the selection of or dropping multiple files. Unfortunately, support for nested folders
+                requires a web API which is currently only available on Google Chrome. See
+                <a href="https://github.com/LibraryOfCongress/bagger-js/pull/1">issue #1</a> for more information.
+            </div>
+        </div>
+
+        <div id="bagger" class="container">
+            <div class="server-info well well-sm clearfix">
+                <h3>
+                    S3 Configuration
+                    <a target="help" href="help.html#s3-cors">
+                        <i class="glyphicon glyphicon-question-sign"></i>
+                    </a>
+                </h3>
+                <div class="configuration-summary text-center">
+                </div>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="accessKeyId">
+                            Access Key
+                        </label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="accessKeyId" placeholder="S3 Access Key">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="secretAccessKey">
+                            Secret Key
+                        </label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="secretAccessKey" placeholder="S3 Secret Key">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="region">
+                            Region
+                        </label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="region" placeholder="us-east-1" value="us-east-1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="bucket">
+                            Bucket
+                        </label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="bucket" placeholder="bagger-js-tests">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="bucket">
+                            Key Prefix
+                        </label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="keyPrefix" value="/">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-12 text-center">
+                            <button type="submit" class="configuration-status btn btn-default">
+                                Test Configuration
+                                <output class="configuration-status-message"></output>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bag hidden">
+                <h2>Create a bag</h2>
+
+                <div class="clearfix well well-sm">
+                    <form class="form">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="bag-name">
+                                Bag Name
+                            </label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="bag-name" placeholder="My Delivery" required pattern="^[^/;+]+$" value="Test Bag">
+                            </div>
+                        </div>
+
+                        <div class="form-group text-center">Bag Info coming soon</div>
+
+                        <div class="form-group bag-finalize hidden">
+                            <div class="col-sm-12 text-center">
+                                <button type="submit" class="btn btn-primary">
+                                    Finalize!
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bag-contents well well-sm">
+                    <div class="dropzone jumbotron text-center">
+                        <p>Drag and drop files or directories here!</p>
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label>
+                                    Select files:
+                                    <input type="file" multiple webkitdirectory="true">
+                                </label>
+                                <button class="btn btn-primary">Go!</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="file-name">Filename</th>
+                                <th class="file-size">Size</th>
+                                <th class="file-hash sha256">SHA-256</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template>
+                                <tr>
+                                    <td class="file-name"></td>
+                                    <td class="file-size"></td>
+                                    <td class="file-hash sha256"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="file-count total"></th>
+                                <td class="file-size total"></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+
+                <div class="dashboard well well-sm clearfix hidden">
+                    <div class="col-sm-6 hash">
+                        <h5>Hashing</h5>
+
+                        <meter class="hash-complete" min=0 max=100 value=0>
+                        </meter>
+
+                        <dl class="throughput dl-horizontal">
+                            <dt>Average throughput:</dt>
+                            <dd>
+                                <output class="rate"></output> per second
+                            </dd>
+
+                            <dt>Time remaining:</dt>
+                            <dd>
+                                <output class="remaining"></output>.
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-sm-6 upload">
+                        <h5>Uploading</h5>
+
+                        <meter class="upload-complete" min=0 max=100 value=0>
+                        </meter>
+
+                        <dl class="throughput dl-horizontal">
+                            <dt>Average throughput:</dt>
+                            <dd>
+                                <output class="rate"></output> per second
+                            </dd>
+
+                            <dt>Time remaining:</dt>
+                            <dd>
+                                <output class="remaining"></output>.
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ES6 modules -->
+        <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/filesize/3.6.1/filesize.es6.min.js" integrity="sha256-PW2WP7Xbx97bl5F+Fd96/HX1m9RZDLYaDb6ScrOw9hY="
+            crossorigin="anonymous"></script>
+        <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.253.1/aws-sdk.min.js" integrity="sha256-M8ybOHpbJFnEDeDDIBq+lsZyH6SrmqDrn+XFimusqQk="
+            crossorigin="anonymous"></script>
+        <!-- Traditional JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/humanize-duration/3.14.0/humanize-duration.min.js" integrity="sha256-lfP2nyh9CrETTh3qI+BT/1bJCHmYxyMXQ4QadQ5Befo=" crossorigin="anonymous"></script>
+        <script type="module" src="js/main.js"></script>
+    </body>
+
+</html>
