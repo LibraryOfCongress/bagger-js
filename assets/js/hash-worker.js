@@ -1,11 +1,11 @@
 /* global self, postMessage, FileReaderSync */
 
-import asmCrypto from 'asmcrypto.js';
+import {Sha256, bytes_to_hex} from 'asmcrypto.js';
 
 const BLOCK_SIZE = 1048576;
 
 self.addEventListener('message', ({data: {file, fullPath}}) => {
-    const sha256 = new asmCrypto.SHA256();
+    const sha256 = new Sha256();
     const startTime = Date.now();
     const fileSize = file.size;
 
@@ -24,7 +24,7 @@ self.addEventListener('message', ({data: {file, fullPath}}) => {
     postMessage({
         type: 'RESULT',
         fullPath,
-        sha256: asmCrypto.bytes_to_hex(sha256.finish().result),
+        sha256: bytes_to_hex(sha256.finish().result),
         elapsedSeconds: (Date.now() - startTime) / 1000
     });
 });
