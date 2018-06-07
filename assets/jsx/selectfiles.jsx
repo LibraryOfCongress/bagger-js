@@ -1,8 +1,8 @@
 // @flow
-import React, {PropTypes} from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
 
 class SelectFiles extends React.Component {
-
     processFileList(fileList: Array<any>) {
         /*
          * Convert a FileList into a map of fullpath to file which is passed to
@@ -12,7 +12,8 @@ class SelectFiles extends React.Component {
         var files = new Map();
 
         for (var i = 0; i < fileList.length; i++) {
-            var file = fileList[i], fileInfo;
+            var file = fileList[i],
+                fileInfo;
             /*
                 There's no standard interface for getting files with the context of a selected or dropped
                 directory (see #1). Currently we're using a non-standard interface in Chrome and due to its
@@ -22,7 +23,10 @@ class SelectFiles extends React.Component {
                 To avoid having to check everywhere we want to get the filename, we'll take the opposite
                 approach and set fullPath from file.name if it's not already set so we can use it elsewhere
             */
-            if ('webkitRelativePath' in file && file.webkitRelativePath.length > 0) {
+            if (
+                'webkitRelativePath' in file &&
+                file.webkitRelativePath.length > 0
+            ) {
                 fileInfo = {file, fullPath: file.webkitRelativePath};
             } else {
                 fileInfo = {file, fullPath: file.name};
@@ -78,42 +82,58 @@ class SelectFiles extends React.Component {
             }
         }
 
-        dropZone.addEventListener('drop', function(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
+        dropZone.addEventListener(
+            'drop',
+            function(evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
 
-            dropZone.classList.add('active');
+                dropZone.classList.add('active');
 
-            if (typeof evt.dataTransfer.items !== 'undefined') {
-                var items = evt.dataTransfer.items;
+                if (typeof evt.dataTransfer.items !== 'undefined') {
+                    var items = evt.dataTransfer.items;
 
-                for (var i = 0; i < items.length; i++) {
-                    var item = items[i],
-                        entry = item.webkitGetAsEntry();
+                    for (var i = 0; i < items.length; i++) {
+                        var item = items[i],
+                            entry = item.webkitGetAsEntry();
 
-                    walkDirectoryTree(entry);
+                        walkDirectoryTree(entry);
+                    }
+                } else {
+                    processFileList(evt.dataTransfer.files);
                 }
-            } else {
-                processFileList(evt.dataTransfer.files);
-            }
 
-            dropZone.classList.remove('active');
-        }, false);
+                dropZone.classList.remove('active');
+            },
+            false
+        );
 
-        dropZone.addEventListener('dragover', function(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-            evt.dataTransfer.dropEffect = 'copy';
-            dropZone.classList.add('active');
-        }, false);
+        dropZone.addEventListener(
+            'dragover',
+            function(evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+                evt.dataTransfer.dropEffect = 'copy';
+                dropZone.classList.add('active');
+            },
+            false
+        );
 
-        dropZone.addEventListener('dragleave', function() {
-            dropZone.classList.remove('active');
-        }, false);
+        dropZone.addEventListener(
+            'dragleave',
+            function() {
+                dropZone.classList.remove('active');
+            },
+            false
+        );
 
-        dropZone.addEventListener('dragend', function() {
-            dropZone.classList.remove('active');
-        }, false);
+        dropZone.addEventListener(
+            'dragend',
+            function() {
+                dropZone.classList.remove('active');
+            },
+            false
+        );
     }
 
     handleFileInputChange(e: any) {
@@ -125,16 +145,16 @@ class SelectFiles extends React.Component {
     render() {
         return (
             <div ref="dropzone" id="dropzone" className="jumbotron text-center">
-                <p>
-                    Drag and drop files or directories here!
-                </p>
+                <p>Drag and drop files or directories here!</p>
                 <form className="form-horizontal">
                     <div className="form-group">
                         <label>
                             Select files:
                             <input
                                 type="file"
-                                onChange={this.handleFileInputChange.bind(this)} multiple webkitdirectory
+                                onChange={this.handleFileInputChange.bind(this)}
+                                multiple
+                                webkitdirectory="true"
                             />
                         </label>
                         <button className="btn btn-primary">Go!</button>
@@ -147,6 +167,6 @@ class SelectFiles extends React.Component {
 
 SelectFiles.propTypes = {
     onFilesSelected: PropTypes.func.isRequired
-}
+};
 
 export default SelectFiles;

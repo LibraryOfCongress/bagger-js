@@ -1,13 +1,12 @@
 // @flow
-import React from 'react'
+import React from 'react';
 
 class Progress extends React.Component {
-
     render() {
-        const {current, total} = this.props
+        const {current, total} = this.props;
 
         const complete = (100 * (current / total)).toFixed(0);
-        const completed = (current === total)
+        const completed = current === total;
 
         let classNames = ['progress-bar'];
 
@@ -30,7 +29,7 @@ class Progress extends React.Component {
                     {complete}%
                 </div>
             </div>
-        )
+        );
     }
 }
 
