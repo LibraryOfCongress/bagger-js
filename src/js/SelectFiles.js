@@ -24,13 +24,28 @@ class SelectFiles {
         this.dropzone = dropzone;
         this.onFilesSelected = onFilesSelectedCallback;
 
-        dropzone
-            .querySelector('input[type="file"]')
-            .addEventListener("change", evt => {
+        let fileInput = dropzone.querySelector('input[type="file"]');
+
+        dropzone.querySelector("form").addEventListener(
+            "submit",
+            evt => {
+                evt.stopPropagation();
+                evt.preventDefault();
+                this.processFileList(fileInput.files);
+                return false;
+            },
+            false
+        );
+
+        fileInput.addEventListener(
+            "change",
+            evt => {
                 evt.preventDefault();
                 this.processFileList(evt.target.files);
-                return;
-            });
+                return false;
+            },
+            false
+        );
 
         dropzone.addEventListener(
             "drop",
