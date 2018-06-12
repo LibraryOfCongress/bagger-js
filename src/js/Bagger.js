@@ -1,10 +1,10 @@
-/* global AWS, filesize */
+/* global filesize */
 
 import {$} from "./utils.js";
 import BagEntry from "./BagEntry.js";
 import Dashboard from "./Dashboard.js";
 import SelectFiles from "./SelectFiles.js";
-import ServerInfo from "./ServerInfo.js";
+import StorageManager from "./StorageManager.js";
 import WorkerPool from "./worker-pool.js";
 
 export default class Bagger {
@@ -17,7 +17,7 @@ export default class Bagger {
 
         this.dashboard = new Dashboard($(".dashboard", elem));
 
-        this.serverInfo = new ServerInfo($(".server-info", elem), status => {
+        this.storage = new StorageManager($(".server-info", elem), status => {
             $(".bag", elem).classList.toggle("hidden", status != "successful");
         });
 
@@ -64,8 +64,20 @@ export default class Bagger {
             // TODO: refactor the payload vs. tag file upload paths so we don't need to check here:
             if (entry) {
                 let metric = entry.statistics[m[1]];
+                if (!isFinite(evt.bytes)) {
+                    throw "Malformed event: " + evt;
+                }
                 metric.bytes = evt.bytes;
                 metric.seconds = evt.elapsedMilliseconds / 1000;
+            } else {
+                console.warn(`Couldn't match ${evt.path} to a payload entry`);
+            }
+        } else if (evt.type == "upload/failure") {
+            let entry = this.bagEntries.get(evt.path);
+            if (entry) {
+                // Since object stores don't save partial files we'll zero out the upload statistics:
+                entry.statistics.upload.bytes = 0;
+                entry.statistics.upload.seconds = 0;
             }
         }
 
@@ -266,20 +278,54 @@ export default class Bagger {
         return this.hashPool.hash({fullPath: path, file});
     }
 
-    uploadPayloadFile(path, body, size, type) {
+    uploadFile(path, body, size, type, progressCallback) {
+        // Upload a bag-relative path using the user-specified bag name prefix
+        let bagName = this.getBagName();
+
+        path = `${bagName}/${path}`;
+
+        return this.storage.uploadObject(
+            path,
+            body,
+            size,
+            type,
+            progressCallback
+        );
+    }
+
+    uploadPayloadFile(payloadPath, body, size, type) {
+        /*
+            Upload a payload file
+
+            The provided payload-relative path will be rewritten to use the
+            BagIt layout (e.g. prefixing with "data/" for BagIt 1.0).
+
+            The dispatcher will be called as each chunk is processes and when
+            the upload finally succeeds or fails.
+        */
+
+        // We reset this to zero every time so our cumulative stats will be correct
+        // after failures or retries:
+        this.dispatch({
+            type: "upload/progress",
+            path: payloadPath,
+            bytes: 0,
+            elapsedMilliseconds: 0
+        });
+
         let uploadStartTime = performance.now();
 
         let progressCallback = progressEvent => {
             this.dispatch({
                 type: "upload/progress",
-                path,
+                path: payloadPath,
                 bytes: progressEvent.loaded,
                 elapsedMilliseconds: performance.now() - uploadStartTime
             });
         };
 
-        return this.uploadObject(
-            `data/${path}`,
+        return this.uploadFile(
+            `data/${payloadPath}`,
             body,
             size,
             type,
@@ -288,7 +334,7 @@ export default class Bagger {
             .then(() => {
                 this.dispatch({
                     type: "upload/complete",
-                    path: path,
+                    path: payloadPath,
                     elapsedMilliseconds: performance.now() - uploadStartTime,
                     bytes: size
                 });
@@ -297,51 +343,11 @@ export default class Bagger {
             .catch(err => {
                 this.dispatch({
                     type: "upload/failure",
-                    path,
+                    path: payloadPath,
                     elapsedMilliseconds: performance.now() - uploadStartTime,
                     message: err
                 });
             });
-    }
-
-    uploadObject(path, body, size, type, progressCallback) {
-        // These are part of the network settings:
-        let keyPrefix = this.serverInfo.config.get("keyPrefix"),
-            bucket = this.serverInfo.config.get("bucket");
-
-        // This is user-entered:
-        let bagName = this.getBagName();
-
-        let key = `${keyPrefix}/${bagName}/${path}`;
-        // Trim any leading slash from the key prefix or doubled slashes to
-        // avoid S3 creating an empty “folder” and confusing clients:
-        key = key.replace(/\/+/g, "/");
-        key = key.replace(/^\/+/, "");
-
-        // We reset this to zero every time so our cumulative stats will be correct
-        // after failures or retries:
-        this.dispatch({type: "upload/progress", path, bytesUploaded: 0});
-
-        // TODO: set ContentMD5
-        // TODO: use leavePartsOnError to allow retries?
-        // TODO: make partSize and queueSize configurable
-        var upload = new AWS.S3.ManagedUpload({
-            maxRetries: 6,
-            partSize: 8 * 1024 * 1024,
-            queueSize: 4,
-            params: {
-                Bucket: bucket,
-                Key: key,
-                Body: body,
-                Contenttype: type
-            }
-        });
-
-        if (progressCallback) {
-            upload.on("httpUploadProgress", progressCallback);
-        }
-
-        return upload.promise();
     }
 
     finalizeBag() {
@@ -374,7 +380,7 @@ export default class Bagger {
         for (let [hashName, entries] of manifests) {
             let body = entries.join("\n");
             uploadPromises.push(
-                this.uploadObject(
+                this.uploadFile(
                     "manifest-" + hashName + ".txt",
                     body,
                     body.length,
@@ -392,7 +398,7 @@ export default class Bagger {
         // FIXME: implement tag manifests!
 
         uploadPromises.push(
-            this.uploadObject(
+            this.uploadFile(
                 "bag-info.txt",
                 bagInfo,
                 bagInfo.length,
@@ -401,7 +407,7 @@ export default class Bagger {
         );
 
         uploadPromises.push(
-            this.uploadObject("bagit.txt", bagIt, bagIt.length, "text/plain")
+            this.uploadFile("bagit.txt", bagIt, bagIt.length, "text/plain")
         );
 
         // TODO: lock the UI to prevent changes / require confirmation?
