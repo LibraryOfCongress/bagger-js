@@ -51,6 +51,16 @@ output {
     display: none;
 }
 
+/* Bag Info */
+
+.bag-info :invalid {
+    border-color: red;
+}
+
+.bag-info td:last-child {
+    width: 50px;
+}
+
 /* File Selection */
 
 .dropzone {

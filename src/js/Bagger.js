@@ -2,6 +2,7 @@
 
 import {$} from "./utils.js";
 import BagEntry from "./BagEntry.js";
+import BagInfo from "./BagInfo.js";
 import Dashboard from "./Dashboard.js";
 import SelectFiles from "./SelectFiles.js";
 import StorageManager from "./StorageManager.js";
@@ -14,6 +15,8 @@ export default class Bagger {
         // This tracks the size + hash information we'll need to generate the
         // manifests after a successful upload:
         this.bagEntries = new Map();
+
+        this.bagInfo = new BagInfo($(".bag-info", elem));
 
         this.dashboard = new Dashboard($(".dashboard", elem));
 
@@ -389,9 +392,12 @@ export default class Bagger {
             );
         }
 
-        // FIXME: Bag Info UI — https://github.com/LibraryOfCongress/bagger-js/issues/13
         let bagInfo = "Bag-Size: " + filesize(totalBytes, {round: 1});
         bagInfo += "\nPayload-Oxum: " + totalBytes + "." + totalFiles + "\n";
+
+        this.bagInfo.getValues().forEach(([label, value]) => {
+            bagInfo += `${label}: ${value}\n`;
+        });
 
         let bagIt = "BagIt-Version: 1.0\nTag-File-Character-Encoding: UTF-8\n";
 

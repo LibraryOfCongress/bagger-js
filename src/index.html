@@ -131,7 +131,102 @@
                             </div>
                         </div>
 
-                        <div class="form-group text-center">Bag Info coming soon</div>
+                        <div class="form-group bag-info">
+                            <table class="table table-striped">
+                                <caption class="text-center">
+                                    <h3>Bag Info</h3>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th>Label</th>
+                                        <th>Value</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <input type="text" readonly class="bag-info-label form-control" value="Bag-Software-Agent">
+                                        </td>
+                                        <td>
+                                            <input type="text" readonly class="bag-info-value form-control" value="Bagger-JS (https://github.com/LibraryOfCongress/bagger-js/)">
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <template id="bag-info-element-template">
+                                        <tr>
+                                            <td>
+                                                <input type="text" class="bag-info-label form-control" placeholder="Label" pattern="^[^\s][^:\n\r]+[^\s]$">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="bag-info-value form-control" placeholder="Value">
+                                            </td>
+                                            <td>
+                                                <button type="button" class="delete-row btn btn-default" title="Delete">❌</button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="btn-group add-element">
+                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    New Element
+                                                    <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <!-- This is the common field list from the RFC except for Bag-Size and Bagging-Date which should not be set by users  -->
+                                                    <li>
+                                                        <a href="#" data-label="Bag-Count">Bag-Count</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="Bag-Group-Identifier">Bag-Group-Identifier</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="Bagging-Date">Bagging-Date</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="Contact-Email">Contact-Email</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="Contact-Name">Contact-Name</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="Contact-Phone">Contact-Phone</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="External-Description">External-Description</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="External-Identifier">External-Identifier</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="Internal-Sender-Description">Internal-Sender-Description</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="Internal-Sender-Identifier">Internal-Sender-Identifier</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="Organization-Address">Organization-Address</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="Payload-Oxum">Payload-Oxum</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#" data-label="Source-Organization">Source-Organization</a>
+                                                    </li>
+                                                    <li role="separator" class="divider"></li>
+                                                    <li>
+                                                        <a href="#" data-label="">Other…</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </form>
                 </div>
 
