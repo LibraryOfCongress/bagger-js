@@ -97,29 +97,29 @@ class SelectFiles {
 
         if (entry.isFile) {
             entry.file(file => {
-                let fullPath = basePath
-                    ? basePath + "/" + file.name
-                    : file.name;
+                let fullPath;
+                if (basePath) {
+                    fullPath = basePath + "/" + file.name;
+                } else {
+                    fullPath = file.name;
+                }
 
-                this.processFileInfoList([
-                    {
-                        file,
-                        fullPath
-                    }
-                ]);
+                this.processFileInfoList([{file, fullPath}]);
             });
         } else if (entry.isDirectory) {
             let dirReader = entry.createReader();
 
             dirReader.readEntries(entries => {
-                for (let j = 0; j < entries.length; j++) {
-                    let subEntry = entries[j],
-                        fullPath = basePath
-                            ? basePath + "/" + entry.name
-                            : entry.name;
+                entries.forEach(subEntry => {
+                    let fullPath;
+                    if (basePath) {
+                        fullPath = basePath + "/" + entry.name;
+                    } else {
+                        fullPath = entry.name;
+                    }
 
                     this.walkDirectoryTree(subEntry, fullPath);
-                }
+                });
             });
         }
     }
