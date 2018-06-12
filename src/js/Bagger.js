@@ -208,6 +208,8 @@ export default class Bagger {
 
         let formattedCount = `${totalCount.toLocaleString()} files`; // Flag for i18n
 
+        this.bagContents.dataset.entries = totalCount;
+
         $(".file-count.total", this.bagContents).textContent = formattedCount;
 
         $(".file-size.total", this.bagContents).textContent = filesize(

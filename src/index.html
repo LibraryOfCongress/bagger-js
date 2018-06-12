@@ -132,18 +132,10 @@
                         </div>
 
                         <div class="form-group text-center">Bag Info coming soon</div>
-
-                        <div class="form-group bag-finalize hidden">
-                            <div class="col-sm-12 text-center">
-                                <button type="submit" class="btn btn-primary">
-                                    Finalize!
-                                </button>
-                            </div>
-                        </div>
                     </form>
                 </div>
 
-                <div class="bag-contents well well-sm">
+                <div class="bag-contents well well-sm" data-entries="0">
                     <div class="dropzone jumbotron text-center">
                         <p>Drag and drop files or directories here!</p>
                         <form class="form-horizontal">
@@ -184,6 +176,15 @@
                         </tfoot>
                     </table>
 
+                    <form class="form-horizontal">
+                        <div class="form-group bag-finalize hidden">
+                            <div class="col-sm-12 text-center">
+                                <button type="submit" class="btn btn-primary">
+                                    Finalize!
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
                 <div class="dashboard well well-sm clearfix hidden">
