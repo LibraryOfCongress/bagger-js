@@ -9,7 +9,7 @@ class Dashboard {
 
     formatRate(value) {
         if (isFinite(value)) {
-            return filesize(value, {round: 1});
+            return filesize(value, {round: 0}) + "/s";
         } else {
             return "—";
         }

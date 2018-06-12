@@ -186,44 +186,36 @@
                         </div>
                     </form>
                 </div>
+            </div>
 
-                <div class="dashboard well well-sm clearfix hidden">
-                    <div class="col-sm-6 hash">
-                        <h5>Hashing</h5>
+            <div class="dashboard well well-sm clearfix hidden">
+                <div class="pane hash">
+                    <h5>Hashing</h5>
 
-                        <meter class="hash-complete" min=0 max=100 value=0>
-                        </meter>
+                    <small class="rate-container">
+                        <output class="rate"></output>
+                    </small>
 
-                        <dl class="throughput dl-horizontal">
-                            <dt>Average throughput:</dt>
-                            <dd>
-                                <output class="rate"></output> per second
-                            </dd>
+                    <meter class="hash-complete" min=0 max=100 value=0></meter>
 
-                            <dt>Time remaining:</dt>
-                            <dd>
-                                <output class="remaining"></output>.
-                            </dd>
-                        </dl>
-                    </div>
-                    <div class="col-sm-6 upload">
-                        <h5>Uploading</h5>
+                    <small class="remaining-container">
+                        Time remaining:
+                        <output class="remaining"></output>
+                    </small>
+                </div>
+                <div class="pane upload">
+                    <h5>Uploading</h5>
 
-                        <meter class="upload-complete" min=0 max=100 value=0>
-                        </meter>
+                    <small class="rate-container">
+                        <output class="rate"></output>
+                    </small>
 
-                        <dl class="throughput dl-horizontal">
-                            <dt>Average throughput:</dt>
-                            <dd>
-                                <output class="rate"></output> per second
-                            </dd>
+                    <meter class="upload-complete" min=0 max=100 value=0></meter>
 
-                            <dt>Time remaining:</dt>
-                            <dd>
-                                <output class="remaining"></output>.
-                            </dd>
-                        </dl>
-                    </div>
+                    <small class="remaining-container">
+                        Time remaining:
+                        <output class="remaining"></output>
+                    </small>
                 </div>
             </div>
         </div>
@@ -234,9 +226,12 @@
         <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.253.1/aws-sdk.min.js" integrity="sha256-M8ybOHpbJFnEDeDDIBq+lsZyH6SrmqDrn+XFimusqQk="
             crossorigin="anonymous"></script>
         <!-- Traditional JS -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/humanize-duration/3.14.0/humanize-duration.min.js" integrity="sha256-lfP2nyh9CrETTh3qI+BT/1bJCHmYxyMXQ4QadQ5Befo=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8="
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/humanize-duration/3.14.0/humanize-duration.min.js" integrity="sha256-lfP2nyh9CrETTh3qI+BT/1bJCHmYxyMXQ4QadQ5Befo="
+            crossorigin="anonymous"></script>
         <script type="module" src="js/main.js"></script>
     </body>
 
