@@ -127,14 +127,14 @@ output {
     display: none;
 }
 
-#bagger[data-active-hashes="0"][data-active-uploads="0"]:not([data-entries="0"]):not(.finalizing)
+#bagger[data-active-hashes="0"][data-pending-uploads="0"]:not([data-entries="0"]):not(.finalizing)
     .bag-finalize {
     display: block;
 }
 
 /* Dashboard styles */
 
-#bagger[data-active-hashes="0"][data-active-uploads="0"] .dashboard {
+#bagger[data-active-hashes="0"][data-pending-uploads="0"] .dashboard {
     display: none;
 }
 

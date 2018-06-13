@@ -16,6 +16,10 @@ export default class Bagger {
         // manifests after a successful upload:
         this.bagEntries = new Map();
 
+        this.maxActiveUploads = 8;
+        this.activeUploads = 0;
+        this.uploadQueue = [];
+
         this.bagInfo = new BagInfo($(".bag-info", elem));
 
         this.dashboard = new Dashboard($(".dashboard", elem));
@@ -85,6 +89,11 @@ export default class Bagger {
             }
         }
 
+        if (evt.type.match(/^upload\/(failure|complete)$/)) {
+            this.activeUploads--;
+            this.checkUploadQueue();
+        }
+
         // We'll use rAF to throttle updates as preferred by the browser:
         window.requestAnimationFrame(() => {
             this.updateDisplay();
@@ -93,12 +102,12 @@ export default class Bagger {
 
     updateDisplay() {
         this.container.dataset.entries = this.bagEntries.size;
-        this.container.dataset.activeUploads = this.getActiveUploadCount();
+        this.container.dataset.pendingUploads = this.getPendingUploadCount();
 
         this.updateDashboard();
     }
 
-    getActiveUploadCount() {
+    getPendingUploadCount() {
         let incompleteUploads = 0;
 
         for (let entry of this.bagEntries.values()) {
@@ -243,7 +252,7 @@ export default class Bagger {
 
                     this.updateBagEntryDisplay(bagEntry);
 
-                    this.uploadPayloadFile(path, file, file.size, file.type);
+                    this.queuePayloadFileUpload(path, file);
                 })
                 .catch(function(error) {
                     // TODO: do we delete the entries entirely or offer to retry them?
@@ -257,6 +266,25 @@ export default class Bagger {
 
     hashFile(path, file) {
         return this.hashPool.hash({fullPath: path, file});
+    }
+
+    queuePayloadFileUpload(path, file) {
+        this.uploadQueue.push([path, file]);
+        this.checkUploadQueue();
+    }
+
+    checkUploadQueue() {
+        if (
+            this.uploadQueue.length < 1 ||
+            this.activeUploads > this.maxActiveUploads
+        ) {
+            return;
+        }
+
+        let [path, file] = this.uploadQueue.shift();
+
+        this.activeUploads++;
+        this.uploadPayloadFile(path, file, file.size, file.type);
     }
 
     uploadFile(path, body, size, type, progressCallback) {
