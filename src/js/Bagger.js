@@ -20,9 +20,7 @@ export default class Bagger {
 
         this.dashboard = new Dashboard($(".dashboard", elem));
 
-        this.storage = new StorageManager($(".server-info", elem), status => {
-            $(".bag", elem).classList.toggle("hidden", status != "successful");
-        });
+        this.storage = new StorageManager($(".server-info", elem));
 
         this.fileSelector = new SelectFiles($(".dropzone", elem), files => {
             return this.addSelectedFiles(files);
@@ -41,10 +39,11 @@ export default class Bagger {
                 });
             },
             // Worker Pool stats callback:
-            () => {
-                this.updateDashboardVisibility();
+            stats => {
+                this.container.dataset.activeHashes = stats.activeHashers;
             }
         );
+        this.container.dataset.activeHashes = 0;
 
         $('.bag-finalize button[type="submit"]', elem).addEventListener(
             "click",
@@ -58,6 +57,8 @@ export default class Bagger {
 
         this.bagContents = $(".bag-contents", elem);
         this.bagEntryTemplate = $("template", this.bagContents);
+
+        this.updateDisplay();
     }
 
     dispatch(evt) {
@@ -91,27 +92,10 @@ export default class Bagger {
     }
 
     updateDisplay() {
-        let allowFinalization =
-            this.bagEntries.size > 0 &&
-            this.getActiveHashCount() == 0 &&
-            this.getActiveUploadCount() == 0;
-
-        $(".bag-finalize", this.element).classList.toggle(
-            "hidden",
-            !allowFinalization
-        );
+        this.container.dataset.entries = this.bagEntries.size;
+        this.container.dataset.activeUploads = this.getActiveUploadCount();
 
         this.updateDashboard();
-    }
-
-    updateDashboardVisibility() {
-        let activeHashes = this.getActiveHashCount();
-        let activeUploads = this.getActiveUploadCount();
-
-        this.dashboard.container.classList.toggle(
-            "hidden",
-            activeHashes == 0 && activeUploads == 0
-        );
     }
 
     getActiveUploadCount() {
@@ -126,13 +110,7 @@ export default class Bagger {
         return incompleteUploads;
     }
 
-    getActiveHashCount() {
-        return this.hashPool.activeWorkers.size;
-    }
-
     updateDashboard() {
-        this.updateDashboardVisibility();
-
         let totalFiles = 0,
             totalBytes = 0;
         let hashedFiles = 0,
@@ -223,7 +201,7 @@ export default class Bagger {
 
         let formattedCount = `${totalCount.toLocaleString()} files`; // Flag for i18n
 
-        this.bagContents.dataset.entries = totalCount;
+        this.container.dataset.entries = totalCount;
 
         $(".file-count.total", this.bagContents).textContent = formattedCount;
 
@@ -416,11 +394,12 @@ export default class Bagger {
             this.uploadFile("bagit.txt", bagIt, bagIt.length, "text/plain")
         );
 
-        // TODO: lock the UI to prevent changes / require confirmation?
-
         Promise.all(uploadPromises).then(() => {
             this.container.classList.add("finalized");
-            alert("ALL DONE!");
+            this.container.querySelectorAll("form,input,button").forEach(i => {
+                i.setAttribute("readonly", "readonly");
+                i.setAttribute("disabled", "disabled");
+            });
         });
     }
 }

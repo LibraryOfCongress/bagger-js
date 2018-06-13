@@ -16,8 +16,8 @@ class Dashboard {
     }
 
     updateDisplay(data) {
-        let hashComplete = data.hashedBytes / data.totalBytes;
-        let uploadComplete = data.uploadedBytes / data.totalBytes;
+        let hashComplete = data.hashedBytes / data.totalBytes || 0;
+        let uploadComplete = data.uploadedBytes / data.totalBytes || 0;
 
         $(".hash meter", this.container).value = (100 * hashComplete).toFixed(
             0

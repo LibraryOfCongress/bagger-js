@@ -3,9 +3,9 @@
 import {$, $$} from "./utils.js";
 
 export default class StorageManager {
-    constructor(elem, serverReadyCallback) {
+    constructor(elem, serverStatusChangeCallback) {
         this.config = new Map();
-        this.serverReadyCallback = serverReadyCallback;
+        this.serverStatusChangeCallback = serverStatusChangeCallback;
         this.status = "untested";
 
         this.container = elem;
@@ -65,7 +65,10 @@ export default class StorageManager {
                 keyPrefix = this.config.get("keyPrefix"),
                 region = this.config.get("region");
             summary.textContent = `✅ ${bucket}${keyPrefix} (${region})`;
-            this.serverReadyCallback(status);
+
+            if (this.serverStatusChangeCallback) {
+                this.serverStatusChangeCallback(status);
+            }
         }
     }
 

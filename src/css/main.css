@@ -51,6 +51,10 @@ output {
     display: none;
 }
 
+.server-info:not([data-status="successful"]) ~ .bag {
+    display: none;
+}
+
 /* Bag Info */
 
 .bag-info :invalid {
@@ -77,11 +81,7 @@ output {
 
 /* Bag payload display */
 
-.finalizing .bag-contents {
-    display: none;
-}
-
-.bag-contents[data-entries="0"] table {
+#bagger[data-entries="0"] .bag-contents table {
     display: none;
 }
 
@@ -123,7 +123,20 @@ output {
     text-align: right;
 }
 
+.bag-finalize {
+    display: none;
+}
+
+#bagger[data-active-hashes="0"][data-active-uploads="0"]:not([data-entries="0"]):not(.finalizing)
+    .bag-finalize {
+    display: block;
+}
+
 /* Dashboard styles */
+
+#bagger[data-active-hashes="0"][data-active-uploads="0"] .dashboard {
+    display: none;
+}
 
 .dashboard {
     position: fixed;
@@ -169,4 +182,19 @@ output {
 .dashboard output {
     font-size: inherit;
     font-weight: 600;
+}
+
+/* Finalized bags allow some information to be visible but read-only */
+.finalizing .dropzone,
+.finalizing button {
+    display: none;
+}
+
+.only-finalized {
+    display: none;
+}
+
+.finalizing .only-finalized,
+.finalized .only-finalized {
+    display: block;
 }
