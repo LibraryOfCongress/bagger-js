@@ -174,7 +174,7 @@ export default class Bagger {
     }
 
     getBagName() {
-        let bagName = this.container.querySelector("input[id=bag-name]").value;
+        let bagName = this.container.querySelector('input[id="bagName"]').value;
         bagName = bagName.trim();
 
         bagName = bagName.replace(/[/+;]+/g, "_");
