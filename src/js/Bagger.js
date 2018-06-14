@@ -75,6 +75,12 @@ export default class Bagger {
         this.bagContents = $(".bag-contents", elem);
         this.bagEntryTemplate = $("template", this.bagContents);
 
+        $("#bagName").addEventListener(
+            "input",
+            this.updateBagUrlDisplay.bind(this)
+        );
+        this.updateBagUrlDisplay();
+
         this.updateDisplay();
     }
 
@@ -113,6 +119,13 @@ export default class Bagger {
         this.container.dataset.pendingUploads = this.getPendingUploadCount();
 
         this.updateDashboard();
+    }
+
+    updateBagUrlDisplay() {
+        let bagUrl = this.getBagUrl();
+        let bagUrlLink = $(".bag-url", this.container);
+        bagUrlLink.href = bagUrl;
+        bagUrlLink.textContent = bagUrl;
     }
 
     getPendingUploadCount() {
@@ -179,6 +192,10 @@ export default class Bagger {
         }
 
         return bagName;
+    }
+
+    getBagUrl() {
+        return new URL(this.getBagName(), this.storage.getBaseUrl());
     }
 
     displayBagEntry(fullPath) {

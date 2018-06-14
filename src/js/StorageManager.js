@@ -72,6 +72,18 @@ export default class StorageManager {
         }
     }
 
+    getBaseUrl() {
+        let bucket = this.config.get("bucket") || "";
+        let keyPrefix = this.config.get("keyPrefix") || "";
+
+        let basePath = `${bucket}/${keyPrefix}`;
+
+        return new URL(
+            basePath.replace(/[/]+/g, "/"),
+            this.getS3Client().endpoint.href
+        );
+    }
+
     getS3Client() {
         if (!this.s3) {
             this.s3 = new AWS.S3({signatureVersion: "v4"});
