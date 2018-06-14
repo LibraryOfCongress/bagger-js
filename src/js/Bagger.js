@@ -232,7 +232,8 @@ export default class Bagger {
 
             this.updateBagEntryDisplay(bagEntry);
 
-            this.hashFile(fullPath, file)
+            this.hashPool
+                .hash({fullPath, file})
                 .then(result => {
                     const {
                         fullPath: path,
@@ -262,10 +263,6 @@ export default class Bagger {
         }
 
         this.updateBagContentsDisplay();
-    }
-
-    hashFile(path, file) {
-        return this.hashPool.hash({fullPath: path, file});
     }
 
     queuePayloadFileUpload(path, file) {
