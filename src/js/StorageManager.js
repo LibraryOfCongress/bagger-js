@@ -174,6 +174,7 @@ export default class StorageManager {
                 Key: key,
                 Body: body,
                 ContentType: type,
+                computeChecksums: true
             }
         });
 
