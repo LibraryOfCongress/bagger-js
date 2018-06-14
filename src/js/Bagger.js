@@ -6,6 +6,7 @@ import BagInfo from "./BagInfo.js";
 import Dashboard from "./Dashboard.js";
 import SelectFiles from "./SelectFiles.js";
 import StorageManager from "./StorageManager.js";
+import UploadQueue from "./UploadQueue.js";
 import WorkerPool from "./worker-pool.js";
 
 export default class Bagger {
@@ -16,9 +17,21 @@ export default class Bagger {
         // manifests after a successful upload:
         this.bagEntries = new Map();
 
-        this.maxActiveUploads = 8;
-        this.activeUploads = 0;
-        this.uploadQueue = [];
+        this.uploadQueue = new UploadQueue(
+            8,
+            this.uploadPayloadFile.bind(this)
+        );
+
+        elem.querySelector(".upload-queue-active").addEventListener(
+            "click",
+            evt => {
+                if (evt.target.classList.toggle("active")) {
+                    this.uploadQueue.start();
+                } else {
+                    this.uploadQueue.stop();
+                }
+            }
+        );
 
         this.bagInfo = new BagInfo($(".bag-info", elem));
 
@@ -87,11 +100,6 @@ export default class Bagger {
                 entry.statistics.upload.bytes = 0;
                 entry.statistics.upload.seconds = 0;
             }
-        }
-
-        if (evt.type.match(/^upload\/(failure|complete)$/)) {
-            this.activeUploads--;
-            this.checkUploadQueue();
         }
 
         // We'll use rAF to throttle updates as preferred by the browser:
@@ -253,7 +261,7 @@ export default class Bagger {
 
                     this.updateBagEntryDisplay(bagEntry);
 
-                    this.queuePayloadFileUpload(path, file);
+                    this.uploadQueue.add(path, file);
                 })
                 .catch(function(error) {
                     // TODO: do we delete the entries entirely or offer to retry them?
@@ -263,25 +271,6 @@ export default class Bagger {
         }
 
         this.updateBagContentsDisplay();
-    }
-
-    queuePayloadFileUpload(path, file) {
-        this.uploadQueue.push([path, file]);
-        this.checkUploadQueue();
-    }
-
-    checkUploadQueue() {
-        if (
-            this.uploadQueue.length < 1 ||
-            this.activeUploads > this.maxActiveUploads
-        ) {
-            return;
-        }
-
-        let [path, file] = this.uploadQueue.shift();
-
-        this.activeUploads++;
-        this.uploadPayloadFile(path, file, file.size, file.type);
     }
 
     uploadFile(path, body, size, type, progressCallback) {
@@ -299,7 +288,7 @@ export default class Bagger {
         );
     }
 
-    uploadPayloadFile(payloadPath, body, size, type) {
+    uploadPayloadFile(payloadPath, file) {
         /*
             Upload a payload file
 
@@ -332,9 +321,9 @@ export default class Bagger {
 
         return this.uploadFile(
             `data/${payloadPath}`,
-            body,
-            size,
-            type,
+            file,
+            file.size,
+            file.type,
             progressCallback
         )
             .then(() => {
@@ -342,7 +331,7 @@ export default class Bagger {
                     type: "upload/complete",
                     path: payloadPath,
                     elapsedMilliseconds: performance.now() - uploadStartTime,
-                    bytes: size
+                    bytes: file.size
                 });
             })
 

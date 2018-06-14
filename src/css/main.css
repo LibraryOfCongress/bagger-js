@@ -79,6 +79,43 @@ output {
     background-color: #eef;
 }
 
+/* Upload queue management */
+
+.upload-queue-manager {
+    margin: 1em;
+}
+
+.upload-queue-manager .btn-block {
+    max-width: 14em;
+}
+
+.upload-queue-manager .upload-queue-active:before {
+    content: "▶️ Start Uploads";
+}
+
+.upload-queue-manager .upload-queue-active.active:before {
+    content: "⏸ Pause Uploads";
+}
+
+.upload-queue-active.active {
+    background: linear-gradient(270deg, #1c4466, #2d6ca3);
+    background-size: 400%;
+
+    animation: ActiveUploads 3s ease-in-out infinite;
+}
+
+@keyframes ActiveUploads {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 /* Bag payload display */
 
 #bagger[data-entries="0"] .bag-contents table {
