@@ -120,6 +120,16 @@ export default class StorageManager {
         );
     }
 
+    ready() {
+        return this.status == "successful";
+    }
+
+    ensureConfig() {
+        if (!this.ready()) {
+            throw "Test the configuration before calling getObject!";
+        }
+    }
+
     keyFromPath(path) {
         // Takes a path, adds the configured key prefix, and normalizes the result
 
@@ -135,10 +145,19 @@ export default class StorageManager {
         return key;
     }
 
+    getObject(key) {
+        this.ensureConfig();
+
+        return this.getS3Client()
+            .getObject({
+                Bucket: this.config.get("bucket"),
+                Key: this.keyFromPath(key)
+            })
+            .promise();
+    }
+
     uploadObject(path, body, size, type, progressCallback) {
-        if (this.status != "successful") {
-            throw "Test the configuration before calling uploadObject!";
-        }
+        this.ensureConfig();
 
         let bucket = this.config.get("bucket");
 

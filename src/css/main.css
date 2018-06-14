@@ -116,6 +116,10 @@ output {
     }
 }
 
+#bagger[data-invalid-bag-name="true"] .upload-queue-manager {
+    display: none;
+}
+
 /* Bag payload display */
 
 #bagger[data-entries="0"] .bag-contents table {

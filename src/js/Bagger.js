@@ -37,7 +37,11 @@ export default class Bagger {
 
         this.dashboard = new Dashboard($(".dashboard", elem));
 
-        this.storage = new StorageManager($(".server-info", elem));
+        this.storage = new StorageManager($(".server-info", elem), status => {
+            if (status == "successful") {
+                this.validateBagName();
+            }
+        });
 
         this.fileSelector = new SelectFiles($(".dropzone", elem), files => {
             return this.addSelectedFiles(files);
@@ -79,8 +83,12 @@ export default class Bagger {
             "input",
             this.updateBagUrlDisplay.bind(this)
         );
-        this.updateBagUrlDisplay();
+        $("#bagName").addEventListener(
+            "change",
+            this.validateBagName.bind(this)
+        );
 
+        this.validateBagName();
         this.updateDisplay();
     }
 
@@ -119,13 +127,6 @@ export default class Bagger {
         this.container.dataset.pendingUploads = this.getPendingUploadCount();
 
         this.updateDashboard();
-    }
-
-    updateBagUrlDisplay() {
-        let bagUrl = this.getBagUrl();
-        let bagUrlLink = $(".bag-url", this.container);
-        bagUrlLink.href = bagUrl;
-        bagUrlLink.textContent = bagUrl;
     }
 
     getPendingUploadCount() {
@@ -187,15 +188,73 @@ export default class Bagger {
 
         bagName = bagName.replace(/[/+;]+/g, "_");
 
-        if (!bagName) {
-            throw `Invalid bag name: ${bagName}`;
-        }
-
         return bagName;
     }
 
     getBagUrl() {
         return new URL(this.getBagName(), this.storage.getBaseUrl());
+    }
+
+    updateBagUrlDisplay() {
+        let bagUrl = this.getBagUrl();
+        let bagUrlLink = $(".bag-url", this.container);
+        bagUrlLink.href = bagUrl;
+        bagUrlLink.textContent = bagUrl;
+    }
+
+    setInvalidBagName(isInvalid) {
+        this.container.dataset.invalidBagName = this.invalidBagName = isInvalid;
+    }
+
+    updateBagNameDisplay() {
+        this.container.dataset.invalidBagName = this.invalidBagName;
+        this.container
+            .querySelector(".form-group.bag-name-container")
+            .classList.toggle("has-error", this.invalidBagName);
+    }
+
+    validateBagName() {
+        let bagName = this.getBagName();
+
+        this.container.dataset.bagName = bagName;
+
+        if (!bagName || !this.storage.ready()) {
+            this.setInvalidBagName(true);
+            this.updateBagNameDisplay();
+            return;
+        }
+
+        this.storage
+            .getObject(`${bagName}/bagit.txt`)
+            .catch(err => {
+                // We expect a 404 but probably want to let the user know if we
+                // get some other error which could indicate a problem with
+                // their network configuration
+                if (err.statusCode != 404) {
+                    alert(
+                        `Unexpected error checking status of bagit.txt: ${err}`
+                    );
+                }
+            })
+            .then(response => {
+                if (!response) {
+                    // No object by that name:
+                    this.setInvalidBagName(false);
+                } else if (
+                    confirm(
+                        "A bag with that name already exists. Do you intend to try overwriting it?"
+                    )
+                ) {
+                    alert("DELETING EXISTING CONTENTS IS NOT IMPLEMENTED!");
+                    // Clobber away:
+                    this.setInvalidBagName(false);
+                } else {
+                    this.setInvalidBagName(true);
+                }
+            })
+            .finally(() => {
+                this.updateBagNameDisplay();
+            });
     }
 
     displayBagEntry(fullPath) {
