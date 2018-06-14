@@ -81,19 +81,22 @@ output {
 
 /* Upload queue management */
 
-.upload-queue-manager {
+.transfer-management {
+    display: flex;
+    justify-content: space-evenly;
+
     margin: 1em;
 }
 
-.upload-queue-manager .btn-block {
+.transfer-management .btn-block {
     max-width: 14em;
 }
 
-.upload-queue-manager .upload-queue-active:before {
+.transfer-management .upload-queue-active:before {
     content: "▶️ Start Uploads";
 }
 
-.upload-queue-manager .upload-queue-active.active:before {
+.transfer-management .upload-queue-active.active:before {
     content: "⏸ Pause Uploads";
 }
 
@@ -116,12 +119,13 @@ output {
     }
 }
 
-#bagger[data-invalid-bag-name="true"] .upload-queue-manager {
+#bagger[data-invalid-bag-name="true"] .transfer-management {
     display: none;
 }
 
 /* Bag payload display */
 
+#bagger[data-entries="0"] .transfer-management,
 #bagger[data-entries="0"] .bag-contents table {
     display: none;
 }
@@ -164,12 +168,12 @@ output {
     text-align: right;
 }
 
-.bag-finalize {
+.bag-finalization {
     display: none;
 }
 
 #bagger[data-active-hashes="0"][data-pending-uploads="0"]:not([data-entries="0"]):not(.finalizing)
-    .bag-finalize {
+    .bag-finalization {
     display: block;
 }
 

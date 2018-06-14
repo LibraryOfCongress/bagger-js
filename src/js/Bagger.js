@@ -66,7 +66,7 @@ export default class Bagger {
         );
         this.container.dataset.activeHashes = 0;
 
-        $('.bag-finalize button[type="submit"]', elem).addEventListener(
+        $('.bag-finalization button[type="submit"]', elem).addEventListener(
             "click",
             evt => {
                 evt.stopPropagation();
@@ -224,6 +224,8 @@ export default class Bagger {
             return;
         }
 
+        this.updateBagUrlDisplay();
+
         this.storage
             .getObject(`${bagName}/bagit.txt`)
             .catch(err => {
@@ -264,6 +266,7 @@ export default class Bagger {
             })
             .finally(() => {
                 this.updateBagNameDisplay();
+                this.updateBagUrlDisplay();
             });
     }
 
