@@ -12,7 +12,7 @@ and a simple web application which allows bagging and transferring local content
 * [x] Uploads to S3
 * [ ] Ability to resume interrupted transfers
 * [ ] Ability to download the generated bag rather than individual files
-* [ ] [Ability to edit bag info fields](https://github.com/LibraryOfCongress/bagger-js/issues/13)
+* [x] [Ability to edit bag info fields](https://github.com/LibraryOfCongress/bagger-js/issues/13)
 
 ## Quickstart
 
