@@ -173,7 +173,7 @@ export default class StorageManager {
                 Bucket: bucket,
                 Key: key,
                 Body: body,
-                Contenttype: type
+                ContentType: type,
             }
         });
 
