@@ -37,6 +37,8 @@ export default class StorageManager {
             secretAccessKey: this.config.get("secretAccessKey"),
             region: this.config.get("region")
         });
+
+        delete this.s3;
     }
 
     setStatus(status, message) {
@@ -86,7 +88,12 @@ export default class StorageManager {
 
     getS3Client() {
         if (!this.s3) {
-            this.s3 = new AWS.S3({signatureVersion: "v4"});
+            this.s3 = new AWS.S3({
+                signatureVersion: "v4",
+                params: {
+                    Bucket: this.config.get("bucket")
+                }
+            });
         }
         return this.s3;
     }
@@ -150,7 +157,6 @@ export default class StorageManager {
 
         return this.getS3Client()
             .getObject({
-                Bucket: this.config.get("bucket"),
                 Key: this.keyFromPath(key)
             })
             .promise();
@@ -159,18 +165,16 @@ export default class StorageManager {
     uploadObject(path, body, size, type, progressCallback) {
         this.ensureConfig();
 
-        let bucket = this.config.get("bucket");
-
         let key = this.keyFromPath(path);
 
         // TODO: use leavePartsOnError to allow retries?
         // TODO: make partSize and queueSize configurable
         var upload = new AWS.S3.ManagedUpload({
+            service: this.getS3Client(),
             maxRetries: 6,
             partSize: 8 * 1024 * 1024,
             queueSize: 4,
             params: {
-                Bucket: bucket,
                 Key: key,
                 Body: body,
                 ContentType: type,
@@ -183,5 +187,105 @@ export default class StorageManager {
         }
 
         return upload.promise();
+    }
+
+    listObjectsWithPrefix(pathPrefix, payloadCallback, completionCallback) {
+        this.ensureConfig();
+
+        if (!pathPrefix) {
+            throw "Path prefix must be non-empty!";
+        }
+
+        pathPrefix = this.keyFromPath(pathPrefix);
+
+        let params = {Prefix: pathPrefix, MaxKeys: 1000};
+        let s3 = this.getS3Client();
+
+        let errHandler = err => {
+            console.error("listObjectsWithPrefix", pathPrefix, err);
+        };
+
+        let listObjectsV2 = params => {
+            return s3
+                .listObjectsV2(params)
+                .promise()
+                .catch(errHandler);
+        };
+
+        let wrappedCallback = resp => {
+            payloadCallback(resp.Contents);
+
+            if (resp.IsTruncated) {
+                listObjectsV2({
+                    ...params,
+                    ContinuationToken: resp.NextContinuationToken
+                }).then(wrappedCallback);
+            } else {
+                completionCallback();
+            }
+        };
+
+        return listObjectsV2(params).then(wrappedCallback);
+    }
+
+    deleteObjectsWithPrefix(pathPrefix, completionCallback) {
+        // In the absence of https://github.com/aws/aws-sdk-js/issues/1654 this
+        // is tedious given the cumbersome design of the AWS JS SDK around
+        // pagination. At some point this should be rewritten to use async
+        // generators so the caller isn't forced to know about the internal
+        // details.
+
+        this.ensureConfig();
+
+        if (!pathPrefix) {
+            throw "Path prefix must be non-empty!";
+        }
+
+        pathPrefix = this.keyFromPath(pathPrefix);
+
+        if (!pathPrefix.endsWith("/")) {
+            throw "The prefix to delete must end with a /!";
+        }
+
+        let s3 = this.getS3Client();
+
+        this.listObjectsWithPrefix(
+            pathPrefix,
+            objects => {
+                let objectsToDelete = objects.map(i => {
+                    return {
+                        Key: i.Key
+                    };
+                });
+
+                if (objectsToDelete.length < 1) {
+                    console.debug("Not deleting empty object list", objects);
+                    return;
+                }
+
+                s3.deleteObjects({
+                    Delete: {
+                        Objects: objectsToDelete
+                    }
+                })
+                    .promise()
+                    .catch(err => {
+                        console.error(
+                            "deleteObjectsWithPrefix",
+                            pathPrefix,
+                            err
+                        );
+                    })
+                    .then(data => {
+                        if ("Errors" in data && data.Errors.length > 0) {
+                            console.error(
+                                `Error while deleting prefix ${pathPrefix}:`,
+                                data.Errors
+                            );
+                        }
+                    });
+            },
+            completionCallback
+        );
     }
 }

@@ -22,16 +22,16 @@ export default class Bagger {
             this.uploadPayloadFile.bind(this)
         );
 
-        elem.querySelector(".upload-queue-active").addEventListener(
-            "click",
-            evt => {
-                if (evt.target.classList.toggle("active")) {
-                    this.uploadQueue.start();
-                } else {
-                    this.uploadQueue.stop();
-                }
-            }
+        this.uploadQueueToggleButton = elem.querySelector(
+            ".upload-queue-active"
         );
+        this.uploadQueueToggleButton.addEventListener("click", evt => {
+            if (evt.target.classList.toggle("active")) {
+                this.uploadQueue.start();
+            } else {
+                this.uploadQueue.stop();
+            }
+        });
 
         this.bagInfo = new BagInfo($(".bag-info", elem));
 
@@ -242,12 +242,22 @@ export default class Bagger {
                     this.setInvalidBagName(false);
                 } else if (
                     confirm(
-                        "A bag with that name already exists. Do you intend to try overwriting it?"
+                        "A bag with that name already exists. Do you want to DELETE it and upload a replacement?"
                     )
                 ) {
-                    alert("DELETING EXISTING CONTENTS IS NOT IMPLEMENTED!");
-                    // Clobber away:
+                    // We'll trigger deletion of all existing files with this prefix and disable the upload queue until it completes:
                     this.setInvalidBagName(false);
+
+                    this.uploadQueue.stop();
+                    this.uploadQueueToggleButton.setAttribute(
+                        "disabled",
+                        "disabled"
+                    );
+                    this.storage.deleteObjectsWithPrefix(bagName + "/", () => {
+                        this.uploadQueueToggleButton.removeAttribute(
+                            "disabled"
+                        );
+                    });
                 } else {
                     this.setInvalidBagName(true);
                 }
