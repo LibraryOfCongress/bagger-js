@@ -208,9 +208,6 @@ export default class Bagger {
 
     updateBagNameDisplay() {
         this.container.dataset.invalidBagName = this.invalidBagName;
-        this.container
-            .querySelector(".form-group.bag-name-container")
-            .classList.toggle("has-error", this.invalidBagName);
     }
 
     validateBagName() {
