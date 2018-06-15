@@ -17,6 +17,10 @@ output {
     margin-top: 0;
 }
 
+.form-control:invalid {
+    border-color: #dc3545;
+}
+
 /* Bagger Styles */
 
 /* Connection parameter entry & display */
