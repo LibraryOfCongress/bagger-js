@@ -355,14 +355,14 @@ export default class Bagger {
                     });
 
                     this.updateBagEntryDisplay(bagEntry);
-
-                    this.uploadQueue.add(path, file);
                 })
                 .catch(function(error) {
                     // TODO: do we delete the entries entirely or offer to retry them?
                     // this.bagEntries.delete(fullPath);
                     throw error;
                 });
+
+            this.uploadQueue.add(fullPath, file);
         }
 
         this.updateBagContentsDisplay();
