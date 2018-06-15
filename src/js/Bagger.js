@@ -1,4 +1,4 @@
-/* global filesize */
+/* global filesize, asmCrypto */
 
 import {$} from "./utils.js";
 import BagEntry from "./BagEntry.js";
@@ -463,6 +463,7 @@ export default class Bagger {
         let totalFiles = this.bagEntries.size;
 
         let manifests = new Map();
+        let tagManifestItems = [];
 
         for (let [fullPath, bagEntry] of this.bagEntries) {
             if (bagEntry.statistics.upload.bytes != bagEntry.size) {
@@ -482,7 +483,9 @@ export default class Bagger {
         }
 
         for (let [hashName, entries] of manifests) {
-            let body = entries.join("\n");
+            let body = entries.join("\n") + "\n";
+            let bodyHash = this.sha256(body);
+            tagManifestItems.push(`${bodyHash} manifest-${hashName}.txt`);
             uploadPromises.push(
                 this.uploadFile(
                     "manifest-" + hashName + ".txt",
@@ -502,8 +505,6 @@ export default class Bagger {
 
         let bagIt = "BagIt-Version: 1.0\nTag-File-Character-Encoding: UTF-8\n";
 
-        // FIXME: implement tag manifests!
-
         uploadPromises.push(
             this.uploadFile(
                 "bag-info.txt",
@@ -517,6 +518,19 @@ export default class Bagger {
             this.uploadFile("bagit.txt", bagIt, bagIt.length, "text/plain")
         );
 
+        tagManifestItems.push(`${this.sha256(bagIt)} bagit.txt`);
+        tagManifestItems.push(`${this.sha256(bagInfo)} bag-info.txt`);
+
+        let tagManifest = tagManifestItems.join("\n") + "\n";
+        uploadPromises.push(
+            this.uploadFile(
+                "tagmanifest-sha256.txt",
+                tagManifest,
+                tagManifest.length,
+                "text/plain"
+            )
+        );
+
         Promise.all(uploadPromises).then(() => {
             this.container.classList.add("finalized");
             this.container.querySelectorAll("form,input,button").forEach(i => {
@@ -527,5 +541,12 @@ export default class Bagger {
                 i.classList.add("disabled");
             });
         });
+    }
+
+    sha256(inputString) {
+        let inputBytes = asmCrypto.string_to_bytes(inputString);
+        let sha256 = new asmCrypto.Sha256();
+        sha256.process(inputBytes);
+        return asmCrypto.bytes_to_hex(sha256.finish().result);
     }
 }
