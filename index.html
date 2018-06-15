@@ -250,15 +250,16 @@
                     </div>
 
                     <form class="transfer-management">
-                        <div class="form-group upload-queue">
-                            <button type="button" class="btn btn-primary btn-lg btn-block upload-queue-active">
-
-                            </button>
+                        <div class="upload-queue manager-panel">
+                            <label class="btn btn-default btn-lg">
+                                <input id="upload-queue-active" type="checkbox"> Start uploads</label>
                         </div>
-                        <div class="form-group bag-finalization">
-                            <button type="submit" class="btn btn-primary btn-lg btn-block">
-                                Finalize!
-                            </button>
+                        <div class="bag-finalization manager-panel">
+                            <label class="btn btn-default btn-lg">
+                                <input id="finalize-bag" type="checkbox"> Ready to finalize</label>
+                            <span class="help-block">
+                                Complete the bag and prevent further changes as soon as the hashing and uploads complete
+                            </span>
                         </div>
                     </form>
 
@@ -335,6 +336,9 @@
             crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/humanize-duration/3.14.0/humanize-duration.min.js" integrity="sha256-lfP2nyh9CrETTh3qI+BT/1bJCHmYxyMXQ4QadQ5Befo="
             crossorigin="anonymous"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/asmCrypto/2.0.1/asmcrypto.all.es5.min.js" crossorigin="anonymous"></script>
+
         <script type="module" src="js/main.js"></script>
     </body>
 

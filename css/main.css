@@ -92,44 +92,22 @@ output {
     margin: 1em;
 }
 
-.transfer-management .btn-block {
-    max-width: 14em;
+.transfer-management .manager-panel {
+    flex-basis: 40%;
 }
 
-.transfer-management .upload-queue-active:before {
-    content: "▶️ Start Uploads";
+.manager-panel label {
+    display: flex;
+    align-items: center;
 }
 
-.transfer-management .upload-queue-active.active:before {
-    content: "⏸ Pause Uploads";
-}
-
-.upload-queue-active.active {
-    background: linear-gradient(270deg, #1c4466, #2d6ca3);
-    background-size: 400%;
-
-    animation: ActiveUploads 3s ease-in-out infinite;
-}
-
-@keyframes ActiveUploads {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-#bagger[data-invalid-bag-name="true"] .transfer-management {
-    display: none;
+.transfer-management input[type="checkbox"] {
+    height: 32px;
+    width: 32px;
 }
 
 /* Bag payload display */
 
-#bagger[data-entries="0"] .transfer-management,
 #bagger[data-entries="0"] .bag-contents table {
     display: none;
 }
@@ -170,15 +148,6 @@ output {
 
 .bag-contents td.file-size {
     text-align: right;
-}
-
-.bag-finalization {
-    display: none;
-}
-
-#bagger[data-active-hashes="0"][data-pending-uploads="0"]:not([data-entries="0"]):not(.finalizing)
-    .bag-finalization {
-    display: block;
 }
 
 /* Dashboard styles */
