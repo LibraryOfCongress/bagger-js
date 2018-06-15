@@ -22,11 +22,11 @@ export default class Bagger {
             this.uploadPayloadFile.bind(this)
         );
 
-        this.uploadQueueToggleButton = elem.querySelector(
-            ".upload-queue-active"
-        );
-        this.uploadQueueToggleButton.addEventListener("click", evt => {
-            if (evt.target.classList.toggle("active")) {
+        this.uploadQueueControl = elem.querySelector("#upload-queue-active");
+        this.uploadQueueControl.addEventListener("change", evt => {
+            let isActive = evt.target.checked;
+            evt.target.classList.toggle("active", isActive);
+            if (isActive) {
                 this.uploadQueue.start();
             } else {
                 this.uploadQueue.stop();
@@ -66,15 +66,11 @@ export default class Bagger {
         );
         this.container.dataset.activeHashes = 0;
 
-        $('.bag-finalization button[type="submit"]', elem).addEventListener(
-            "click",
-            evt => {
-                evt.stopPropagation();
-                evt.preventDefault();
-                this.finalizeBag();
-                return false;
-            }
-        );
+        this.finalizeControl = this.container.querySelector("#finalize-bag");
+
+        this.finalizeControl.addEventListener("change", () => {
+            this.finalizeIfReady();
+        });
 
         this.bagContents = $(".bag-contents", elem);
         this.bagEntryTemplate = $("template", this.bagContents);
@@ -107,6 +103,8 @@ export default class Bagger {
             } else {
                 console.warn(`Couldn't match ${evt.path} to a payload entry`);
             }
+
+            this.finalizeIfReady();
         } else if (evt.type == "upload/failure") {
             let entry = this.bagEntries.get(evt.path);
             if (entry) {
@@ -124,9 +122,22 @@ export default class Bagger {
 
     updateDisplay() {
         this.container.dataset.entries = this.bagEntries.size;
+        this.container.dataset.pendingHashes = this.getPendingHashCount();
         this.container.dataset.pendingUploads = this.getPendingUploadCount();
 
         this.updateDashboard();
+    }
+
+    getPendingHashCount() {
+        let incompleteHashes = 0;
+
+        for (let entry of this.bagEntries.values()) {
+            if (entry.size > entry.statistics.hash.bytes) {
+                incompleteHashes += 1;
+            }
+        }
+
+        return incompleteHashes;
     }
 
     getPendingUploadCount() {
@@ -248,14 +259,12 @@ export default class Bagger {
                     this.setInvalidBagName(false);
 
                     this.uploadQueue.stop();
-                    this.uploadQueueToggleButton.setAttribute(
+                    this.uploadQueueControl.setAttribute(
                         "disabled",
                         "disabled"
                     );
                     this.storage.deleteObjectsWithPrefix(bagName + "/", () => {
-                        this.uploadQueueToggleButton.removeAttribute(
-                            "disabled"
-                        );
+                        this.uploadQueueControl.removeAttribute("disabled");
                     });
                 } else {
                     this.setInvalidBagName(true);
@@ -431,6 +440,20 @@ export default class Bagger {
             });
     }
 
+    finalizeIfReady() {
+        let pendingUploads = this.getPendingUploadCount();
+        let pendingHashes = this.getPendingHashCount();
+
+        if (
+            this.bagEntries.size > 0 &&
+            pendingHashes == 0 &&
+            pendingUploads == 0 &&
+            this.finalizeControl.checked
+        ) {
+            this.finalizeBag();
+        }
+    }
+
     finalizeBag() {
         this.container.classList.add("finalizing");
 
@@ -499,6 +522,9 @@ export default class Bagger {
             this.container.querySelectorAll("form,input,button").forEach(i => {
                 i.setAttribute("readonly", "readonly");
                 i.setAttribute("disabled", "disabled");
+            });
+            this.container.querySelectorAll(".btn").forEach(i => {
+                i.classList.add("disabled");
             });
         });
     }
