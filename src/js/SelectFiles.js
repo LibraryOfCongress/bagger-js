@@ -119,7 +119,7 @@ class SelectFiles {
                     fullPath = file.name;
                 }
 
-                this.processFileInfoList([{file, fullPath}]);
+                this.processFileInfoList([{ file, fullPath }]);
             });
         } else if (entry.isDirectory) {
             let dirReader = entry.createReader();
@@ -163,9 +163,9 @@ class SelectFiles {
                 "webkitRelativePath" in file &&
                 file.webkitRelativePath.length > 0
             ) {
-                fileInfo = {file, fullPath: file.webkitRelativePath};
+                fileInfo = { file, fullPath: file.webkitRelativePath };
             } else {
-                fileInfo = {file, fullPath: file.name};
+                fileInfo = { file, fullPath: file.name };
             }
             files.set(fileInfo.fullPath, fileInfo.file);
         }

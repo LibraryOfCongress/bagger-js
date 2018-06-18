@@ -1,6 +1,6 @@
 /* global filesize, humanizeDuration */
 
-import {$} from "./utils.js";
+import { $ } from "./utils.js";
 
 class Dashboard {
     constructor(elem) {
@@ -9,7 +9,7 @@ class Dashboard {
 
     formatRate(value) {
         if (isFinite(value)) {
-            return filesize(value, {round: 0}) + "/s";
+            return filesize(value, { round: 0 }) + "/s";
         } else {
             return "—";
         }
@@ -44,11 +44,11 @@ class Dashboard {
 
         $(".hash .remaining", this.container).textContent = humanizeDuration(
             hashRemaining * 1000,
-            {round: true}
+            { round: true }
         );
         $(".upload .remaining", this.container).textContent = humanizeDuration(
             uploadRemaining * 1000,
-            {round: true}
+            { round: true }
         );
     }
 }

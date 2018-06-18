@@ -1,6 +1,6 @@
 /* global AWS */
 
-import {$, $$} from "./utils.js";
+import { $, $$ } from "./utils.js";
 
 export default class StorageManager {
     constructor(elem, serverStatusChangeCallback) {
@@ -108,7 +108,9 @@ export default class StorageManager {
 
         this.setStatus("testing", "Waiting…");
 
-        let errLog = this.container.querySelector(".configuration-status-test-result");
+        let errLog = this.container.querySelector(
+            ".configuration-status-test-result"
+        );
         errLog.classList.add("hidden");
         errLog.textContent = "";
 
@@ -202,7 +204,7 @@ export default class StorageManager {
 
         pathPrefix = this.keyFromPath(pathPrefix);
 
-        let params = {Prefix: pathPrefix, MaxKeys: 1000};
+        let params = { Prefix: pathPrefix, MaxKeys: 1000 };
         let s3 = this.getS3Client();
 
         let errHandler = err => {
