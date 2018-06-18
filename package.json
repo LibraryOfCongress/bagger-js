@@ -1,13 +1,10 @@
 {
-    "name": "bagger",
+    "name": "bagger-js",
     "version": "0.1.1",
-    "description": "",
+    "homepage": "https://github.com/LibraryOfCongress/bagger-js/",
+    "description": "Upload BagIt-format deliveries to S3 entirely in the browser",
+    "license": "See license in LICENSE.md",
     "private": true,
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node server.js"
-    },
-    "author": "",
     "dependencies": {},
     "devDependencies": {
         "babel-eslint": "^8.2.3",
