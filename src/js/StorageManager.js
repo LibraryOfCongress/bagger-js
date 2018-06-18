@@ -108,23 +108,27 @@ export default class StorageManager {
 
         this.setStatus("testing", "Waiting…");
 
-        s3.getBucketCors(
-            {
-                Bucket: this.config.get("bucket")
-            },
-            (isError, data) => {
-                if (isError) {
-                    var errMessage = "ERROR";
-                    if (data) {
-                        errMessage += " (" + data + ")";
-                    }
-                    this.setStatus("unsuccessful", errMessage);
-                } else {
-                    this.setStatus("successful", "OK");
-                    return true;
-                }
-            }
-        );
+        let errLog = this.container.querySelector(".configuration-status-test-result");
+        errLog.classList.add("hidden");
+        errLog.textContent = "";
+
+        s3.getBucketCors({ Bucket: this.config.get("bucket") })
+            .promise()
+            .then(() => {
+                this.setStatus("successful", "OK");
+            })
+            .catch(err => {
+                this.setStatus("unsuccessful", err.message);
+
+                errLog.classList.remove("hidden");
+
+                errLog.textContent = [
+                    `${err.code}: ${err.message}`,
+                    `Region: ${err.region}`,
+                    `Hostname: ${err.hostname}`,
+                    `Stack: ${err.stack}`
+                ].join("\n");
+            });
     }
 
     ready() {

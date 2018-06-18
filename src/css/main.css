@@ -45,6 +45,12 @@ output {
     display: none;
 }
 
+.configuration-status-test-result {
+    display: block;
+    white-space: pre;
+    font-family: monospace;
+}
+
 /* Once the connection has been validated, hide the form */
 
 .server-info[data-status="successful"] .configuration-summary {
