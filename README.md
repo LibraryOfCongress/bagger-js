@@ -5,14 +5,14 @@ and a simple web application which allows bagging and transferring local content
 
 ## Major Features
 
-* [x] File drag and drop or selection
-* [x] [Recursive directory drag and drop or selection](https://github.com/loc-rdc/bagger-js/pull/1)
-* [x] Incremental hashing
-* [x] Multi-threading
-* [x] Uploads to S3
-* [ ] Ability to resume interrupted transfers
-* [ ] Ability to download the generated bag rather than individual files
-* [x] [Ability to edit bag info fields](https://github.com/LibraryOfCongress/bagger-js/issues/13)
+-   [x] File drag and drop or selection
+-   [x] [Recursive directory drag and drop or selection](https://github.com/loc-rdc/bagger-js/pull/1)
+-   [x] Incremental hashing
+-   [x] Multi-threading
+-   [x] Uploads to S3
+-   [ ] Ability to resume interrupted transfers
+-   [ ] Ability to download the generated bag rather than individual files
+-   [x] [Ability to edit bag info fields](https://github.com/LibraryOfCongress/bagger-js/issues/13)
 
 ## Quickstart
 
@@ -21,7 +21,7 @@ and a simple web application which allows bagging and transferring local content
 The two key parts are having a working
 [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) configuration
 attached to the bucket and a policy attached to the IAM user granting enough
-access to upload files. 
+access to upload files.
 
 This CORS configuration is known to work as of June 2018:
 
@@ -89,9 +89,9 @@ bucket name which you'll need to change:
 
 ### Running Bagger JS
 
-#. Open index.html in a browser
+1.  Open index.html in a browser
 
 ## Contributor Guidelines
 
 All code should be formatted using Prettier and pass ESLint using the provided
-configuration
+configuration.
