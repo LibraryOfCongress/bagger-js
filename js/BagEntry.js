@@ -8,8 +8,8 @@ export default class BagEntry {
         this.hashes = new Map();
 
         this.statistics = {
-            hash: {bytes: 0, seconds: 0.0},
-            upload: {bytes: 0, seconds: 0.0}
+            hash: { bytes: 0, seconds: 0.0 },
+            upload: { bytes: 0, seconds: 0.0 }
         };
     }
 }

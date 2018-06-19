@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
     <head>
         <meta charset="utf-8">
         <title>
-            BaggerJS: Help
+            Bagger-JS: Help
         </title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w="
+            crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap-theme.min.css"
+            integrity="sha256-ZT4HPpdCOt2lvDkXokHuhJfdOKSPFLzeAJik5U/Q+l4=" crossorigin="anonymous" />
         <link href="https://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="css/main.css">
     </head>
+
     <body>
         <div class="container">
             <h1>Instructions &amp; Limitations</h1>
@@ -17,48 +21,78 @@
             <h2 id="compatibility">Browser Compatibility</h2>
 
             <p>
-                All HTML5 browsers are supported for single-file operations. Unfortunately, support for
-                selecting directories is currently limited to Safari and Google Chrome until the APIs are
-                completely implemented in other browsers.
-
-                See <a href="https://github.com/LibraryOfCongress/bagger-js/pull/1">issue #1</a> for more information.
+                All HTML5 browsers are supported for single and multi-file operations. Uploading nested directories is supported by the current
+                versions of Firefox, Google Chrome, and Safari. See
+                <a href="https://github.com/LibraryOfCongress/bagger-js/pull/1">issue #1</a>
+                for more information about browser support.
             </p>
 
             <h2 id="s3-configuration">Amazon S3 Configuration</h2>
 
-            <h3 id="s3-cors"><a href="http://www.w3.org/TR/cors/" title="Cross-Origin Resource Sharing"><abbr title="Cross-Origin Resource Sharing">CORS</abbr></a></h3>
             <p>
-                <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Browser_compatibility">All modern browsers apply CORS restrictions to requests</a> made by our JavaScript.
-                This means that an S3 bucket must have a CORS policy defined following the instructions in the
-                <a href="http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/browser-configuring.html#Cross-Origin_Resource_Sharing__CORS_">S3 CORS configuration</a>
+                Please see the Bagger-JS documentation at
+
+                <a href="https://github.com/LibraryOfCongress/bagger-js/">
+                    https://github.com/LibraryOfCongress/bagger-js/
+                </a>
+
+                for the full details about CORS and IAM policies required on the target bucket.
+            </p>
+
+            <h3 id="s3-cors">
+                <a href="http://www.w3.org/TR/cors/" title="Cross-Origin Resource Sharing">
+                    <abbr title="Cross-Origin Resource Sharing">CORS</abbr>
+                </a>
+            </h3>
+
+            <p>
+                <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS#Browser_compatibility">
+                    All modern browsers apply CORS restrictions to requests
+                </a>
+
+                made by JavaScript. This means that an S3 bucket must have a CORS policy defined following the instructions in the
+
+                <a href="http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/browser-configuring.html#Cross-Origin_Resource_Sharing__CORS_">
+                    S3 CORS configuration
+                </a>
+
                 section of the
-                <a href="http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/browser-examples.html#Uploading_data_into_an_object" title="Examples in the Browser &mdash; AWS SDK for JavaScript">AWS SDK for JavaScript documentation</a>.
+
+                <a href="http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/browser-examples.html#Uploading_data_into_an_object">
+                    AWS SDK for JavaScript documentation
+                </a>.
             </p>
 
             <p>
                 The configuration below is known to work:
             </p>
 
-            <pre class="pre-scrollable">
-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+            <pre class="pre-scrollable">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;CORSConfiguration xmlns=&quot;http://s3.amazonaws.com/doc/2006-03-01/&quot;&gt;
-    &lt;CORSRule&gt;
-        &lt;AllowedOrigin&gt;*&lt;/AllowedOrigin&gt;
-        &lt;AllowedMethod&gt;GET&lt;/AllowedMethod&gt;
-        &lt;AllowedMethod&gt;PUT&lt;/AllowedMethod&gt;
-        &lt;AllowedMethod&gt;POST&lt;/AllowedMethod&gt;
-        &lt;AllowedMethod&gt;DELETE&lt;/AllowedMethod&gt;
-        &lt;AllowedMethod&gt;HEAD&lt;/AllowedMethod&gt;
-        &lt;MaxAgeSeconds&gt;3000&lt;/MaxAgeSeconds&gt;
-        &lt;ExposeHeader&gt;ETag&lt;/ExposeHeader&gt;
-        &lt;AllowedHeader&gt;*&lt;/AllowedHeader&gt;
-        &lt;AllowedHeader&gt;x-amz-*&lt;/AllowedHeader&gt;
-    &lt;/CORSRule&gt;
-&lt;/CORSConfiguration&gt;
-            </pre>
+&lt;CORSRule&gt;
+    &lt;AllowedOrigin&gt;*&lt;/AllowedOrigin&gt;
+    &lt;AllowedMethod&gt;PUT&lt;/AllowedMethod&gt;
+    &lt;AllowedMethod&gt;POST&lt;/AllowedMethod&gt;
+    &lt;AllowedMethod&gt;DELETE&lt;/AllowedMethod&gt;
+    &lt;AllowedMethod&gt;GET&lt;/AllowedMethod&gt;
+    &lt;AllowedMethod&gt;HEAD&lt;/AllowedMethod&gt;
+    &lt;AllowedHeader&gt;*&lt;/AllowedHeader&gt;
+    &lt;AllowedHeader&gt;authorization&lt;/AllowedHeader&gt;
+    &lt;AllowedHeader&gt;content-type&lt;/AllowedHeader&gt;
+    &lt;AllowedHeader&gt;x-amz-date&lt;/AllowedHeader&gt;
+    &lt;AllowedHeader&gt;x-amz-user-agent&lt;/AllowedHeader&gt;
+    &lt;ExposeHeader&gt;ETag&lt;/ExposeHeader&gt;
+    &lt;ExposeHeader&gt;x-amz-server-side-encryption&lt;/ExposeHeader&gt;
+    &lt;ExposeHeader&gt;x-amz-request-id&lt;/ExposeHeader&gt;
+    &lt;ExposeHeader&gt;x-amz-id-2&lt;/ExposeHeader&gt;
+&lt;/CORSRule&gt;
+&lt;/CORSConfiguration&gt;</pre>
         </div>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8="
+            crossorigin="anonymous"></script>
     </body>
+
 </html>

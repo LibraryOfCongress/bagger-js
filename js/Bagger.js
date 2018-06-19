@@ -1,6 +1,6 @@
 /* global filesize, asmCrypto */
 
-import {$} from "./utils.js";
+import { $ } from "./utils.js";
 import BagEntry from "./BagEntry.js";
 import BagInfo from "./BagInfo.js";
 import Dashboard from "./Dashboard.js";
@@ -294,7 +294,9 @@ export default class Bagger {
         let elem = bagEntry.element;
 
         $(".file-name", elem).textContent = bagEntry.path;
-        $(".file-size", elem).textContent = filesize(bagEntry.size, {round: 1});
+        $(".file-size", elem).textContent = filesize(bagEntry.size, {
+            round: 1
+        });
 
         for (let [name, hash] of bagEntry.hashes) {
             let e = $(`.file-hash.${name}`, elem);
@@ -319,7 +321,7 @@ export default class Bagger {
 
         $(".file-size.total", this.bagContents).textContent = filesize(
             totalSize,
-            {round: 1}
+            { round: 1 }
         );
     }
 
@@ -336,7 +338,7 @@ export default class Bagger {
             this.updateBagEntryDisplay(bagEntry);
 
             this.hashPool
-                .hash({fullPath, file})
+                .hash({ fullPath, file })
                 .then(result => {
                     const {
                         fullPath: path,
@@ -496,7 +498,7 @@ export default class Bagger {
             );
         }
 
-        let bagInfo = "Bag-Size: " + filesize(totalBytes, {round: 1});
+        let bagInfo = "Bag-Size: " + filesize(totalBytes, { round: 1 });
         bagInfo += "\nPayload-Oxum: " + totalBytes + "." + totalFiles + "\n";
 
         this.bagInfo.getValues().forEach(([label, value]) => {

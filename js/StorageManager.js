@@ -1,6 +1,6 @@
 /* global AWS */
 
-import {$, $$} from "./utils.js";
+import { $, $$ } from "./utils.js";
 
 export default class StorageManager {
     constructor(elem, serverStatusChangeCallback) {
@@ -54,19 +54,18 @@ export default class StorageManager {
         let newClass = classesForStatus[status] || classesForStatus["untested"];
 
         this.statusButton.className = newClass;
-        $(
-            ".configuration-status-message",
-            this.statusButton
-        ).textContent = message;
+        $(".configuration-status-message", this.statusButton).textContent = message;
 
         this.container.dataset.status = status;
 
+        document.getElementById("server-info-verified").checked =
+            status == "successful";
+
         if (status == "successful") {
-            let summary = $(".configuration-summary", this.container);
-            let bucket = this.config.get("bucket"),
-                keyPrefix = this.config.get("keyPrefix"),
-                region = this.config.get("region");
-            summary.textContent = `✅ ${bucket}${keyPrefix} (${region})`;
+            let url = this.getBaseUrl();
+            let summary = this.container.querySelector(".configuration-summary");
+            summary.href = url;
+            summary.textContent = url;
 
             if (this.serverStatusChangeCallback) {
                 this.serverStatusChangeCallback(status);
@@ -108,23 +107,27 @@ export default class StorageManager {
 
         this.setStatus("testing", "Waiting…");
 
-        s3.getBucketCors(
-            {
-                Bucket: this.config.get("bucket")
-            },
-            (isError, data) => {
-                if (isError) {
-                    var errMessage = "ERROR";
-                    if (data) {
-                        errMessage += " (" + data + ")";
-                    }
-                    this.setStatus("unsuccessful", errMessage);
-                } else {
-                    this.setStatus("successful", "OK");
-                    return true;
-                }
-            }
-        );
+        let errLog = this.container.querySelector(".configuration-status-test-result");
+        errLog.classList.add("hidden");
+        errLog.textContent = "";
+
+        s3.getBucketCors({ Bucket: this.config.get("bucket") })
+            .promise()
+            .then(() => {
+                this.setStatus("successful", "OK");
+            })
+            .catch(err => {
+                this.setStatus("unsuccessful", err.message);
+
+                errLog.classList.remove("hidden");
+
+                errLog.textContent = [
+                    `${err.code}: ${err.message}`,
+                    `Region: ${err.region}`,
+                    `Hostname: ${err.hostname}`,
+                    `Stack: ${err.stack}`
+                ].join("\n");
+            });
     }
 
     ready() {
@@ -198,7 +201,7 @@ export default class StorageManager {
 
         pathPrefix = this.keyFromPath(pathPrefix);
 
-        let params = {Prefix: pathPrefix, MaxKeys: 1000};
+        let params = { Prefix: pathPrefix, MaxKeys: 1000 };
         let s3 = this.getS3Client();
 
         let errHandler = err => {

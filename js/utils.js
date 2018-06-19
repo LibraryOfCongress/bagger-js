@@ -8,4 +8,4 @@ export function $$(selector, scope = document) {
     return scope.querySelectorAll(selector);
 }
 
-export default {$, $$};
+export default { $, $$ };

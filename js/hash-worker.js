@@ -6,7 +6,7 @@ self.importScripts(
 
 const BLOCK_SIZE = 1048576;
 
-self.addEventListener("message", ({data: {file, fullPath}}) => {
+self.addEventListener("message", ({ data: { file, fullPath } }) => {
     const fileSize = file.size;
     const sha256 = new asmCrypto.Sha256();
     const startMilliseconds = performance.now();

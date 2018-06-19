@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8">
         <title>
-            BaggerJS: BagIt uploads to S3 from your browser
+            Bagger-JS: BagIt uploads to S3 from your browser
         </title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w="
             crossorigin="anonymous" />
@@ -26,12 +26,15 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#">BaggerJS</a>
+                    <a class="navbar-brand" href="#">Bagger-JS</a>
                 </div>
                 <div id="navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
                         <li class="active">
                             <a href="#">Send Files</a>
+                        </li>
+                        <li>
+                            <a href="help.html">Help</a>
                         </li>
                     </ul>
                 </div>
@@ -52,14 +55,11 @@
 
         <div id="bagger" class="container">
             <div class="server-info well well-sm clearfix">
+                <input type="checkbox" id="server-info-verified">
                 <h3>
-                    S3 Configuration
-                    <a target="help" href="help.html#s3-cors">
-                        <i class="glyphicon glyphicon-question-sign"></i>
-                    </a>
+                    <label for="server-info-verified">S3 Configuration</label>
                 </h3>
-                <div class="configuration-summary text-center">
-                </div>
+                <a class="configuration-summary"></a>
                 <form class="form-horizontal">
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="accessKeyId">
@@ -115,6 +115,7 @@
                         </div>
                     </div>
                 </form>
+                <output class="configuration-status-test-result"></output>
             </div>
 
             <div class="bag">
