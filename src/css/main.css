@@ -33,16 +33,36 @@ output {
 }
 
 .server-info > * {
-    flex: 1;
+    flex: 1 1 auto;
+    margin: 0 !important;
+}
+
+.server-info h3,
+.server-info h3 label {
     margin: 0;
 }
 
-.server-info form {
-    flex: 1 1 100%;
+.server-info > form {
+    flex-basis: 100%;
+}
+
+.server-info #server-info-verified {
+    flex: 0 1 24px;
+
+    height: 24px;
+    width: 24px;
 }
 
 .server-info .configuration-summary {
     display: none;
+
+    overflow: hidden;
+    max-width: 50%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    font-family: "Droid Sans Mono", monospace;
+    text-align: right;
 }
 
 .configuration-status-test-result {
@@ -53,11 +73,11 @@ output {
 
 /* Once the connection has been validated, hide the form */
 
-.server-info[data-status="successful"] .configuration-summary {
+#server-info-verified:checked ~ .configuration-summary {
     display: block;
 }
 
-.server-info[data-status="successful"] form {
+#server-info-verified:checked ~ form {
     display: none;
 }
 

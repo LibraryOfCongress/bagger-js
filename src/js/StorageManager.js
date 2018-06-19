@@ -54,19 +54,18 @@ export default class StorageManager {
         let newClass = classesForStatus[status] || classesForStatus["untested"];
 
         this.statusButton.className = newClass;
-        $(
-            ".configuration-status-message",
-            this.statusButton
-        ).textContent = message;
+        $(".configuration-status-message", this.statusButton).textContent = message;
 
         this.container.dataset.status = status;
 
+        document.getElementById("server-info-verified").checked =
+            status == "successful";
+
         if (status == "successful") {
-            let summary = $(".configuration-summary", this.container);
-            let bucket = this.config.get("bucket"),
-                keyPrefix = this.config.get("keyPrefix"),
-                region = this.config.get("region");
-            summary.textContent = `✅ ${bucket}${keyPrefix} (${region})`;
+            let url = this.getBaseUrl();
+            let summary = this.container.querySelector(".configuration-summary");
+            summary.href = url;
+            summary.textContent = url;
 
             if (this.serverStatusChangeCallback) {
                 this.serverStatusChangeCallback(status);
@@ -108,9 +107,7 @@ export default class StorageManager {
 
         this.setStatus("testing", "Waiting…");
 
-        let errLog = this.container.querySelector(
-            ".configuration-status-test-result"
-        );
+        let errLog = this.container.querySelector(".configuration-status-test-result");
         errLog.classList.add("hidden");
         errLog.textContent = "";
 
