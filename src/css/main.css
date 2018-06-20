@@ -145,19 +145,26 @@ output {
     max-width: 90vw;
 }
 
+.bag-contents .upload-status,
+.bag-contents .hash-status {
+    width: 2em;
+    text-align: center;
+}
+
 .bag-contents thead th.file-name {
-    width: 50%;
+    width: 100%;
 }
 
 .bag-contents thead th.file-size {
-    width: 10%;
+    width: 8em;
 }
 
 .bag-contents thead th.file-hash {
-    width: 40%;
+    width: 12em;
 }
 
 .bag-contents td {
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 
@@ -165,15 +172,26 @@ output {
 }
 
 .bag-contents th {
-    text-align: right;
+    text-align: center;
 }
 
-.bag-contents th.file-name {
+.bag-contents .file-name {
     text-align: left;
 }
 
-.bag-contents td.file-size {
+.bag-contents .file-size {
     text-align: right;
+}
+
+tr[data-upload-status="successful"] .upload-status:after,
+tr[data-hash-status="successful"] .hash-status:after {
+    content: "✓";
+    color: #999;
+}
+
+tr[data-upload-status="error"] .upload-status:after,
+tr[data-hash-status="error"] .hash-status:after {
+    content: "❌";
 }
 
 /* Dashboard styles */

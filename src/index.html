@@ -267,6 +267,12 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th class="hash-status" title="Hash Status">
+                                    <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+                                </th>
+                                <th class="upload-status" title="Upload Status">
+                                    <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
+                                </th>
                                 <th class="file-name">Filename</th>
                                 <th class="file-size">Size</th>
                                 <th class="file-hash sha256">SHA-256</th>
@@ -275,6 +281,8 @@
                         <tbody>
                             <template>
                                 <tr>
+                                    <td class="hash-status"></td>
+                                    <td class="upload-status"></td>
                                     <td class="file-name"></td>
                                     <td class="file-size"></td>
                                     <td class="file-hash sha256"></td>
@@ -283,6 +291,8 @@
                         </tbody>
                         <tfoot>
                             <tr>
+                                <th class="hash-status total"></th>
+                                <td class="upload-status total"></td>
                                 <th class="file-count total"></th>
                                 <td class="file-size total"></td>
                                 <td></td>

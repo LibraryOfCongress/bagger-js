@@ -89,29 +89,48 @@ export default class Bagger {
     }
 
     dispatch(evt) {
-        let m = evt.type.match(/^(hash|upload)\/(progress|complete)$/);
-        if (m) {
-            let entry = this.bagEntries.get(evt.path);
-            // TODO: refactor the payload vs. tag file upload paths so we don't need to check here:
-            if (entry) {
-                let metric = entry.statistics[m[1]];
+        let m = evt.type.match(/^(hash|upload)\/(progress|complete|failure)$/);
+        if (!m) {
+            console.warn("Unrecognized event:", evt);
+            return;
+        }
+
+        let [, category, subCategory] = m;
+
+        let entry = this.bagEntries.get(evt.path);
+        if (!entry) {
+            // This will happen for the tag files which are uploaded to S3 but
+            // don't have entries in this.bagEntries for obvious reasons:
+            console.warn(`Couldn't match ${evt.path} to a payload entry`);
+            return;
+        }
+
+        // This code is highly similar because the statistics for both hash
+        // and upload bytes/seconds are identical in structure.
+
+        let metric = entry.statistics[category];
+
+        switch (subCategory) {
+            case "progress":
+            case "complete":
                 if (!isFinite(evt.bytes)) {
                     throw "Malformed event: " + evt;
                 }
                 metric.bytes = evt.bytes;
                 metric.seconds = evt.elapsedMilliseconds / 1000;
-            } else {
-                console.warn(`Couldn't match ${evt.path} to a payload entry`);
-            }
 
-            this.finalizeIfReady();
-        } else if (evt.type == "upload/failure") {
-            let entry = this.bagEntries.get(evt.path);
-            if (entry) {
-                // Since object stores don't save partial files we'll zero out the upload statistics:
-                entry.statistics.upload.bytes = 0;
-                entry.statistics.upload.seconds = 0;
-            }
+                if (subCategory == "complete") {
+                    entry.element.dataset[`${category}Status`] = "successful";
+                    this.finalizeIfReady();
+                }
+
+                break;
+            case "failure":
+                metric.bytes = 0;
+                metric.seconds = 0;
+
+                entry.element.dataset[`${category}Status`] = "failure";
+                break;
         }
 
         // We'll use rAF to throttle updates as preferred by the browser:
@@ -302,6 +321,7 @@ export default class Bagger {
             let e = $(`.file-hash.${name}`, elem);
             if (e) {
                 e.textContent = hash;
+                e.title = hash;
             }
         }
     }
