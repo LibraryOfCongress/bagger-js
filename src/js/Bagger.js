@@ -139,6 +139,18 @@ export default class Bagger {
         });
     }
 
+    disableUI() {
+        this.container.querySelectorAll("form,input,button").forEach(i => {
+            if (!i.classList.contains("no-disable")) {
+                i.setAttribute("readonly", "readonly");
+                i.setAttribute("disabled", "disabled");
+            }
+        });
+        this.container.querySelectorAll(".btn:not(.no-disable)").forEach(i => {
+            i.classList.add("disabled");
+        });
+    }
+
     updateDisplay() {
         this.container.dataset.entries = this.bagEntries.size;
         this.container.dataset.pendingHashes = this.getPendingHashCount();
@@ -558,13 +570,7 @@ export default class Bagger {
 
         Promise.all(uploadPromises).then(() => {
             this.container.classList.add("finalized");
-            this.container.querySelectorAll("form,input,button").forEach(i => {
-                i.setAttribute("readonly", "readonly");
-                i.setAttribute("disabled", "disabled");
-            });
-            this.container.querySelectorAll(".btn").forEach(i => {
-                i.classList.add("disabled");
-            });
+            this.disableUI();
         });
     }
 

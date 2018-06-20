@@ -194,6 +194,26 @@ tr[data-hash-status="error"] .hash-status:after {
     content: "❌";
 }
 
+label[for="hide-completed-files"] {
+    margin: auto;
+    display: block;
+    width: 14em;
+}
+
+#hide-completed-files:checked
+    ~ .bag-contents-table
+    tr[data-upload-status="successful"][data-hash-status="successful"] {
+    display: none;
+}
+
+#hide-completed-files ~ label[for="hide-completed-files"]:before {
+    content: "Hide ";
+}
+
+#hide-completed-files:checked ~ label[for="hide-completed-files"]:before {
+    content: "Show ";
+}
+
 /* Dashboard styles */
 
 #bagger[data-active-hashes="0"][data-pending-uploads="0"] .dashboard {
