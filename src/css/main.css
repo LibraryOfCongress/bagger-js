@@ -142,7 +142,7 @@ output {
 
 .bag-contents .upload-status,
 .bag-contents .hash-status {
-    width: 2em;
+    width: 3em;
     text-align: center;
 }
 
@@ -183,9 +183,19 @@ tr[data-hash-status="successful"] .hash-status::after {
     color: #999;
 }
 
-tr[data-upload-status="error"] .upload-status::after,
-tr[data-hash-status="error"] .hash-status::after {
+tr[data-upload-status="failure"] .upload-status::after,
+tr[data-hash-status="failure"] .hash-status::after {
     content: "❌";
+}
+
+tr[data-upload-status="failure"] .upload-status:hover::after,
+tr[data-hash-status="failure"] .hash-status:hover::after {
+    content: "🔄";
+}
+
+tr[data-upload-status="failure"] .upload-status,
+tr[data-hash-status="failure"] .hash-status {
+    cursor: pointer;
 }
 
 label[for="hide-completed-files"] {

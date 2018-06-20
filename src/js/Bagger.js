@@ -28,6 +28,13 @@ export default class Bagger {
             evt.target.classList.toggle("active", isActive);
             if (isActive) {
                 this.uploadQueue.start();
+                // Scan for failed uploads and automatically retry them:
+                document
+                    .querySelectorAll('[data-upload-status="failure"]')
+                    .forEach(i => {
+                        let entry = this.bagEntries.get(i.id);
+                        this.uploadQueue.add(entry.path, entry.file);
+                    });
             } else {
                 this.uploadQueue.stop();
             }
@@ -74,6 +81,18 @@ export default class Bagger {
 
         this.bagContents = $(".bag-contents", elem);
         this.bagEntryTemplate = $("template", this.bagContents);
+
+        this.bagContents.addEventListener("click", evt => {
+            if (evt.target.classList.contains("upload-status")) {
+                let parentRow = evt.target.closest("tr");
+                let entry = this.bagEntries.get(parentRow.id);
+                if (entry) {
+                    // Intentionally jump the queue so the user gets immediate feedback:
+                    this.uploadPayloadFile(entry.path, entry.file);
+                    parentRow.dataset.uploadStatus = "";
+                }
+            }
+        });
 
         $("#bagName").addEventListener(
             "input",
