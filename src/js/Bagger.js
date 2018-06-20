@@ -83,14 +83,32 @@ export default class Bagger {
         this.bagEntryTemplate = $("template", this.bagContents);
 
         this.bagContents.addEventListener("click", evt => {
-            if (evt.target.classList.contains("upload-status")) {
-                let parentRow = evt.target.closest("tr");
-                let entry = this.bagEntries.get(parentRow.id);
-                if (entry) {
-                    // Intentionally jump the queue so the user gets immediate feedback:
-                    this.uploadPayloadFile(entry.path, entry.file);
-                    parentRow.dataset.uploadStatus = "";
-                }
+            let target = evt.target;
+            let parentRow = evt.target.closest("tr");
+            if (!parentRow) {
+                return;
+            }
+
+            let entry = this.bagEntries.get(parentRow.id);
+            if (!entry) return;
+
+            if (target.classList.contains("upload-status")) {
+                // Intentionally jump the queue so the user gets immediate feedback:
+                this.uploadPayloadFile(entry.path, entry.file);
+                parentRow.dataset.uploadStatus = "";
+                return false;
+            } else if (target.classList.contains("remove-entry")) {
+                entry.element.classList.add("removing");
+                this.deleteFile(`data/${entry.path}`)
+                    .then(() => {
+                        entry.element.remove();
+                        this.uploadQueue.delete(parentRow.id);
+                        this.bagEntries.delete(parentRow.id);
+                    })
+                    .catch(err => {
+                        alert(`Error deleting ${evt.path}: ${err}`);
+                    });
+                return false;
             }
         });
 
@@ -420,6 +438,12 @@ export default class Bagger {
         }
 
         this.updateBagContentsDisplay();
+    }
+
+    deleteFile(path) {
+        let bagName = this.getBagName();
+
+        return this.storage.deleteObject(`${bagName}/${path}`);
     }
 
     uploadFile(path, body, size, type, progressCallback) {

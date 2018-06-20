@@ -21,6 +21,14 @@ export default class UploadQueue {
         this.run();
     }
 
+    delete(path) {
+        this.queue.forEach((elem, idx) => {
+            if (elem[0] == path) {
+                this.queue.splice(idx, 1);
+            }
+        });
+    }
+
     run() {
         if (
             !this.active ||

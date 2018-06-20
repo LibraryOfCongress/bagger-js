@@ -155,12 +155,22 @@ export default class StorageManager {
         return key;
     }
 
-    getObject(key) {
+    getObject(path) {
         this.ensureConfig();
 
         return this.getS3Client()
             .getObject({
-                Key: this.keyFromPath(key)
+                Key: this.keyFromPath(path)
+            })
+            .promise();
+    }
+
+    deleteObject(path) {
+        this.ensureConfig();
+
+        return this.getS3Client()
+            .deleteObject({
+                Key: this.keyFromPath(path)
             })
             .promise();
     }

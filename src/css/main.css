@@ -141,7 +141,8 @@ output {
 }
 
 .bag-contents .upload-status,
-.bag-contents .hash-status {
+.bag-contents .hash-status,
+.bag-contents .remove-entry {
     width: 3em;
     text-align: center;
 }
@@ -175,6 +176,14 @@ output {
 
 .bag-contents .file-size {
     text-align: right;
+}
+
+.bag-contents .removing {
+    text-decoration: line-through;
+}
+
+.bag-contents tbody .remove-entry:hover::after {
+    content: "♻️";
 }
 
 tr[data-upload-status="successful"] .upload-status::after,
