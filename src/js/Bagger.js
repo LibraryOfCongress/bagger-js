@@ -546,7 +546,7 @@ export default class Bagger {
     }
 
     sha256(inputString) {
-        let inputBytes = asmCrypto.string_to_bytes(inputString);
+        let inputBytes = new TextEncoder().encode(inputString);
         let sha256 = new asmCrypto.Sha256();
         sha256.process(inputBytes);
         return asmCrypto.bytes_to_hex(sha256.finish().result);
