@@ -48,19 +48,16 @@ output {
 
 .server-info #server-info-verified {
     flex: 0 1 24px;
-
     height: 24px;
     width: 24px;
 }
 
 .server-info .configuration-summary {
     display: none;
-
     overflow: hidden;
     max-width: 50%;
     white-space: nowrap;
     text-overflow: ellipsis;
-
     font-family: "Droid Sans Mono", monospace;
     text-align: right;
 }
@@ -99,7 +96,6 @@ output {
 
 .dropzone {
     margin: 0;
-
     border: dashed #ccc 4px;
 }
 
@@ -114,7 +110,6 @@ output {
 .transfer-management {
     display: flex;
     justify-content: space-evenly;
-
     margin: 1em;
 }
 
@@ -167,7 +162,6 @@ output {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
     font-family: "Droid Sans Mono", monospace;
 }
 
@@ -183,14 +177,14 @@ output {
     text-align: right;
 }
 
-tr[data-upload-status="successful"] .upload-status:after,
-tr[data-hash-status="successful"] .hash-status:after {
+tr[data-upload-status="successful"] .upload-status::after,
+tr[data-hash-status="successful"] .hash-status::after {
     content: "✓";
     color: #999;
 }
 
-tr[data-upload-status="error"] .upload-status:after,
-tr[data-hash-status="error"] .hash-status:after {
+tr[data-upload-status="error"] .upload-status::after,
+tr[data-hash-status="error"] .hash-status::after {
     content: "❌";
 }
 
@@ -206,11 +200,11 @@ label[for="hide-completed-files"] {
     display: none;
 }
 
-#hide-completed-files ~ label[for="hide-completed-files"]:before {
+#hide-completed-files ~ label[for="hide-completed-files"]::before {
     content: "Hide ";
 }
 
-#hide-completed-files:checked ~ label[for="hide-completed-files"]:before {
+#hide-completed-files:checked ~ label[for="hide-completed-files"]::before {
     content: "Show ";
 }
 
@@ -225,12 +219,9 @@ label[for="hide-completed-files"] {
     bottom: 0;
     left: 0;
     right: 0;
-
     margin: 0;
     padding: 0;
-
     min-height: 3.6em;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
