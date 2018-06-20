@@ -8,7 +8,7 @@ rules:
     indent:
         # https://eslint.org/docs/4.0.0/rules/indent
         # Match defaults & Crockford but enable indentation for switch statement cases:
-        - 2
+        - error
         - 4
         - SwitchCase: 1
 env:
