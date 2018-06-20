@@ -118,8 +118,6 @@ export default class Bagger {
 
         let entry = this.bagEntries.get(evt.path);
         if (!entry) {
-            // This will happen for the tag files which are uploaded to S3 but
-            // don't have entries in this.bagEntries for obvious reasons:
             console.warn(`Couldn't match ${evt.path} to a payload entry`);
             return;
         }
