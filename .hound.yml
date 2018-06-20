@@ -1,6 +1,8 @@
 eslint:
     enabled: true
     config_file: .eslintrc.yaml
+scss:
+    enabled: false
 stylelint:
-    enabled: true
+    enabled: false
     config_file: .stylelintrc.yaml
