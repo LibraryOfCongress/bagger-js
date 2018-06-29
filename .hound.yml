@@ -4,5 +4,5 @@ eslint:
 scss:
     enabled: false
 stylelint:
-    enabled: false
+    enabled: true
     config_file: .stylelintrc.yaml
