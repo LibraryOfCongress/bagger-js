@@ -55,7 +55,7 @@ export default class Bagger {
         });
 
         this.hashPool = new WorkerPool(
-            "js/hash-worker.js",
+            "js/webworkers/sha256/webworker.js",
             4,
             // Hash result callback:
             evt => {
