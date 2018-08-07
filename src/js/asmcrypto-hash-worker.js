@@ -33,13 +33,15 @@ self.addEventListener("message", ({ data: { file, fullPath } }) => {
 
     let hashResult = asmCrypto.bytes_to_hex(sha256.finish().result);
 
+    let elapsedMilliseconds = performance.now() - startMilliseconds;
+
     // This is a sanity check against
     if (
         file.size > 0 &&
         hashResult ==
             "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     ) {
-        throw `ASMCrypto hashed ${file.size} bytes as an empty result!`;
+        throw `Hashed ${file.size} bytes as an empty result!`;
     }
 
     postMessage({
@@ -47,6 +49,6 @@ self.addEventListener("message", ({ data: { file, fullPath } }) => {
         fullPath,
         sha256: hashResult,
         bytesHashed: fileSize,
-        elapsedMilliseconds: performance.now() - startMilliseconds
+        elapsedMilliseconds: elapsedMilliseconds
     });
 });
