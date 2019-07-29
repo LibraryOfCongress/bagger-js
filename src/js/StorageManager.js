@@ -54,7 +54,10 @@ export default class StorageManager {
         let newClass = classesForStatus[status] || classesForStatus["untested"];
 
         this.statusButton.className = newClass;
-        $(".configuration-status-message", this.statusButton).textContent = message;
+        $(
+            ".configuration-status-message",
+            this.statusButton
+        ).textContent = message;
 
         this.container.dataset.status = status;
 
@@ -63,7 +66,9 @@ export default class StorageManager {
 
         if (status == "successful") {
             let url = this.getBaseUrl();
-            let summary = this.container.querySelector(".configuration-summary");
+            let summary = this.container.querySelector(
+                ".configuration-summary"
+            );
             summary.href = url;
             summary.textContent = url;
 
@@ -107,7 +112,9 @@ export default class StorageManager {
 
         this.setStatus("testing", "Waiting…");
 
-        let errLog = this.container.querySelector(".configuration-status-test-result");
+        let errLog = this.container.querySelector(
+            ".configuration-status-test-result"
+        );
         errLog.classList.add("hidden");
         errLog.textContent = "";
 

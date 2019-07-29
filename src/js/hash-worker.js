@@ -1,4 +1,5 @@
-/* global self, postMessage, FileReaderSync, asmCrypto */
+/* eslint-env worker */
+/* global asmCrypto */
 
 self.importScripts(
     "https://cdnjs.cloudflare.com/ajax/libs/asmCrypto/2.0.1/asmcrypto.all.es5.min.js"

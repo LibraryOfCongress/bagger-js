@@ -1,7 +1,6 @@
 extends:
- - stylelint-config-standard
- - stylelint-config-prettier
-
+    - stylelint-config-recommended
+    - stylelint-config-prettier
 rules:
     # Until https://github.com/stylelint/stylelint/issues/2489 and
     # https://github.com/stylelint/stylelint/issues/3196 are resolved

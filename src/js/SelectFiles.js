@@ -175,9 +175,9 @@ class SelectFiles {
 
     processFileInfoList(fileList) {
         /*
-        * Convert a FileList into a map of fullpath to file which is passed to
-        * this.onFilesSelected so all downstream callers can reliably get the full path
-        */
+         * Convert a FileList into a map of fullpath to file which is passed to
+         * this.onFilesSelected so all downstream callers can reliably get the full path
+         */
         let files = new Map();
         for (let i = 0; i < fileList.length; i++) {
             let fileInfo = fileList[i];
