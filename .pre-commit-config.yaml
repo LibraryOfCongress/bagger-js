@@ -1,10 +1,11 @@
 exclude: ".*/vendor/.*"
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v2.2.3
+      rev: v2.3.0
       hooks:
           - id: check-added-large-files
             args: ["--maxkb=128"]
+            exclude: "npm-shrinkwrap.json"
           - id: check-ast
           - id: check-byte-order-marker
           - id: check-case-conflict
@@ -31,7 +32,7 @@ repos:
           - id: prettier
             files: \.(css|less|scss|ts|tsx|graphql|gql|js|jsx|md)$
     - repo: https://github.com/pre-commit/mirrors-eslint
-      rev: v6.1.0
+      rev: v6.3.0
       hooks:
           - id: eslint
             additional_dependencies:
