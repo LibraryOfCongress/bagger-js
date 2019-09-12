@@ -274,6 +274,7 @@ label[for="hide-completed-files"] {
 .dashboard output {
     font-size: inherit;
     font-weight: 600;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Finalized bags allow some information to be visible but read-only */
