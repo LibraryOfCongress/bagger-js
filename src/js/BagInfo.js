@@ -19,14 +19,14 @@ export default class BagInfo {
 
         container
             .querySelector(".add-element .dropdown-menu")
-            .addEventListener("click", evt => {
+            .addEventListener("click", (evt) => {
                 if ("label" in evt.target.dataset) {
                     this.addElement(evt.target.dataset.label);
                     return false;
                 }
             });
 
-        this.elementBody.addEventListener("click", evt => {
+        this.elementBody.addEventListener("click", (evt) => {
             if (evt.target.classList.contains("delete-row")) {
                 evt.target.parentNode.parentNode.remove();
             }
@@ -51,7 +51,7 @@ export default class BagInfo {
     getValues() {
         // This is not a Map because bag-info.txt allows multiple values for the same label and we must preserve ordering:
         let info = [];
-        this.container.querySelectorAll("tbody tr").forEach(row => {
+        this.container.querySelectorAll("tbody tr").forEach((row) => {
             let labelInput = row.querySelector(
                 "input.bag-info-label:not(:invalid)"
             );

@@ -17,7 +17,7 @@ export default class StorageManager {
             this.getStateFromDOM();
         });
 
-        form.addEventListener("submit", evt => {
+        form.addEventListener("submit", (evt) => {
             evt.preventDefault();
             this.testConfiguration();
             return false;
@@ -28,14 +28,14 @@ export default class StorageManager {
     }
 
     getStateFromDOM() {
-        $$("input", this.container).forEach(elem => {
+        $$("input", this.container).forEach((elem) => {
             this.config.set(elem.id, elem.value);
         });
 
         AWS.config.update({
             accessKeyId: this.config.get("accessKeyId"),
             secretAccessKey: this.config.get("secretAccessKey"),
-            region: this.config.get("region")
+            region: this.config.get("region"),
         });
 
         delete this.s3;
@@ -48,7 +48,7 @@ export default class StorageManager {
             untested: "btn btn-default",
             testing: "btn btn-info",
             unsuccessful: "btn btn-danger",
-            successful: "btn btn-success"
+            successful: "btn btn-success",
         };
 
         let newClass = classesForStatus[status] || classesForStatus["untested"];
@@ -95,8 +95,8 @@ export default class StorageManager {
             this.s3 = new AWS.S3({
                 signatureVersion: "v4",
                 params: {
-                    Bucket: this.config.get("bucket")
-                }
+                    Bucket: this.config.get("bucket"),
+                },
             });
         }
         return this.s3;
@@ -123,7 +123,7 @@ export default class StorageManager {
             .then(() => {
                 this.setStatus("successful", "OK");
             })
-            .catch(err => {
+            .catch((err) => {
                 this.setStatus("unsuccessful", err.message);
 
                 errLog.classList.remove("hidden");
@@ -132,7 +132,7 @@ export default class StorageManager {
                     `${err.code}: ${err.message}`,
                     `Region: ${err.region}`,
                     `Hostname: ${err.hostname}`,
-                    `Stack: ${err.stack}`
+                    `Stack: ${err.stack}`,
                 ].join("\n");
             });
     }
@@ -167,7 +167,7 @@ export default class StorageManager {
 
         return this.getS3Client()
             .getObject({
-                Key: this.keyFromPath(path)
+                Key: this.keyFromPath(path),
             })
             .promise();
     }
@@ -177,7 +177,7 @@ export default class StorageManager {
 
         return this.getS3Client()
             .deleteObject({
-                Key: this.keyFromPath(path)
+                Key: this.keyFromPath(path),
             })
             .promise();
     }
@@ -198,8 +198,8 @@ export default class StorageManager {
                 Key: key,
                 Body: body,
                 ContentType: type,
-                computeChecksums: true
-            }
+                computeChecksums: true,
+            },
         });
 
         if (progressCallback) {
@@ -221,24 +221,21 @@ export default class StorageManager {
         let params = { Prefix: pathPrefix, MaxKeys: 1000 };
         let s3 = this.getS3Client();
 
-        let errHandler = err => {
+        let errHandler = (err) => {
             console.error("listObjectsWithPrefix", pathPrefix, err);
         };
 
-        let listObjectsV2 = params => {
-            return s3
-                .listObjectsV2(params)
-                .promise()
-                .catch(errHandler);
+        let listObjectsV2 = (params) => {
+            return s3.listObjectsV2(params).promise().catch(errHandler);
         };
 
-        let wrappedCallback = resp => {
+        let wrappedCallback = (resp) => {
             payloadCallback(resp.Contents);
 
             if (resp.IsTruncated) {
                 listObjectsV2({
                     ...params,
-                    ContinuationToken: resp.NextContinuationToken
+                    ContinuationToken: resp.NextContinuationToken,
                 }).then(wrappedCallback);
             } else {
                 completionCallback();
@@ -271,10 +268,10 @@ export default class StorageManager {
 
         this.listObjectsWithPrefix(
             pathPrefix,
-            objects => {
-                let objectsToDelete = objects.map(i => {
+            (objects) => {
+                let objectsToDelete = objects.map((i) => {
                     return {
-                        Key: i.Key
+                        Key: i.Key,
                     };
                 });
 
@@ -285,18 +282,18 @@ export default class StorageManager {
 
                 s3.deleteObjects({
                     Delete: {
-                        Objects: objectsToDelete
-                    }
+                        Objects: objectsToDelete,
+                    },
                 })
                     .promise()
-                    .catch(err => {
+                    .catch((err) => {
                         console.error(
                             "deleteObjectsWithPrefix",
                             pathPrefix,
                             err
                         );
                     })
-                    .then(data => {
+                    .then((data) => {
                         if ("Errors" in data && data.Errors.length > 0) {
                             console.error(
                                 `Error while deleting prefix ${pathPrefix}:`,

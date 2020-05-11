@@ -28,7 +28,7 @@ self.addEventListener("message", ({ data: { file, fullPath } }) => {
             type: "PROGRESS_UPDATE",
             fullPath,
             bytesHashed: end,
-            elapsedMilliseconds: performance.now() - startMilliseconds
+            elapsedMilliseconds: performance.now() - startMilliseconds,
         });
     }
 
@@ -48,6 +48,6 @@ self.addEventListener("message", ({ data: { file, fullPath } }) => {
         fullPath,
         sha256: hashResult,
         bytesHashed: fileSize,
-        elapsedMilliseconds: performance.now() - startMilliseconds
+        elapsedMilliseconds: performance.now() - startMilliseconds,
     });
 });

@@ -9,7 +9,7 @@ export default class BagEntry {
 
         this.statistics = {
             hash: { bytes: 0, seconds: 0.0 },
-            upload: { bytes: 0, seconds: 0.0 }
+            upload: { bytes: 0, seconds: 0.0 },
         };
     }
 }

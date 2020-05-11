@@ -23,7 +23,7 @@ export default class Bagger {
         );
 
         this.uploadQueueControl = elem.querySelector("#upload-queue-active");
-        this.uploadQueueControl.addEventListener("change", evt => {
+        this.uploadQueueControl.addEventListener("change", (evt) => {
             let isActive = evt.target.checked;
             evt.target.classList.toggle("active", isActive);
             if (isActive) {
@@ -31,7 +31,7 @@ export default class Bagger {
                 // Scan for failed uploads and automatically retry them:
                 document
                     .querySelectorAll('[data-upload-status="failure"]')
-                    .forEach(i => {
+                    .forEach((i) => {
                         let entry = this.bagEntries.get(i.id);
                         this.uploadQueue.add(entry.path, entry.file);
                     });
@@ -44,13 +44,13 @@ export default class Bagger {
 
         this.dashboard = new Dashboard($(".dashboard", elem));
 
-        this.storage = new StorageManager($(".server-info", elem), status => {
+        this.storage = new StorageManager($(".server-info", elem), (status) => {
             if (status == "successful") {
                 this.validateBagName();
             }
         });
 
-        this.fileSelector = new SelectFiles($(".dropzone", elem), files => {
+        this.fileSelector = new SelectFiles($(".dropzone", elem), (files) => {
             return this.addSelectedFiles(files);
         });
 
@@ -58,16 +58,16 @@ export default class Bagger {
             "js/hash-worker.js",
             4,
             // Hash result callback:
-            evt => {
+            (evt) => {
                 this.dispatch({
                     type: "hash/progress",
                     path: evt.fullPath,
                     bytes: evt.bytesHashed,
-                    elapsedMilliseconds: evt.elapsedMilliseconds
+                    elapsedMilliseconds: evt.elapsedMilliseconds,
                 });
             },
             // Worker Pool stats callback:
-            stats => {
+            (stats) => {
                 this.container.dataset.activeHashes = stats.activeHashers;
             }
         );
@@ -82,7 +82,7 @@ export default class Bagger {
         this.bagContents = $(".bag-contents", elem);
         this.bagEntryTemplate = $("template", this.bagContents);
 
-        this.bagContents.addEventListener("click", evt => {
+        this.bagContents.addEventListener("click", (evt) => {
             let target = evt.target;
             let parentRow = evt.target.closest("tr");
             if (!parentRow) {
@@ -105,7 +105,7 @@ export default class Bagger {
                         this.uploadQueue.delete(parentRow.id);
                         this.bagEntries.delete(parentRow.id);
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         alert(`Error deleting ${evt.path}: ${err}`);
                     });
                 return false;
@@ -175,15 +175,17 @@ export default class Bagger {
     }
 
     disableUI() {
-        this.container.querySelectorAll("form,input,button").forEach(i => {
+        this.container.querySelectorAll("form,input,button").forEach((i) => {
             if (!i.classList.contains("no-disable")) {
                 i.setAttribute("readonly", "readonly");
                 i.setAttribute("disabled", "disabled");
             }
         });
-        this.container.querySelectorAll(".btn:not(.no-disable)").forEach(i => {
-            i.classList.add("disabled");
-        });
+        this.container
+            .querySelectorAll(".btn:not(.no-disable)")
+            .forEach((i) => {
+                i.classList.add("disabled");
+            });
     }
 
     updateDisplay() {
@@ -255,7 +257,7 @@ export default class Bagger {
             hashSeconds,
             uploadedFiles,
             uploadedBytes,
-            uploadSeconds
+            uploadSeconds,
         });
     }
 
@@ -302,7 +304,7 @@ export default class Bagger {
 
         this.storage
             .getObject(`${bagName}/bagit.txt`)
-            .catch(err => {
+            .catch((err) => {
                 // We expect a 404 but probably want to let the user know if we
                 // get some other error which could indicate a problem with
                 // their network configuration
@@ -312,7 +314,7 @@ export default class Bagger {
                     );
                 }
             })
-            .then(response => {
+            .then((response) => {
                 if (!response) {
                     // No object by that name:
                     this.setInvalidBagName(false);
@@ -361,7 +363,7 @@ export default class Bagger {
 
         $(".file-name", elem).textContent = bagEntry.path;
         $(".file-size", elem).textContent = filesize(bagEntry.size, {
-            round: 1
+            round: 1,
         });
 
         for (let [name, hash] of bagEntry.hashes) {
@@ -386,10 +388,10 @@ export default class Bagger {
 
         $(".file-count.total", this.bagContents).textContent = formattedCount;
 
-        $(".file-size.total", this.bagContents).textContent = filesize(
-            totalSize,
-            { round: 1 }
-        );
+        $(
+            ".file-size.total",
+            this.bagContents
+        ).textContent = filesize(totalSize, { round: 1 });
     }
 
     addSelectedFiles(files) {
@@ -406,12 +408,12 @@ export default class Bagger {
 
             this.hashPool
                 .hash({ fullPath, file })
-                .then(result => {
+                .then((result) => {
                     const {
                         fullPath: path,
                         sha256: hash,
                         bytesHashed,
-                        elapsedMilliseconds
+                        elapsedMilliseconds,
                     } = result;
 
                     bagEntry.hashes.set("sha256", hash);
@@ -420,16 +422,16 @@ export default class Bagger {
                         type: "hash/complete",
                         path,
                         bytes: bytesHashed,
-                        elapsedMilliseconds
+                        elapsedMilliseconds,
                     });
 
                     this.updateBagEntryDisplay(bagEntry);
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     this.dispatch({
                         type: "hash/failure",
                         path: fullPath,
-                        message: error
+                        message: error,
                     });
                     throw error;
                 });
@@ -478,17 +480,17 @@ export default class Bagger {
             type: "upload/progress",
             path: payloadPath,
             bytes: 0,
-            elapsedMilliseconds: 0
+            elapsedMilliseconds: 0,
         });
 
         let uploadStartTime = performance.now();
 
-        let progressCallback = progressEvent => {
+        let progressCallback = (progressEvent) => {
             this.dispatch({
                 type: "upload/progress",
                 path: payloadPath,
                 bytes: progressEvent.loaded,
-                elapsedMilliseconds: performance.now() - uploadStartTime
+                elapsedMilliseconds: performance.now() - uploadStartTime,
             });
         };
 
@@ -504,16 +506,16 @@ export default class Bagger {
                     type: "upload/complete",
                     path: payloadPath,
                     elapsedMilliseconds: performance.now() - uploadStartTime,
-                    bytes: file.size
+                    bytes: file.size,
                 });
             })
 
-            .catch(err => {
+            .catch((err) => {
                 this.dispatch({
                     type: "upload/failure",
                     path: payloadPath,
                     elapsedMilliseconds: performance.now() - uploadStartTime,
-                    message: err
+                    message: err,
                 });
             });
     }

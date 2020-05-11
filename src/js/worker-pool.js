@@ -9,7 +9,7 @@ export default class WorkerPool {
         var pool = this;
         for (var i = 0; i < n; i++) {
             let w = new Worker(url);
-            w.addEventListener("message", evt => {
+            w.addEventListener("message", (evt) => {
                 switch (evt.data.type) {
                     case "PROGRESS_UPDATE":
                         progressUpdate(evt.data);
@@ -24,7 +24,7 @@ export default class WorkerPool {
                         this.dispatch();
                 }
             });
-            w.addEventListener("error", error => {
+            w.addEventListener("error", (error) => {
                 // These events have very limited information by design and are
                 // thus minimally useful for debugging so we'll make sure our
                 // error message at least includes some context:
@@ -41,7 +41,7 @@ export default class WorkerPool {
 
     dispatch() {
         const idleWorkers = new Set(
-            [...this.workers].filter(w => !this.activeWorkers.has(w))
+            [...this.workers].filter((w) => !this.activeWorkers.has(w))
         );
         for (var w of idleWorkers) {
             var message = this.messages.shift();
@@ -54,12 +54,12 @@ export default class WorkerPool {
         }
         this.hasherStatsUpdate({
             activeHashers: this.activeWorkers.size,
-            totalHashers: this.n
+            totalHashers: this.n,
         });
     }
 
     hash(message) {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             this.callbacks.set(message.fullPath, function cb(evt) {
                 resolve(evt);
             });

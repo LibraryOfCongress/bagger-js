@@ -42,13 +42,15 @@ class Dashboard {
 
         // NOTE: humanizeDuration takes times in *milliseconds*
 
-        $(".hash .remaining", this.container).textContent = humanizeDuration(
-            hashRemaining * 1000,
-            { round: true }
-        );
+        $(
+            ".hash .remaining",
+            this.container
+        ).textContent = humanizeDuration(hashRemaining * 1000, { round: true });
         $(".upload .remaining", this.container).textContent = humanizeDuration(
             uploadRemaining * 1000,
-            { round: true }
+            {
+                round: true,
+            }
         );
     }
 }

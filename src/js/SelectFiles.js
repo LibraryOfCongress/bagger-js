@@ -28,7 +28,7 @@ class SelectFiles {
 
         dropzone.querySelector("form").addEventListener(
             "submit",
-            evt => {
+            (evt) => {
                 evt.stopPropagation();
                 evt.preventDefault();
                 this.processFileList(fileInput.files);
@@ -39,7 +39,7 @@ class SelectFiles {
 
         fileInput.addEventListener(
             "change",
-            evt => {
+            (evt) => {
                 evt.preventDefault();
                 this.processFileList(evt.target.files);
                 return false;
@@ -49,7 +49,7 @@ class SelectFiles {
 
         dropzone.addEventListener(
             "drop",
-            evt => {
+            (evt) => {
                 evt.stopPropagation();
                 evt.preventDefault();
                 this.processDataTransferEvent(evt);
@@ -59,7 +59,7 @@ class SelectFiles {
 
         dropzone.addEventListener(
             "dragover",
-            function(evt) {
+            function (evt) {
                 evt.stopPropagation();
                 evt.preventDefault();
                 evt.dataTransfer.dropEffect = "copy";
@@ -70,7 +70,7 @@ class SelectFiles {
 
         dropzone.addEventListener(
             "dragleave",
-            function() {
+            function () {
                 dropzone.classList.remove("active");
             },
             false
@@ -78,7 +78,7 @@ class SelectFiles {
 
         dropzone.addEventListener(
             "dragend",
-            function() {
+            function () {
                 dropzone.classList.remove("active");
             },
             false
@@ -111,7 +111,7 @@ class SelectFiles {
         basePath = basePath || "";
 
         if (entry.isFile) {
-            entry.file(file => {
+            entry.file((file) => {
                 let fullPath;
                 if (basePath) {
                     fullPath = basePath + "/" + file.name;
@@ -124,8 +124,8 @@ class SelectFiles {
         } else if (entry.isDirectory) {
             let dirReader = entry.createReader();
 
-            dirReader.readEntries(entries => {
-                entries.forEach(subEntry => {
+            dirReader.readEntries((entries) => {
+                entries.forEach((subEntry) => {
                     let fullPath;
                     if (basePath) {
                         fullPath = basePath + "/" + entry.name;
