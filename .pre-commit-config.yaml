@@ -1,7 +1,7 @@
 exclude: ".*/vendor/.*"
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v2.5.0
+      rev: v3.3.0
       hooks:
           - id: check-added-large-files
             args: ["--maxkb=128"]
@@ -27,12 +27,12 @@ repos:
             args: ["--autofix", "--no-sort-keys", "--indent=4"]
           - id: trailing-whitespace
     - repo: https://github.com/prettier/prettier
-      rev: 2.0.5
+      rev: 2.1.2
       hooks:
           - id: prettier
             files: \.(css|less|scss|ts|tsx|graphql|gql|js|jsx|md)$
     - repo: https://github.com/pre-commit/mirrors-eslint
-      rev: v7.0.0
+      rev: v7.13.0-1
       hooks:
           - id: eslint
             additional_dependencies:
